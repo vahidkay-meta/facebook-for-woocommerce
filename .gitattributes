@@ -1,4 +1,4 @@
-.dist.env
+.dist.env export-ignore
 .gitattributes export-ignore
 .gitmodules export-ignore
 .gitignore export-ignore
@@ -36,3 +36,7 @@ wordpress_org_assets export-ignore
 .nvmrc export-ignore
 storybook export-ignore
 .jsdocrc.json export-ignore
+.npmrc export-ignore
+.vscode export-ignore
+data/.gitkeep export-ignore
+.wp-env.json export-ignore
