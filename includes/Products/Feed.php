@@ -129,7 +129,7 @@ class Feed {
 	/**
 	 * Regenerates the product feed.
 	 *
-	 * @internal
+	 * @public
 	 *
 	 * @since 1.11.0
 	 * @since 2.6.6 Enable new feed generation code if requested.
@@ -148,7 +148,7 @@ class Feed {
 	/**
 	 * Schedules the recurring feed generation.
 	 *
-	 * @internal
+	 * @public
 	 *
 	 * @since 1.11.0
 	 */
