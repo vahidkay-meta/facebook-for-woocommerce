@@ -60,7 +60,7 @@ function hasExcludedCategories( selectedCategories, excludedCategoryIDs ) {
 	let counter = 0;
 
 	for ( let i = 0; i < excludedCategoryIDs.length; i++ ) {
-		if ( selectedCategories.includes( excludedCategoryIDs[i] ) ) counter++;
+		if ( excludedCategoryIDs.includes( excludedCategoryIDs[i] ) ) counter++;
 	}
 
 	return counter > 0;
