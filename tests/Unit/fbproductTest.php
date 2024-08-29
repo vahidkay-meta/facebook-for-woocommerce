@@ -103,4 +103,33 @@ class fbproductTest extends WP_UnitTestCase {
 		$this->assertEquals( $description, 'fb description' );
 
 	}
+
+	/**
+	 * Test quantity_to_sell_on_facebook is populated when manage stock is enabled
+	 * @return void
+	 */
+	public function test_quantity_to_sell_on_facebook_when_manage_stock_is_on() {
+		$product = WC_Helper_Product::create_simple_product();
+		$product->set_manage_stock('yes');
+		$product->set_stock_quantity(128);
+
+		$facebook_product = new \WC_Facebook_Product( $product );
+		$data = $facebook_product->prepare_product();
+
+		$this->assertEquals( $data['quantity_to_sell_on_facebook'], 128 );
+	}
+
+	/**
+	 * Test quantity_to_sell_on_facebook is not populated when manage stock is disabled
+	 * @return void
+	 */
+	public function test_quantity_to_sell_on_facebook_when_manage_stock_is_off() {
+		$product = WC_Helper_Product::create_simple_product();
+		$product->set_manage_stock('no');
+
+		$facebook_product = new \WC_Facebook_Product( $product );
+		$data = $facebook_product->prepare_product();
+
+		$this->assertEquals(isset($data['quantity_to_sell_on_facebook']), false);
+	}
 }
