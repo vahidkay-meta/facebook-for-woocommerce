@@ -11,7 +11,6 @@
 namespace WooCommerce\Facebook\Admin;
 
 use Automattic\WooCommerce\Admin\Features\Features as WooAdminFeatures;
-use Automattic\WooCommerce\Admin\Features\Navigation\Menu as WooAdminMenu;
 use WooCommerce\Facebook\Admin\Settings_Screens;
 use WooCommerce\Facebook\Admin\Settings_Screens\Connection;
 use WooCommerce\Facebook\Framework\Helper;
