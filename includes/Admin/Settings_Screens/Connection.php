@@ -281,11 +281,7 @@ class Connection extends Abstract_Settings_Screen {
 
 				<?php if ( $is_connected ) : ?>
 
-					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_manage_url() ); ?>" class="button button-primary">
-						<?php esc_html_e( 'Manage Connection', 'facebook-for-woocommerce' ); ?>
-					</a>
-
-					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_disconnect_url() ); ?>" class="uninstall">
+					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_disconnect_url() ); ?>" class="button button-primary uninstall">
 						<?php esc_html_e( 'Disconnect', 'facebook-for-woocommerce' ); ?>
 					</a>
 
