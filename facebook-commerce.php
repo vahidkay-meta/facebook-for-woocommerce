@@ -860,6 +860,10 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 			$woo_product->set_price( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_PRICE ] ) ) );
 		}
 
+		if ( isset( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) {
+			$woo_product->set_fb_brand( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) );
+		}
+
 		if ( isset( $_POST['fb_product_image_source'] ) ) {
 			$product->update_meta_data( Products::PRODUCT_IMAGE_SOURCE_META_KEY, sanitize_key( wp_unslash( $_POST['fb_product_image_source'] ) ) );
 			$product->save_meta_data();
@@ -893,7 +897,7 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 		 */
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( ( ! wp_doing_ajax() || ! isset( $_POST['action'] ) || 'ajax_delete_fb_product' !== $_POST['action'] )
-			 && ! Products::published_product_should_be_synced( $product ) && ! $product->is_type( 'variable' ) ) {
+			&& ! Products::published_product_should_be_synced( $product ) && ! $product->is_type( 'variable' ) ) {
 			return;
 		}
 

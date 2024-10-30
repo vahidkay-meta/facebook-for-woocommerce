@@ -35,6 +35,7 @@ class WC_Facebook_Product {
 	const FB_VARIANT_IMAGE       = 'fb_image';
 	const FB_VISIBILITY          = 'fb_visibility';
 	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_BRAND               = 'fb_brand';
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -102,6 +103,7 @@ class WC_Facebook_Product {
 		$this->gallery_urls           = null;
 		$this->fb_use_parent_image    = null;
 		$this->main_description       = '';
+		$this->fb_brand               = '';
 		$this->sync_short_description = \WC_Facebookcommerce_Integration::PRODUCT_DESCRIPTION_MODE_SHORT === facebook_for_woocommerce()->get_integration()->get_product_description_mode();
 
 		if ( $meta = get_post_meta( $this->id, self::FB_VISIBILITY, true ) ) {
@@ -117,6 +119,7 @@ class WC_Facebook_Product {
 			$this->gallery_urls        = $parent_product->get_gallery_urls();
 			$this->fb_use_parent_image = $parent_product->get_use_parent_image();
 			$this->main_description    = $parent_product->get_fb_description();
+			$this->fb_brand            = $parent_product->get_fb_brand();
 		}
 	}
 
@@ -345,6 +348,18 @@ class WC_Facebook_Product {
 		);
 	}
 
+	public function set_fb_brand( $fb_brand ) {
+		$fb_brand  = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_brand )
+		);
+		$this->fb_brand = $fb_brand;
+		update_post_meta(
+			$this->id,
+			self::FB_BRAND,
+			$fb_brand
+		);
+	}
+
 	public function set_product_image( $image ) {
 		if ( $image !== null && strlen( $image ) !== 0 ) {
 			$image = WC_Facebookcommerce_Utils::clean_string( $image );
@@ -445,6 +460,24 @@ class WC_Facebook_Product {
 		 * @param int     $id          WooCommerce Product ID.
 		 */
 		return apply_filters( 'facebook_for_woocommerce_fb_product_description', $description, $this->id );
+	}
+
+	public function get_fb_brand() {
+		$fb_brand = '';
+
+		if ( $this->fb_brand ) {
+			$fb_brand = $this->fb_brand;
+		}
+
+		if ( empty( $fb_brand ) ) {
+			// Try to get brand from post meta
+			$fb_brand = get_post_meta(
+				$this->id,
+				self::FB_BRAND,
+				true
+			);
+		}
+		return WC_Facebookcommerce_Utils::clean_string( $fb_brand );
 	}
 
 	/**
@@ -641,7 +674,7 @@ class WC_Facebook_Product {
 		WC_Facebookcommerce_Utils::get_product_categories( $id );
 
 		// Get brand attribute.
-		$brand = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
+		$brand          = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
 		$brand_taxonomy = get_the_term_list( $id, 'product_brand', '', ', ' );
 
 		if ( $brand ) {
@@ -659,8 +692,8 @@ class WC_Facebook_Product {
 				'image_link'            => $image_urls[0],
 				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 				'link'                  => $product_url,
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $brand, 100 ),
 				'retailer_id'           => $retailer_id,
 				'price'                 => $this->get_fb_price( true ),
 				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
@@ -690,7 +723,7 @@ class WC_Facebook_Product {
 				 */
 				'category'              => $categories['categories'],
 				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $brand, 100 ),
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 				'retailer_id'           => $retailer_id,
 				'price'                 => $this->get_fb_price(),
 				'currency'              => get_woocommerce_currency(),
@@ -738,9 +771,9 @@ class WC_Facebook_Product {
 			// No Visibility Option for Variations
 			// get_virtual() returns true for "unassembled bundles", so we exclude
 			// bundles from this check.
-			if ( true === $this->get_virtual() && 'bundle' !== $this->get_type() ) {
-				$product_data['visibility'] = \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN;
-			}
+		if ( true === $this->get_virtual() && 'bundle' !== $this->get_type() ) {
+			$product_data['visibility'] = \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN;
+		}
 
 		if ( self::PRODUCT_PREP_TYPE_FEED !== $type_to_prepare_for ) {
 			$this->prepare_variants_for_item( $product_data );
@@ -1042,6 +1075,4 @@ class WC_Facebook_Product {
 
 		return $final_variants;
 	}
-
-
 }

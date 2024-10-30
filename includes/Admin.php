@@ -1251,9 +1251,18 @@ class Admin {
 
 				woocommerce_wp_text_input(
 					array(
+						'id'    => \WC_Facebook_Product::FB_BRAND,
+						'label' => __( 'Brand', 'facebook-for-woocommerce' ),
+						'value' => $fb_brand,
+						'class' => 'enable-if-sync-enabled',
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
 						'id'          => \WC_Facebook_Product::FB_PRODUCT_PRICE,
 						'label'       => sprintf(
-						 /* translators: Placeholders %1$s - WC currency symbol */
+						/* translators: Placeholders %1$s - WC currency symbol */
 							__( 'Facebook Price (%1$s)', 'facebook-for-woocommerce' ),
 							get_woocommerce_currency_symbol()
 						),
