@@ -259,7 +259,7 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 		 * @param String string
 		 * @return string
 		 */
-		public static function clean_string( $string ) {
+		public static function clean_string( $string, $strip_html_tags = true ) {
 
 			/**
 			 * Filters whether the shortcodes should be applied for a string when syncing a product or be stripped out.
@@ -280,10 +280,11 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 
 			$string = str_replace( array( '&amp%3B', '&amp;' ), '&', $string );
 			$string = str_replace( array( "\r", '&nbsp;', "\t" ), ' ', $string );
-			$string = wp_strip_all_tags( $string, false ); // true == remove line breaks
+			if($strip_html_tags){
+				$string = wp_strip_all_tags( $string, false ); // true == remove line breaks
+			}
 			return $string;
-		}
-
+		}	
 		/**
 		 * Returns flat array of woo IDs for variable products, or
 		 * an array with a single woo ID for simple products.

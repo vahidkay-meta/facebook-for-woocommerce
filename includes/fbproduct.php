@@ -35,6 +35,8 @@ class WC_Facebook_Product {
 	const FB_VARIANT_IMAGE       = 'fb_image';
 	const FB_VISIBILITY          = 'fb_visibility';
 	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_RICH_TEXT_DESCRIPTION = 'fb_rich_text_description';
+
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -88,6 +90,11 @@ class WC_Facebook_Product {
 	 */
 	public $fb_visibility;
 
+	/**
+	 * @var string Product rich text description.
+	 */
+	public $fb_rich_text_description;
+
 	public function __construct( $wpid, $parent_product = null ) {
 
 		if ( $wpid instanceof WC_Product ) {
@@ -102,6 +109,7 @@ class WC_Facebook_Product {
 		$this->gallery_urls           = null;
 		$this->fb_use_parent_image    = null;
 		$this->main_description       = '';
+		$this->rich_text_description  = '';
 		$this->sync_short_description = \WC_Facebookcommerce_Integration::PRODUCT_DESCRIPTION_MODE_SHORT === facebook_for_woocommerce()->get_integration()->get_product_description_mode();
 
 		if ( $meta = get_post_meta( $this->id, self::FB_VISIBILITY, true ) ) {
@@ -345,6 +353,18 @@ class WC_Facebook_Product {
 		);
 	}
 
+	public function set_rich_text_description( $rich_text_description ) {
+		$description          = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $description, false )
+		);
+		$this->rich_text_description = $rich_text_description;
+		update_post_meta(
+			$this->id,
+			self::FB_RICH_TEXT_DESCRIPTION,
+			$rich_text_description
+		);
+	}
+
 	public function set_product_image( $image ) {
 		if ( $image !== null && strlen( $image ) !== 0 ) {
 			$image = WC_Facebookcommerce_Utils::clean_string( $image );
@@ -390,7 +410,7 @@ class WC_Facebook_Product {
 		);
 	}
 
-	public function get_fb_description() {
+	public function get_fb_description($strip_html_tags = true) {
 		$description = '';
 
 		if ( $this->fb_description ) {
@@ -417,25 +437,36 @@ class WC_Facebook_Product {
 		}
 
 		// If no description is found from meta or variation, get from post
-		if ( empty( $description ) ) {
+		if ( empty( $description )&& $strip_html_tags ) {
 			$post         = $this->get_post_data();
-			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content );
+			
+			if($strip_html){
+			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, $strip_html_tags );
 			$post_excerpt = WC_Facebookcommerce_Utils::clean_string( $post->post_excerpt );
 			$post_title   = WC_Facebookcommerce_Utils::clean_string( $post->post_title );
 
-			// Prioritize content, then excerpt, then title
-			if ( ! empty( $post_content ) ) {
-				$description = $post_content;
+				// Prioritize content, then excerpt, then title
+				if ( ! empty( $post_content  ) ) {
+					$description = $post_content;
+				}
+
+				if ( $this->sync_short_description || ( empty( $description ) && ! empty( $post_excerpt ) ) ) {
+					$description = $post_excerpt;
+				}
+
+				if ( empty( $description ) ) {
+					$description = $post_title;
+				}
+			}else{
+				if ( ! empty( $post_content  ) ) {
+					$description = $post_content;
+				}
 			}
 
-			if ( $this->sync_short_description || ( empty( $description ) && ! empty( $post_excerpt ) ) ) {
-				$description = $post_excerpt;
-			}
-
-			if ( empty( $description ) ) {
-				$description = $post_title;
-			}
+			
 		}
+
+		// If no description is found from meta or variation and trying to enrich rich_text_description, get from post
 		/**
 		 * Filters the FB product description.
 		 *
@@ -445,7 +476,7 @@ class WC_Facebook_Product {
 		 * @param int     $id          WooCommerce Product ID.
 		 */
 		return apply_filters( 'facebook_for_woocommerce_fb_product_description', $description, $this->id );
-	}
+	}	
 
 	/**
 	 * @param array $product_data
@@ -656,6 +687,7 @@ class WC_Facebook_Product {
 			$product_data = array(
 				'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 				'description'           => $this->get_fb_description(),
+				'rich_text_description' => $this->get_fb_description(false),
 				'image_link'            => $image_urls[0],
 				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 				'link'                  => $product_url,
@@ -675,6 +707,7 @@ class WC_Facebook_Product {
 			$product_data = array(
 				'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 				'description'           => $this->get_fb_description(),
+				'rich_text_description' => $this->get_fb_description(false),
 				'image_url'             => $image_urls[0],
 				'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
 				'url'                   => $product_url,
