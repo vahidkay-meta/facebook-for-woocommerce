@@ -35,6 +35,7 @@ class WC_Facebook_Product {
 	const FB_VARIANT_IMAGE       = 'fb_image';
 	const FB_VISIBILITY          = 'fb_visibility';
 	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_RICH_TEXT_DESCRIPTION = 'fb_rich_text_description';
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -88,6 +89,11 @@ class WC_Facebook_Product {
 	 */
 	public $fb_visibility;
 
+	/**
+	 * @var string Product rich text description.
+	 */
+	public $fb_rich_text_description;
+
 	public function __construct( $wpid, $parent_product = null ) {
 
 		if ( $wpid instanceof WC_Product ) {
@@ -103,6 +109,7 @@ class WC_Facebook_Product {
 		$this->fb_use_parent_image    = null;
 		$this->main_description       = '';
 		$this->sync_short_description = \WC_Facebookcommerce_Integration::PRODUCT_DESCRIPTION_MODE_SHORT === facebook_for_woocommerce()->get_integration()->get_product_description_mode();
+		$this->rich_text_description  = '';
 
 		if ( $meta = get_post_meta( $this->id, self::FB_VISIBILITY, true ) ) {
 			$this->fb_visibility = wc_string_to_bool( $meta );
@@ -357,6 +364,18 @@ class WC_Facebook_Product {
 		}
 	}
 
+	public function set_rich_text_description( $rich_text_description ) {
+		$description          = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $description, false )
+		);
+		$this->rich_text_description = $rich_text_description;
+		update_post_meta(
+			$this->id,
+			self::FB_RICH_TEXT_DESCRIPTION,
+			$rich_text_description
+		);
+	}
+
 	public function set_price( $price ) {
 		if ( is_numeric( $price ) ) {
 			update_post_meta(
@@ -445,6 +464,46 @@ class WC_Facebook_Product {
 		 * @param int     $id          WooCommerce Product ID.
 		 */
 		return apply_filters( 'facebook_for_woocommerce_fb_product_description', $description, $this->id );
+	}
+
+	public function get_rich_text_description() {
+		$rich_text_description = '';
+
+		if ( $this->fb_rich_text_description ) {
+			$rich_text_description = $this->fb_rich_text_description;
+		}
+
+		if ( empty( $fb_rich_text_description ) ) {
+			// Try to get description from post meta
+			$fb_rich_text_description = get_post_meta(
+				$this->id,
+				self::FB_RICH_TEXT_DESCRIPTION,
+				true
+			);
+		}
+
+		// Check if the product type is a variation and no rich text description is found yet
+		if ( empty( $rich_text_description ) && WC_Facebookcommerce_Utils::is_variation_type( $this->woo_product->get_type() ) ) {
+			$rich_text_description = WC_Facebookcommerce_Utils::clean_string( $this->woo_product->get_rich_text_description() );
+
+			// Fallback to main rich text description
+			if ( empty( $rich_text_description ) && $this->main_description ) {
+				$rich_text_description = $this->fb_rich_text_description;
+			}
+		}
+
+		// If no description is found from meta or variation, get from post
+		if ( empty( $rich_text_description ) ) {
+			$post         = $this->get_post_data();
+			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, false );
+			
+			if ( ! empty( $post_content ) ) {
+				$rich_text_description = $post_content;
+			}
+
+		}
+		
+		return apply_filters( 'facebook_for_woocommerce_fb_rich_text_description', $rich_text_description, $this->id );
 	}
 
 	/**
@@ -656,6 +715,7 @@ class WC_Facebook_Product {
 			$product_data = array(
 				'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 				'description'           => $this->get_fb_description(),
+				'rich_text_description' => $this->get_rich_text_description(),
 				'image_link'            => $image_urls[0],
 				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 				'link'                  => $product_url,
@@ -675,6 +735,7 @@ class WC_Facebook_Product {
 			$product_data = array(
 				'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 				'description'           => $this->get_fb_description(),
+				'rich_text_description' => $this->get_rich_text_description(),
 				'image_url'             => $image_urls[0],
 				'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
 				'url'                   => $product_url,

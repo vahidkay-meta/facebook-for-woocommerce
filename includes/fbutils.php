@@ -252,14 +252,14 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 		 * Clean up strings for FB Graph POSTing.
 		 * This function should will:
 		 * 1. Replace newlines chars/nbsp with a real space
-		 * 2. strip_tags()
+		 * 2. strip_tags() if not explicitly stated to not
 		 * 3. trim()
 		 *
 		 * @access public
 		 * @param String string
 		 * @return string
 		 */
-		public static function clean_string( $string ) {
+		public static function clean_string( $string, $strip_html_tags = true ) {
 
 			/**
 			 * Filters whether the shortcodes should be applied for a string when syncing a product or be stripped out.
@@ -280,7 +280,9 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 
 			$string = str_replace( array( '&amp%3B', '&amp;' ), '&', $string );
 			$string = str_replace( array( "\r", '&nbsp;', "\t" ), ' ', $string );
-			$string = wp_strip_all_tags( $string, false ); // true == remove line breaks
+			if ($strip_html_tags){
+				$string = wp_strip_all_tags( $string, false ); // true == remove line breaks
+			}
 			return $string;
 		}
 
