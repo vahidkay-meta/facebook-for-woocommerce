@@ -35,6 +35,7 @@ class WC_Facebook_Product {
 	const FB_VARIANT_IMAGE       = 'fb_image';
 	const FB_VISIBILITY          = 'fb_visibility';
 	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_MPN              	 = 'fb_mpn';
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -103,6 +104,7 @@ class WC_Facebook_Product {
 		$this->fb_use_parent_image    = null;
 		$this->main_description       = '';
 		$this->sync_short_description = \WC_Facebookcommerce_Integration::PRODUCT_DESCRIPTION_MODE_SHORT === facebook_for_woocommerce()->get_integration()->get_product_description_mode();
+		$this->fb_mpn               = '';
 
 		if ( $meta = get_post_meta( $this->id, self::FB_VISIBILITY, true ) ) {
 			$this->fb_visibility = wc_string_to_bool( $meta );
@@ -117,6 +119,7 @@ class WC_Facebook_Product {
 			$this->gallery_urls        = $parent_product->get_gallery_urls();
 			$this->fb_use_parent_image = $parent_product->get_use_parent_image();
 			$this->main_description    = $parent_product->get_fb_description();
+			$this->fb_mpn              = $parent_product->get_fb_mpn();
 		}
 	}
 
@@ -357,6 +360,18 @@ class WC_Facebook_Product {
 		}
 	}
 
+	public function set_fb_mpn( $fb_mpn ) {
+		$fb_brand  = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_mpn )
+		);
+		$this->fb_mpn = $fb_mpn;
+		update_post_meta(
+			$this->id,
+			self::FB_MPN,
+			$fb_mpn
+		);
+	}
+
 	public function set_price( $price ) {
 		if ( is_numeric( $price ) ) {
 			update_post_meta(
@@ -505,6 +520,24 @@ class WC_Facebook_Product {
 				  ? $woo_product->get_price_including_tax( 1, $price )
 				  : $woo_product->get_price_excluding_tax( 1, $price );
 		}
+	}
+
+	public function get_fb_mpn() {
+		$fb_mpn = '';
+
+		if ( $this->fb_mpn ) {
+			$fb_mpn = $this->fb_mpn;
+		}
+
+		if ( empty( $fb_mpn ) ) {
+			// Try to get mpn from post meta
+			$fb_mpn = get_post_meta(
+				$this->id,
+				self::FB_MPN,
+				true
+			);
+		}
+		return WC_Facebookcommerce_Utils::clean_string( $fb_mpn );
 	}
 
 	public function get_grouped_product_option_names( $key, $option_values ) {
@@ -658,6 +691,7 @@ class WC_Facebook_Product {
 				'description'           => $this->get_fb_description(),
 				'image_link'            => $image_urls[0],
 				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
+				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 				'link'                  => $product_url,
 				'product_type'          => $categories['categories'],
 				'brand'                 => Helper::str_truncate( $brand, 100 ),
@@ -691,6 +725,7 @@ class WC_Facebook_Product {
 				'category'              => $categories['categories'],
 				'product_type'          => $categories['categories'],
 				'brand'                 => Helper::str_truncate( $brand, 100 ),
+				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 				'retailer_id'           => $retailer_id,
 				'price'                 => $this->get_fb_price(),
 				'currency'              => get_woocommerce_currency(),
