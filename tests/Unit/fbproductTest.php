@@ -589,6 +589,50 @@ class fbproductTest extends WP_UnitTestCase {
         $this->assertArrayHasKey('image_link', $product_data);
     }
 
+		
+	/**
+	 * Test it gets rich text description from post meta.
+	 * @return void
+	 */
+	public function test_get_rich_text_description_from_post_meta() {
+		$product = WC_Helper_Product::create_simple_product();
+
+		$facebook_product = new \WC_Facebook_Product( $product );
+		$facebook_product->set_rich_text_description( 'rich text description' );
+		$rich_text_description = $facebook_product->get_rich_text_description();
+
+		$this->assertEquals( $rich_text_description,  'rich text description' );
+	}	
+	
+	/**
+	 * Test html tags preservation for rich text description
+	 * @return void
+	 */
+	public function test_html_preservation_for_rich_text_description() {
+    // Create a simple product
+    $product = WC_Helper_Product::create_simple_product();
+
+    // Create a Facebook product instance
+    $facebookProduct = new \WC_Facebook_Product($product);
+
+    // Set the rich text description with HTML content
+    $htmlContent = '<html>
+        <p>Unisex cotton T-shirt with 3/4 length sleeves in royal blue. Great for everyday casual wear. Features graphic print of logo in white on upper left sleeve.</p>
+        <ul>
+            <li>100% Cotton</li>
+            <li>Relaxed Fit</li>
+        </ul>
+    </html>';
+    $facebookProduct->set_rich_text_description($htmlContent);
+
+    // Get the rich text description
+    $richTextDescription = $facebookProduct->get_rich_text_description();
+
+    // Assert that the HTML content is preserved
+    $this->assertEquals($htmlContent, $richTextDescription);
+	}
+
+
 	/**
 	 * Test Brand is added for simple product 
 	 * @return void
