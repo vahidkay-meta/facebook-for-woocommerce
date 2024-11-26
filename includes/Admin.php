@@ -1223,16 +1223,16 @@ class Admin {
 					$description,
 					\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 					array(
+						'id'      => 'wc_facebook_sync_mode',
 						'textarea_name' => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 						'textarea_rows' => 10,
-						'media_buttons' => false,
+						'media_buttons' => true,
 						'teeny'        => true,
 						'quicktags'    => false,
 						'tinymce'      => array(
-							'toolbar1' => 'bold,italic,underline,bullist,numlist,link,unlink',
-							'toolbar2' => '',
+							'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen,wp_adv',
+							'toolbar2' => 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
 						),
-						'editor_css'   => '<style>.wp-editor-area{height:200px !important;}</style>',
 					)
 				);
 				echo '</div>';
@@ -1399,15 +1399,14 @@ class Admin {
 			array(
 				'textarea_name' => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 				'textarea_rows' => 10,
-				'media_buttons' => false,
+				'media_buttons' => true,
 				'teeny'        => true,
 				'quicktags'    => false,
 				'tinymce'      => array(
-					'toolbar1' => 'bold,italic,underline,bullist,numlist,link,unlink',
-					'toolbar2' => '',
+					'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen,wp_adv',
+					'toolbar2' => 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
 				),
-				'editor_css'   => '<style>.wp-editor-area{height:200px !important;}</style>',
-			)
+				)
 		);
 		echo '</div>';
 

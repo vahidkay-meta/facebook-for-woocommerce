@@ -18,41 +18,6 @@
 	padding-bottom: 0;
 }
 
-/* Align the editor with other WooCommerce fields */
-#facebook_options .wp-editor-wrap {
-    padding: 5px 20px 5px 162px !important;
-    margin: 6px 0 !important;
-    position: relative;
-}
-
-/* Position the label like other WooCommerce fields */
-#facebook_options .wp-editor-wrap label {
-    float: left;
-    width: 150px;
-    padding: 0;
-    margin: 0 0 0 -150px;
-    color: #666;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 24px;
-}
-
-/* Match WooCommerce field styling */
-#facebook_options .wp-editor-container {
-    border: 1px solid #8c8f94;
-    clear: both;
-    background: #fff;
-}
-
-/* Adjust editor width to match other fields */
-#facebook_options .wp-editor-wrap {
-    max-width: calc(100% - 20px);
-}
-
-/* Style the toolbar to match WooCommerce */
-#facebook_options .mce-toolbar {
-    background: #f6f7f7;
-}
 
 /* Ensure proper spacing between fields */
 #facebook_options .options_group {
@@ -61,12 +26,6 @@
     border-bottom: 1px solid #eee;
 }
 
-/* For variation editors - apply same styles */
-.woocommerce_variable_attributes .wp-editor-wrap {
-    padding: 5px 20px 5px 162px !important;
-    margin: 6px 0 !important;
-    position: relative;
-}
 
 .woocommerce_variable_attributes .wp-editor-wrap label {
     float: left;
@@ -150,4 +109,21 @@
 /* adjusts widths of the products table, same as WooCommerce categories and tags */
 .column-facebook_sync {
 	width: 11% !important;
+}
+
+.woocommerce_options_panel .wp-editor-container {
+    margin-left: 162px;
+    width: calc(80% - 182px);
+}
+
+.woocommerce_options_panel .wp-editor-tabs {
+    margin-left: 162px;
+}
+
+/* Ensure the label aligns properly */
+.woocommerce_options_panel label[for="fb_product_description"] {
+    float: left;
+    width: 150px;
+    padding: 0;
+    margin: 0 0 0 12px;
 }
