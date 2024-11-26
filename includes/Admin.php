@@ -1215,18 +1215,27 @@ class Admin {
 					)
 				);
 
-				woocommerce_wp_textarea_input(
+				echo '<div class="wp-editor-wrap">';
+				echo '<label for="' . esc_attr(\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION) . '">' . 
+					 esc_html__( 'Facebook Description', 'facebook-for-woocommerce' ) . 
+					 '</label>';
+				wp_editor(
+					$description,
+					\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 					array(
-						'id'          => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
-						'label'       => __( 'Facebook Description', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Custom (plain-text only) description for product on Facebook. If blank, product description will be used. If product description is blank, shortname will be used.', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 20,
-						'value'       => $description,
-						'class'       => 'short enable-if-sync-enabled',
+						'textarea_name' => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
+						'textarea_rows' => 10,
+						'media_buttons' => false,
+						'teeny'        => true,
+						'quicktags'    => false,
+						'tinymce'      => array(
+							'toolbar1' => 'bold,italic,underline,bullist,numlist,link,unlink',
+							'toolbar2' => '',
+						),
+						'editor_css'   => '<style>.wp-editor-area{height:200px !important;}</style>',
 					)
 				);
+				echo '</div>';
 
 				woocommerce_wp_radio(
 					array(
@@ -1379,20 +1388,28 @@ class Admin {
 			)
 		);
 
-		woocommerce_wp_textarea_input(
+		// $editor_id = sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index );
+		echo '<div class="wp-editor-wrap">';
+		echo '<label for="' . esc_attr(\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION) . '">' . 
+			 esc_html__( 'Facebook Description', 'facebook-for-woocommerce' ) . 
+			 '</label>';
+		wp_editor(
+			$description,
+			\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 			array(
-				'id'            => sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index ),
-				'name'          => sprintf( "variable_%s[$index]", \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION ),
-				'label'         => __( 'Facebook Description', 'facebook-for-woocommerce' ),
-				'desc_tip'      => true,
-				'description'   => __( 'Custom (plain-text only) description for product on Facebook. If blank, product description will be used. If product description is blank, shortname will be used.', 'facebook-for-woocommerce' ),
-				'cols'          => 40,
-				'rows'          => 5,
-				'value'         => $description,
-				'class'         => 'enable-if-sync-enabled',
-				'wrapper_class' => 'form-row form-row-full',
+				'textarea_name' => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
+				'textarea_rows' => 10,
+				'media_buttons' => false,
+				'teeny'        => true,
+				'quicktags'    => false,
+				'tinymce'      => array(
+					'toolbar1' => 'bold,italic,underline,bullist,numlist,link,unlink',
+					'toolbar2' => '',
+				),
+				'editor_css'   => '<style>.wp-editor-area{height:200px !important;}</style>',
 			)
 		);
+		echo '</div>';
 
 		woocommerce_wp_radio(
 			array(

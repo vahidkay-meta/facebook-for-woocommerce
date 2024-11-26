@@ -71,6 +71,12 @@ class WC_Facebook_Product {
 	 */
 	private $fb_description;
 
+
+	/**
+	 * @var string Facebook Rich Text Description.
+	 */
+	private $fb_rich_text_description;
+
 	/**
 	 * @var array Gallery URLs.
 	 */
@@ -351,11 +357,22 @@ class WC_Facebook_Product {
 		$description          = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $description )
 		);
+		$rich_text_description          = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $description, false )
+		);
 		$this->fb_description = $description;
+		$this->fb_rich_text_description = $rich_text_description;
+
 		update_post_meta(
 			$this->id,
 			self::FB_PRODUCT_DESCRIPTION,
 			$description
+		);
+
+		update_post_meta(
+			$this->id,
+			self::FB_RICH_TEXT_DESCRIPTION,
+			$rich_text_description
 		);
 	}
 
@@ -541,20 +558,23 @@ class WC_Facebook_Product {
 
 		if ( empty( $rich_text_description ) ) {
 			// Try to get description from post meta if fb description has been set
-			$rich_text_description = get_post_meta(
+			$temp_rich_text_description = get_post_meta(
 				$this->id,
+				self::FB_RICH_TEXT_DESCRIPTION,
 				self::FB_RICH_TEXT_DESCRIPTION,
 				true
 			);
-			if ($rich_text_description){
+
+			if ($temp_rich_text_description){
                 self::$rich_text_description_source = WC_Facebookcommerce_Utils::FB_DESCRIPTION;
+				$rich_text_description = $temp_rich_text_description;
             }
 		}
 
 		// For variable products, we want to use the rich text description of the variant.
 		// If that's not available, fall back to the main (parent) product's rich text description.
 		if (empty($rich_text_description) && WC_Facebookcommerce_Utils::is_variation_type($this->woo_product->get_type())) {
-			$rich_text_description = WC_Facebookcommerce_Utils::clean_string($this->woo_product->get_rich_text_description());
+			$rich_text_description = WC_Facebookcommerce_Utils::clean_string($this->woo_product->get_description(), false);
 
 			// If the variant's rich text description is still empty, use the main product's rich text description as a fallback.
 			if (empty($rich_text_description) && $this->main_description) {
