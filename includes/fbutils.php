@@ -35,7 +35,7 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 		const FB_VARIANT_GENDER  = 'gender';
 
 		const FB_DESCRIPTION = 'fb_description';
-		const WOO_DESCRIPTION = 'woo_description';
+		const WC_DESCRIPTION = 'wc_description';
 
 		public static $ems        = null;
 		public static $store_name = null;
@@ -273,7 +273,7 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 			 * @param string $string           String to clean up.
 			 */
 
-			 if (!$string){
+			 if (empty($string)){
 				return '';
 			 }
 			$apply_shortcodes = apply_filters( 'wc_facebook_string_apply_shortcodes', false, $string );
