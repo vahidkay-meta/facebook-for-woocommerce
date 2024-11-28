@@ -353,13 +353,17 @@ class WC_Facebook_Product {
 	}
 
 	public function set_description( $description ) {
-		$description          = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $description )
-		);
 		$rich_text_description          = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $description, false )
 		);
-		$this->fb_description = $description;
+
+		$description          = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $description )
+		);
+		
+		error_log('FB Product Description SET value: ' . print_r($description, true));
+
+		$this->fb_description = $rich_text_description;
 		$this->fb_rich_text_description = $rich_text_description;
 
 		update_post_meta(
@@ -570,7 +574,6 @@ class WC_Facebook_Product {
 			// Try to get description from post meta if fb description has been set
 			$temp_rich_text_description = get_post_meta(
 				$this->id,
-				self::FB_RICH_TEXT_DESCRIPTION,
 				self::FB_RICH_TEXT_DESCRIPTION,
 				true
 			);
@@ -849,6 +852,7 @@ class WC_Facebook_Product {
 				array(
 					'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 					'description'           => $this->get_fb_description(),
+					'rich_text_description' => $rich_text_description,
 					'image_link'            => $image_urls[0],
 					'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 					'link'                  => $product_url,
@@ -861,7 +865,7 @@ class WC_Facebook_Product {
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 				'custom_fields'			=> $custom_fields,
 				),
-				self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
+				// self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
 			$gpc_field_name = 'google_product_category';
@@ -876,6 +880,7 @@ class WC_Facebook_Product {
 					'image_url'             => $image_urls[0],
 					'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
 					'url'                   => $product_url,
+					'rich_text_description' => $rich_text_description,
 					/**
 					 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
 					 * This field should have the Google product category for the item. Google product category is not a required field
@@ -897,7 +902,7 @@ class WC_Facebook_Product {
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 				'custom_fields'			=> $custom_fields
 				),
-				self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
+				// self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {

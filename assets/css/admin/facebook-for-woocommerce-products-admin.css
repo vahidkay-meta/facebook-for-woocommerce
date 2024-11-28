@@ -111,9 +111,19 @@
 	width: 11% !important;
 }
 
+.wp-editor-container {
+    border: 1px solid #dcdcde;
+}
+
+/* Ensure the border remains visible in text mode */
+.wp-editor-container textarea.wp-editor-area {
+    border: 1px solid #dcdcde;
+    box-sizing: border-box;
+}
+
 .woocommerce_options_panel .wp-editor-container {
     margin-left: 162px;
-    width: calc(80% - 182px);
+    width: calc(100% - 182px);
 }
 
 .woocommerce_options_panel .wp-editor-tabs {
