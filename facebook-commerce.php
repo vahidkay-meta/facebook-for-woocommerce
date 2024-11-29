@@ -867,11 +867,12 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( isset( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ) ) {
-			$woo_product->set_description( sanitize_text_field( wp_unslash( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ) ) );
+			error_log('FB Product Description POST value: ' . print_r($_POST[ self::FB_PRODUCT_DESCRIPTION ], true));
+			error_log('Sanitize ' . print_r( wp_strip_all_tags( wp_unslash( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ), true ) , true));
+    		$woo_product->set_description( wp_strip_all_tags( wp_unslash( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ), true ) );
 		}
 		
 		if ( isset( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ) ) {
-			// error_log('FB Product Description POST value: ' . print_r($_POST[ self::FB_PRODUCT_DESCRIPTION ], true));
 			$woo_product->set_rich_text_description( $_POST[ self::FB_PRODUCT_DESCRIPTION ] );
 		}
 

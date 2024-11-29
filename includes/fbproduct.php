@@ -48,8 +48,7 @@ class WC_Facebook_Product {
 	const MIN_TIME   = 'T00:00+00:00';
 
 	public static $rich_text_description_source = WC_Facebookcommerce_Utils::WC_DESCRIPTION;
-
-	static $use_checkout_url = array(
+	static $use_checkout_url                    = array(
 		'simple'    => 1,
 		'variable'  => 1,
 		'variation' => 1,
@@ -136,6 +135,7 @@ class WC_Facebook_Product {
 			$this->gallery_urls        = $parent_product->get_gallery_urls();
 			$this->fb_use_parent_image = $parent_product->get_use_parent_image();
 			$this->main_description    = $parent_product->get_fb_description();
+			$this->rich_text_description = $parent_product->get_rich_text_description();
 		}
 	}
 
@@ -353,29 +353,12 @@ class WC_Facebook_Product {
 	}
 
 	public function set_description( $description ) {
-		$rich_text_description          = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $description, false )
-		);
-
-		$description          = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $description )
-		);
-		
-		error_log('FB Product Description SET value: ' . print_r($description, true));
-
-		$this->fb_description = $rich_text_description;
-		$this->fb_rich_text_description = $rich_text_description;
-
+		$description          = stripslashes( WC_Facebookcommerce_Utils::clean_string( $description ) );
+		$this->fb_description = $description;
 		update_post_meta(
 			$this->id,
 			self::FB_PRODUCT_DESCRIPTION,
 			$description
-		);
-
-		update_post_meta(
-			$this->id,
-			self::FB_RICH_TEXT_DESCRIPTION,
-			$rich_text_description
 		);
 	}
 
@@ -392,7 +375,7 @@ class WC_Facebook_Product {
 	}
 
 	public function set_rich_text_description( $rich_text_description ) {
-		$rich_text_description          = 
+		$rich_text_description       =
 			WC_Facebookcommerce_Utils::clean_string( $rich_text_description, false );
 		$this->rich_text_description = $rich_text_description;
 		update_post_meta(
@@ -449,7 +432,7 @@ class WC_Facebook_Product {
 	}
 
 	public function set_use_parent_image( $setting ) {
-		$this->fb_use_parent_image = ( $setting == 'yes' );
+		$this->fb_use_parent_image = ( $setting === 'yes' );
 		update_post_meta(
 			$this->id,
 			self::FB_VARIANT_IMAGE,
@@ -549,68 +532,67 @@ class WC_Facebook_Product {
 	/**
 	 * Get the rich text description for a product.
 	 *
-	 * This function determines the preferred product description based on the following logic:
-	 * 1. Check if the rich text description is available and not empty.
+	 * This function retrieves the rich text product description based on the following logic:
+	 * 1. Check if the facebook rich text description is set and not empty.
 	 * 2. If the rich text description is available, use it as the preferred description.
-	 * 3. Otherwise, fall back to the plain text description.
+	 * 3. Otherwise, fall back to the plain text description made available by Woocommerce.
 	 *
 	 * @return string The rich text description for the product.
 	 */
 	public function get_rich_text_description() {
 		$rich_text_description = '';
 
-			// Check if the fb description is set as that takes preference.
+		// Check if the fb description is set as that takes preference
 		if ( $this->fb_description ) {
-				$rich_text_description = $this->fb_description;
+			$rich_text_description = $this->fb_description;
 		}
 
-			// If the rich text description is available, use it as the preferred description.
+		// If the rich text description is available, use it as the preferred description
 		if ( $this->rich_text_description ) {
-				$rich_text_description = $this->rich_text_description;
+			$rich_text_description = $this->rich_text_description;
 		}
 
-			// If no description is found from meta or variation, get from post
+		// Try to get description from post meta if fb description has been set
 		if ( empty( $rich_text_description ) ) {
-			// Try to get description from post meta if fb description has been set
 			$temp_rich_text_description = get_post_meta(
 				$this->id,
 				self::FB_RICH_TEXT_DESCRIPTION,
 				true
 			);
 
-			if ($temp_rich_text_description){
-                self::$rich_text_description_source = WC_Facebookcommerce_Utils::FB_DESCRIPTION;
-				$rich_text_description = $temp_rich_text_description;
-            }
+			if ( $temp_rich_text_description ) {
+				self::$rich_text_description_source = WC_Facebookcommerce_Utils::FB_DESCRIPTION;
+				$rich_text_description              = $temp_rich_text_description;
+			}
 		}
 
 		// For variable products, we want to use the rich text description of the variant.
 		// If that's not available, fall back to the main (parent) product's rich text description.
-		if (empty($rich_text_description) && WC_Facebookcommerce_Utils::is_variation_type($this->woo_product->get_type())) {
-			$rich_text_description = WC_Facebookcommerce_Utils::clean_string($this->woo_product->get_description(), false);
+		if ( empty( $rich_text_description ) && WC_Facebookcommerce_Utils::is_variation_type( $this->woo_product->get_type() ) ) {
+			$rich_text_description = WC_Facebookcommerce_Utils::clean_string( $this->woo_product->get_description(), false );
 
-				// If the variant's rich text description is still empty, use the main product's rich text description as a fallback.
+			// If the variant's rich text description is still empty, use the main product's rich text description as a fallback
 			if ( empty( $rich_text_description ) && $this->main_description ) {
-					$rich_text_description = $this->rich_text_description;
+				$rich_text_description = $this->main_description;
 			}
 		}
 
-			// If no description is found from meta or variation, get from post
+		// If no description is found from meta or variation, get from post
 		if ( empty( $rich_text_description ) ) {
-				$post         = $this->get_post_data();
-				$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, false );
-				$post_excerpt = WC_Facebookcommerce_Utils::clean_string( $post->post_excerpt, false );
+			$post         = $this->get_post_data();
+			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, false );
+			$post_excerpt = WC_Facebookcommerce_Utils::clean_string( $post->post_excerpt, false );
 
 			if ( ! empty( $post_content ) ) {
-					$rich_text_description = $post_content;
+				$rich_text_description = $post_content;
 			}
 
 			if ( $this->sync_short_description || ( empty( $rich_text_description ) && ! empty( $post_excerpt ) ) ) {
-					$rich_text_description = $post_excerpt;
+				$rich_text_description = $post_excerpt;
 			}
 		}
 
-			return apply_filters( 'facebook_for_woocommerce_fb_rich_text_description', $rich_text_description, $this->id );
+		return apply_filters( 'facebook_for_woocommerce_fb_rich_text_description', $rich_text_description, $this->id );
 	}
 
 	/**
@@ -865,7 +847,6 @@ class WC_Facebook_Product {
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 				'custom_fields'			=> $custom_fields,
 				),
-				// self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
 			$gpc_field_name = 'google_product_category';
@@ -902,7 +883,6 @@ class WC_Facebook_Product {
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 				'custom_fields'			=> $custom_fields
 				),
-				// self::$rich_text_description_source === WC_Facebookcommerce_Utils::WC_DESCRIPTION ? array( 'rich_text_description' => $rich_text_description ) : array()
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {

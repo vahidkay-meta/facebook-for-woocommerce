@@ -1395,7 +1395,6 @@ class Admin {
 			)
 		);
 
-		// $editor_id = sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index );
 		echo '<div class="wp-editor-wrap">';
 		echo '<label for="' . esc_attr(\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION) . '">' . 
 			 esc_html__( 'Facebook Description', 'facebook-for-woocommerce' ) . 
