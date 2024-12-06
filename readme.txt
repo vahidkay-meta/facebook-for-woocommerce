@@ -40,6 +40,11 @@ When opening a bug on GitHub, please give us as many details as possible.
 
 == Changelog ==
 
+= 3.3.1 - 2024-12-06 =
+Fix - Sale price effective date by @vinkmeta in #2809
+Fix - Sync stock quantity when available by @mshymon in #2811
+Fix - Sync product GTIN when available by @mshymon in #2810
+
 = 3.3.0 - 2024-11-07 =
 * Add - Extension navigation tabs on Product Sets screens.
 * Tweak - Tooltips, config labels, documentation links.
