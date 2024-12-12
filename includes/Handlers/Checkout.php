@@ -42,25 +42,27 @@ class Checkout {
 	 */
 	public function init_checkout_endpoint() {
 		register_rest_route(
-            'wc-facebook/v1', // Namespace for your custom API
-            '/checkout', // The endpoint URL (e.g., /wp-json/myplugin/v1/experience)
+            'wc-facebook/v1',
+            '/checkout',
             array(
-                'methods' => array( 'GET', 'POST' ), // You can also use POST, PUT, etc.
-                'callback' => array( $this, 'redirect_to_checkout' ), // Callback function
-                'permission_callback' => '__return_true', // You can add permission checks here
+                'methods' => array( 'GET', 'POST' ),
+                'callback' => array( $this, 'redirect_to_checkout' ),
+                'permission_callback' => '__return_true',
             )
         );
 	}
 
-	// The callback function to handle the redirect logic
+	/**
+     * Redirects to the checkout page.
+     * @since 2.3.0
+     */
     public function redirect_to_checkout() {
-        // Perform the redirect
 		$this->add_multiple_items_and_apply_coupon();
         wp_redirect( wc_get_cart_url() );
-        exit; // Ensure no further output after the redirect
+        exit;
     }
 
-    public function add_multiple_items_and_apply_coupon() {
+    private function add_multiple_items_and_apply_coupon() {
         $product_ids = isset($_REQUEST['products']) ? array_map('trim', explode(',', urldecode(wp_unslash($_REQUEST['products'])))) : array();
         $quantities = isset($_REQUEST['quantity']) ? array_map('trim', explode(',', urldecode(wp_unslash($_REQUEST['quantity'])))) : array();
         $coupon_code = isset($_REQUEST['coupon']) ? wp_unslash($_REQUEST['coupon']) : '';
@@ -132,10 +134,8 @@ class Checkout {
         $underscore_pos = strrpos($product_sku, '_');
 
         if ($underscore_pos !== false) {
-            // Extract the part after the last underscore
             return intval(substr($product_sku, $underscore_pos + 1));
         } else {
-            // If no underscore, convert the whole string to an integer
             return intval($product_sku);
         }
     }
