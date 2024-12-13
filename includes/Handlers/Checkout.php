@@ -14,21 +14,21 @@ namespace WooCommerce\Facebook\Handlers;
 defined( 'ABSPATH' ) or exit;
 
 /**
- * The WebHook handler.
+ * The Checkout handler.
  *
- * @since 2.3.0
+ * @since 3.3.2
  */
 class Checkout {
 
 	/** @var string auth page ID */
-	const WEBHOOK_PAGE_ID = 'wc-facebook-checkout';
+	const CHECKOUT_PAGE_ID = 'wc-facebook-checkout';
 
 	/**
-	 * Constructs a new WebHook.
+	 * Constructs a new checkout endpoint.
 	 *
 	 * @param \WC_Facebookcommerce $plugin Plugin instance.
 	 *
-	 * @since 2.3.0
+	 * @since 3.3.2
 	 */
 	public function __construct( \WC_Facebookcommerce $plugin ) {
 		add_action( 'rest_api_init', array( $this, 'init_checkout_endpoint' ) );
@@ -38,7 +38,7 @@ class Checkout {
 	/**
 	 * Register Checkout REST API endpoint
 	 *
-	 * @since 2.3.0
+	 * @since 3.3.2
 	 */
 	public function init_checkout_endpoint() {
 		register_rest_route(
@@ -54,11 +54,10 @@ class Checkout {
 
 	/**
      * Redirects to the checkout page.
-     * @since 2.3.0
+     * @since 3.3.2
      */
     public function redirect_to_checkout() {
 		$this->add_multiple_items_and_apply_coupon();
-        wp_redirect( wc_get_cart_url() );
         exit;
     }
 
@@ -103,6 +102,12 @@ class Checkout {
             }
 
             $add_to_cart_handler = apply_filters('woocommerce_add_to_cart_handler', $adding_to_cart->get_type(), $adding_to_cart);
+
+            if ('grouped' === $add_to_cart_handler)
+            {
+                continue;
+            }
+
             $passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, $quantity);
                                 wc_load_cart();
                                 $cart = WC()->cart;
@@ -120,8 +125,6 @@ class Checkout {
         }
 
         if ($was_added_to_cart && 0 === wc_notice_count('error')) {
-            $url = apply_filters('woocommerce_add_to_cart_redirect', $url, $adding_to_cart);
-
             wp_safe_redirect(wc_get_checkout_url());
             exit;
         }
