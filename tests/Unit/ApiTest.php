@@ -540,8 +540,9 @@ class ApiTest extends WP_UnitTestCase {
 		$response = function( $result, $parsed_args, $url ) use ( $facebook_product_catalog_id, $facebook_product_retailer_id ) {
 			$this->assertEquals( 'GET', $parsed_args['method'] );
 
-			$path = "catalog:{$facebook_product_catalog_id}:" . base64_encode( $facebook_product_retailer_id );
-			$path = "/{$path}/?fields=id,product_group{id}";
+			$filter = urlencode('{"retailer_id":{"eq":"' . $facebook_product_retailer_id . '"}}');
+			$fields = urlencode('id,product_group{id}');
+			$path = "/{$facebook_product_catalog_id}/products?filter={$filter}&fields={$fields}";
 
 			$this->assertEquals( "{$this->endpoint}{$this->version}{$path}", $url );
 			return [
