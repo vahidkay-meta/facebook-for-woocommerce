@@ -22,6 +22,8 @@ class Response extends ApiResponse {
 	 * @return string
 	 */
 	public function get_facebook_product_group_id(): string {
-		return $this->product_group['id'] ?? '';
+		if ( !$this['product_group'] )
+			return '';
+		return $this['product_group']['id'] ?? '';
 	}
 }

@@ -2933,15 +2933,21 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 		$fb_retailer_id = WC_Facebookcommerce_Utils::get_fb_retailer_id( $woo_product );
 
 		try {
-			$facebook_ids = $this->facebook_for_woocommerce->get_api()->get_product_facebook_ids(
+			$response = $this->facebook_for_woocommerce->get_api()->get_product_facebook_ids(
 				$this->get_product_catalog_id(),
 				$fb_retailer_id
 			);
 
-			if ( $facebook_ids->id ) {
+			if ( !$response->data || empty( $response->data ) ) {
+				return null;
+			}
+
+			$facebook_ids = $response->data[0];
+
+			if ( $facebook_ids && $facebook_ids['id'] ) {
 				$fb_id = $fbid_type == self::FB_PRODUCT_GROUP_ID
-					? $facebook_ids->get_facebook_product_group_id()
-					: $facebook_ids->id;
+					? $facebook_ids['product_group']['id']
+					: $facebook_ids['id'];
 				update_post_meta( $wp_id, $fbid_type, $fb_id );
 
 				return $fb_id;
