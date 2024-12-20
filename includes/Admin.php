@@ -1231,8 +1231,7 @@ class Admin {
 						'teeny'        => true,
 						'quicktags'    => true,
 						'tinymce'      => array(
-							'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen,wp_adv',
-							'toolbar2' => 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help',
+							'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen',
 							'entity_encoding' => 'named',
 							'verify_html' => false,
 							'preserve_newlines' => true,
@@ -1409,8 +1408,7 @@ class Admin {
 				'teeny'        => true,
 				'quicktags'    => true,
 				'tinymce'      => array(
-					'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen,wp_adv',
-					'toolbar2' => 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help',
+					'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen',
 					'entity_encoding' => 'named',
 					'verify_html' => false,
 					'preserve_newlines' => true,
