@@ -1229,14 +1229,9 @@ class Admin {
 						'textarea_rows' => 10,
 						'media_buttons' => true,
 						'teeny'        => true,
-						'quicktags'    => true,
+						'quicktags'    => false,
 						'tinymce'      => array(
 							'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen',
-							'entity_encoding' => 'named',
-							'verify_html' => false,
-							'preserve_newlines' => true,
-							'entities' => '160,nbsp,38,amp,60,lt,62,gt',
-							'cleanup' => false,
 						),
 					)
 				);
@@ -1363,7 +1358,6 @@ class Admin {
 		$sync_enabled = 'no' !== $this->get_product_variation_meta( $variation, Products::SYNC_ENABLED_META_KEY, $parent );
 		$is_visible   = ( $visibility = $this->get_product_variation_meta( $variation, Products::VISIBILITY_META_KEY, $parent ) ) ? wc_string_to_bool( $visibility ) : true;
 
-		$description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $parent );
 		$rich_text_description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_RICH_TEXT_DESCRIPTION, $parent );
 		$price        = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_PRICE, $parent );
 		$image_url    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_IMAGE, $parent );
@@ -1399,21 +1393,16 @@ class Admin {
 			 esc_html__( 'Facebook Description', 'facebook-for-woocommerce' ) . 
 			 '</label>';
 		wp_editor(
-			$description,
+			$rich_text_description,
 			\WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 			array(
 				'textarea_name' => \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION,
 				'textarea_rows' => 10,
 				'media_buttons' => true,
 				'teeny'        => true,
-				'quicktags'    => true,
+				'quicktags'    => false,
 				'tinymce'      => array(
 					'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,wp_more,spellchecker,fullscreen',
-					'entity_encoding' => 'named',
-					'verify_html' => false,
-					'preserve_newlines' => true,
-					'entities' => '160,nbsp,38,amp,60,lt,62,gt',
-					'cleanup' => false,
 				),
 			)
 		);

@@ -111,23 +111,15 @@
 	width: 11% !important;
 }
 
-.wp-editor-container {
-    border: 1px solid #dcdcde;
-}
-
-/* Ensure the border remains visible in text mode */
-.wp-editor-container textarea.wp-editor-area {
-    border: 1px solid #dcdcde;
-    box-sizing: border-box;
-}
-
 .woocommerce_options_panel .wp-editor-container {
     margin-left: 162px;
     width: calc(100% - 182px);
+    max-width: 550px;
 }
 
 .woocommerce_options_panel .wp-editor-tabs {
     margin-left: 162px;
+    max-width: 550px;
 }
 
 /* Ensure the label aligns properly */
@@ -136,4 +128,10 @@
     width: 150px;
     padding: 0;
     margin: 0 0 0 12px;
+}
+
+/* Ensure the wp-editor-wrap takes full width */
+.wp-editor-wrap {
+    width: 100%;
+    max-width: 100%;
 }
