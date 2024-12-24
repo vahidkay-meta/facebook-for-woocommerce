@@ -543,16 +543,13 @@ class WC_Facebook_Product {
 		$rich_text_description = '';
 
 		// Check if the fb description is set as that takes preference
-		if ( $this->fb_description ) {
+		if ( $this->rich_text_description ) {
+			$rich_text_description = $this->rich_text_description;
+		} elseif ( $this->fb_description ) {
 			$rich_text_description = $this->fb_description;
 		}
 
-		// If the rich text description is available, use it as the preferred description
-		if ( $this->rich_text_description ) {
-			$rich_text_description = $this->rich_text_description;
-		}
-
-		// Try to get description from post meta if fb description has been set
+		// Try to get rich text description from post meta if description has been set
 		if ( empty( $rich_text_description ) ) {
 			$temp_rich_text_description = get_post_meta(
 				$this->id,
