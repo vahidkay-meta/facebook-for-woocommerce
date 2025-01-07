@@ -1256,3 +1256,4 @@ class WC_Facebook_Product {
 	}
 
 }
+
