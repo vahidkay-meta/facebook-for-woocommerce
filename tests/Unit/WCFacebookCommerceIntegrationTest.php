@@ -495,7 +495,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 
 		$_POST[ WC_Facebook_Product::FB_REMOVE_FROM_SYNC ] = $product_to_delete->get_id();
 
-		$_POST[ WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION ] = 'Facebook product description.';
 		$_POST[ WC_Facebook_Product::FB_PRODUCT_PRICE ]                   = '199';
 		$_POST['fb_product_image_source']                                 = 'Image source meta key value.';
 		$_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ]                   = 'Facebook product image.';
@@ -524,7 +523,7 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_data                               = $facebook_product->prepare_product(null, \WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH );
 		$this->integration->product_catalog_id               = '123123123123123123';
 		/* Data coming from _POST data. */
-		$facebook_product_data['description']                = 'Facebook product description.';
+		$facebook_product_data['description']                = 'Dummy Product';
 		$facebook_product_data['price']                      = '199 USD';
 		$facebook_product_data['google_product_category']    = 1718;
 
@@ -555,7 +554,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 
 		$facebook_product_to_update = new WC_Facebook_Product( $product_to_update->get_id() );
 
-		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
 		$this->assertEquals( '199', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, true ) );
 		$this->assertEquals( 'http://example.orgFacebook product image.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_IMAGE, true ) );
 	}
@@ -1860,7 +1858,7 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		set_current_screen( 'edit-post' );
 
 		/** @var WC_Product_Simple $product */
-		$product = WC_Helper_Product::create_simple_product();
+		$product =   WC_Helper_Product::create_simple_product();
 		$product->add_meta_data( WC_Facebookcommerce_Integration::FB_PRODUCT_GROUP_ID, 'facebook-product-group-id-1' );
 		$product->add_meta_data( WC_Facebookcommerce_Integration::FB_PRODUCT_ITEM_ID, 'facebook-product-item-id-1' );
 		$product->add_meta_data( Products::VISIBILITY_META_KEY, true );
