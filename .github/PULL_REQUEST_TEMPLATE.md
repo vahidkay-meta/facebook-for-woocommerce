@@ -6,20 +6,19 @@ Closes # .
 
 _Replace this with a good description of your changes & reasoning._
 
-- [ ] Do the changed files pass `phpcs` checks? Please remove `phpcs:ignore` comments in changed files and fix any issues, or delete if not practical.
+-   [ ] Do the changed files pass `phpcs` checks? Please remove `phpcs:ignore` comments in changed files and fix any issues, or delete if not practical.
 
 ### Screenshots:
 
 <!--- Optional --->
 
-
 ### Detailed test instructions:
+
 <!-- Add detailed instructions for how to test that this PR fixes the issue and confirm that it doesn't break any other features :) -->
 
-1. 
-2. 
-3. 
-
+1.
+2.
+3.
 
 ### Additional details:
 
@@ -39,6 +38,7 @@ If you remove the "Changelog entry" header, the Pull Request title will be used 
 
 Add the `changelog: none` label if no changelog entry is needed.
 -->
+
 ### Changelog entry
 
 >

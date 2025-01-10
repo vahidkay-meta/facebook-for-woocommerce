@@ -11,45 +11,39 @@
  *  Takes optional payload for POST and optional callback.
  */
 function ajax(action, payload = null, callback = null, failcallback = null) {
-	var data = Object.assign( {}, {
-		'action': action,
-	}, payload );
+	var data = Object.assign(
+		{},
+		{
+			action: action,
+		},
+		payload,
+	);
 
 	// Since  Wordpress 2.8 ajaxurl is always defined in admin header and
 	// points to admin-ajax.php
-	jQuery.post(
-		ajaxurl,
-		data,
-		function(response) {
+	jQuery
+		.post(ajaxurl, data, function (response) {
 			if (callback) {
-				callback( response );
+				callback(response);
 			}
-		}
-	).fail(
-		function(errorResponse){
+		})
+		.fail(function (errorResponse) {
 			if (failcallback) {
-				failcallback( errorResponse );
+				failcallback(errorResponse);
 			}
-		}
-	);
+		});
 }
 
-window.fb_woo_infobanner_post_click = function (){
-	console.log( "Woo infobanner post tip click!" );
-	return ajax(
-		'ajax_woo_infobanner_post_click',
-		{
-			"_ajax_nonce": wc_facebook_infobanner_jsx.nonce
-		},
-	);
+window.fb_woo_infobanner_post_click = function () {
+	console.log("Woo infobanner post tip click!");
+	return ajax("ajax_woo_infobanner_post_click", {
+		_ajax_nonce: wc_facebook_infobanner_jsx.nonce,
+	});
 };
 
-window.fb_woo_infobanner_post_xout = function() {
-	console.log( "Woo infobanner post tip xout!" );
-	return ajax(
-		'ajax_woo_infobanner_post_xout',
-		{
-			"_ajax_nonce": wc_facebook_infobanner_jsx.nonce
-		},
-	);
+window.fb_woo_infobanner_post_xout = function () {
+	console.log("Woo infobanner post tip xout!");
+	return ajax("ajax_woo_infobanner_post_xout", {
+		_ajax_nonce: wc_facebook_infobanner_jsx.nonce,
+	});
 };

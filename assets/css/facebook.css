@@ -7,38 +7,38 @@
  * @package FacebookCommerce
  */
 #fbsetup .wrapper {
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
-  display: block;
-  width: 600px;
-  background: white url(../image/small-store.png) no-repeat;
-  background-position-x: 92%;
-  background-position-y: 172px;
-  background-size: 180px;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+	display: block;
+	width: 600px;
+	background: white url(../image/small-store.png) no-repeat;
+	background-position-x: 92%;
+	background-position-y: 172px;
+	background-size: 180px;
 }
 
 #fbsetup .wrapper .help-center {
-  float: right;
-  margin-top: -23px;
+	float: right;
+	margin-top: -23px;
 }
 
 #fbsetup .wrapper .help-center a {
-  color: white;
+	color: white;
 }
 
 #fbsetup .wrapper .help-center-icon {
-  display: inline-block;
-  background-image: url(../image/help-center.png);
-  background-size: 38px 38px;
-  background-repeat: no-repeat;
-  width: 38px;
-  height: 38px;
-  zoom: 0.7;
-  top: 12px;
-  position: relative;
+	display: inline-block;
+	background-image: url(../image/help-center.png);
+	background-size: 38px 38px;
+	background-repeat: no-repeat;
+	width: 38px;
+	height: 38px;
+	zoom: 0.7;
+	top: 12px;
+	position: relative;
 }
 
 #fbsetup .content {
-  padding: 10px 30px 20px 30px;
+	padding: 10px 30px 20px 30px;
 }
 
 #fbsetup .loader {
@@ -50,227 +50,231 @@
 	animation: spin 2s linear infinite;
 }
 @keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 #fbsetup .btn {
-  /* container: */
-  background-color: rgb(86,120,227);
-  border: 1px solid;
-  border-color: #435a8b #3c5488 #334c83;
-  border-radius: 2px;
-  padding: 10px 20px;
-  /* Get started: */
-  font-family: helvetica, arial, sans-serif;
-  font-size: 12px;
-  font-weight: 550;
-  color: #FFFFFF;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  letter-spacing: 0.2px;
-  margin: 0px 12px 10px 0px;
-  width: 60px;
+	/* container: */
+	background-color: rgb(86, 120, 227);
+	border: 1px solid;
+	border-color: #435a8b #3c5488 #334c83;
+	border-radius: 2px;
+	padding: 10px 20px;
+	/* Get started: */
+	font-family: helvetica, arial, sans-serif;
+	font-size: 12px;
+	font-weight: 550;
+	color: #ffffff;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	letter-spacing: 0.2px;
+	margin: 0px 12px 10px 0px;
+	width: 60px;
 }
 
-#fbsetup .btn.grey{
-  background: #f6f7f8;
-  border-color: #e0e1e2;
-  color: #4e5665;
-  width: 75px;
+#fbsetup .btn.grey {
+	background: #f6f7f8;
+	border-color: #e0e1e2;
+	color: #4e5665;
+	width: 75px;
 }
 
-#fbsetup .btn.pre-setup{
-  font-size: 13px;
-  width: 80px;
+#fbsetup .btn.pre-setup {
+	font-size: 13px;
+	width: 80px;
 }
 
 #fbsetup header {
-  display: block;
-  background: url(../image/facebook.png) no-repeat #4267B2;
-  background-position: 20px center;
-  background-size: 100px 19px;
-  padding: 20px;
+	display: block;
+	background: url(../image/facebook.png) no-repeat #4267b2;
+	background-position: 20px center;
+	background-size: 100px 19px;
+	padding: 20px;
 }
 #fbsetup h1 {
-  /* title: */
-  font-family: arial;
-  font-size: 18px;
-  font-weight: bold;
-  color: #141823;
-  margin-top: 12px;
-  width: 400px;
+	/* title: */
+	font-family: arial;
+	font-size: 18px;
+	font-weight: bold;
+	color: #141823;
+	margin-top: 12px;
+	width: 400px;
 }
 #fbsetup p {
-  /* copy: */
-  font-family: Helvetica;
-  font-size: 12px;
-  color: #1D2129;
-  margin: 10px 0px 14px 0px;
+	/* copy: */
+	font-family: Helvetica;
+	font-size: 12px;
+	color: #1d2129;
+	margin: 10px 0px 14px 0px;
 }
 #fbsetup h2 {
-  color: rgb(0,0,0);
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 18px;
-  margin-bottom: 6px;
-  margin-top: 12px;
-  width: 520px;
+	color: rgb(0, 0, 0);
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 18px;
+	margin-bottom: 6px;
+	margin-top: 12px;
+	width: 520px;
 }
 #fbsetup ul {
-  list-style-type: disc;
-  margin: 10px 10px 15px 19px;
+	list-style-type: disc;
+	margin: 10px 10px 15px 19px;
 }
 #fbsetup li {
-  margin: 2px 0px;
-  padding-left: 8px;
+	margin: 2px 0px;
+	padding-left: 8px;
 }
 #fbsetup .nux-message {
-  box-sizing: border-box;
-  color: #fff;
-  overflow: hidden;
-  padding: 9px;
-  position: absolute;
-  text-align: left;
-  transform: translateZ(0);
-  transition: all 200ms cubic-bezier(.08,.52,.52,1);
-  z-index: 5;
+	box-sizing: border-box;
+	color: #fff;
+	overflow: hidden;
+	padding: 9px;
+	position: absolute;
+	text-align: left;
+	transform: translateZ(0);
+	transition: all 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+	z-index: 5;
 }
 #fbsetup .nux-message .nux-message-text {
-  background: #3578e5;
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-  box-sizing: border-box;
-  padding: 10px 34px 12px 10px;
-  white-space: normal;
-  min-width: 252px;
+	background: #3578e5;
+	border-radius: 3px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+	box-sizing: border-box;
+	padding: 10px 34px 12px 10px;
+	white-space: normal;
+	min-width: 252px;
 }
 #fbsetup .nux-message .nux-message-close-btn {
-  cursor: pointer;
-  position: absolute;
-  right: 19px;
-  top: 19px;
-  height: 12px;
-  width: 12px;
-  font-style: normal;
-  color: #ccc;
+	cursor: pointer;
+	position: absolute;
+	right: 19px;
+	top: 19px;
+	height: 12px;
+	width: 12px;
+	font-style: normal;
+	color: #ccc;
 }
 #fbsetup .nux-message .nux-message-close-btn:hover {
-  color: #fff;
+	color: #fff;
 }
 #fbsetup .nux-message .nux-message-arrow {
-  border-right: 9px solid #3578e5;
-  left: 0;
-  position: absolute;
-  border-bottom: 9px solid transparent;
-  border-top: 9px solid transparent;
-  margin-top: -9px;
-  top: 50%;
+	border-right: 9px solid #3578e5;
+	left: 0;
+	position: absolute;
+	border-bottom: 9px solid transparent;
+	border-top: 9px solid transparent;
+	margin-top: -9px;
+	top: 50%;
 }
 #fbsetup .settings-section {
-  display: inline-block;
-  min-width: 45%;
-  max-width: 45%;
-  margin-right: 8px;
-  vertical-align: top;
+	display: inline-block;
+	min-width: 45%;
+	max-width: 45%;
+	margin-right: 8px;
+	vertical-align: top;
 }
 #fbsetup .settings-section h1 {
-  color: rgb(126,129,136);
-  font-size: 14px;
-  margin-top: 0px;
-  width: auto;
+	color: rgb(126, 129, 136);
+	font-size: 14px;
+	margin-top: 0px;
+	width: auto;
 }
 #fbsetup .settings-section h2 {
-  color: rgb(126,129,136);
-  font-size: 14px;
-  margin-top: 2px;
-  width: auto;
+	color: rgb(126, 129, 136);
+	font-size: 14px;
+	margin-top: 2px;
+	width: auto;
 }
 #fbsetup .settings-section .btn.small {
-  background: #f6f7f8;
-  border-color: #e0e1e2;
-  color: #4e5665;
-  height: 20px;
-  margin-top: 10px;
-  padding: 2px 6px;
-  width: auto;
+	background: #f6f7f8;
+	border-color: #e0e1e2;
+	color: #4e5665;
+	height: 20px;
+	margin-top: 10px;
+	padding: 2px 6px;
+	width: auto;
 }
 .tooltip {
-  position: relative;
-  border-bottom: 1px dotted black;
+	position: relative;
+	border-bottom: 1px dotted black;
 	/* container: */
-  border: 1px solid;
-  border-radius: 2px;
-  /* Launch Test: */
-  font-size: 12px;
-  font-weight: 550;
-  color: #FFFFFF;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  letter-spacing: 0.2px;
-  margin: 0px 12px 10px 0px;
-  background: #f6f7f8;
-  border-color: #e0e1e2;
-  color: #4e5665;
-  height: 20px;
-  margin-top: 10px;
-  padding: 2px 6px;
-  width: auto;
+	border: 1px solid;
+	border-radius: 2px;
+	/* Launch Test: */
+	font-size: 12px;
+	font-weight: 550;
+	color: #ffffff;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	letter-spacing: 0.2px;
+	margin: 0px 12px 10px 0px;
+	background: #f6f7f8;
+	border-color: #e0e1e2;
+	color: #4e5665;
+	height: 20px;
+	margin-top: 10px;
+	padding: 2px 6px;
+	width: auto;
 }
 .tooltip .tooltiptext {
-  color: black;
-  font-size: 13px;
-  padding: 5px 0;
-  text-align: justify;
-  visibility: hidden;
-  width: 400px;
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  top: 100%;
-  left: 50%;
-  margin-left: -60px;
+	color: black;
+	font-size: 13px;
+	padding: 5px 0;
+	text-align: justify;
+	visibility: hidden;
+	width: 400px;
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 1;
+	top: 100%;
+	left: 50%;
+	margin-left: -60px;
 }
 .tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
+	visibility: visible;
+	opacity: 1;
 }
 #fbsetup a {
-  text-decoration: none;
+	text-decoration: none;
 }
 
 #fbAdvancedOptionsText {
-  color: rgb(69, 114, 169);
-  font-size: 14px;
-  font-family: Helvetica;
-  padding: 8px 0px 8px 0px;
+	color: rgb(69, 114, 169);
+	font-size: 14px;
+	font-family: Helvetica;
+	padding: 8px 0px 8px 0px;
 }
 
 #fbAdvancedOptions {
-  color: rgb(126,129,136);
-  font-size: 12px;
-  font-family: Helvetica;
-  display: none;
-  padding: 8px 4px 8px 4px;
+	color: rgb(126, 129, 136);
+	font-size: 12px;
+	font-family: Helvetica;
+	display: none;
+	padding: 8px 4px 8px 4px;
 }
 
 #fbAdvancedOptions .autosyncSavedNotice {
-  color: green;
-  font-size: 10px;
-  display: none;
+	color: green;
+	font-size: 10px;
+	display: none;
 }
 
 #fbAdvancedOptions div {
-  padding: 4px 4px 4px 4px;
+	padding: 4px 4px 4px 4px;
 }
 
 .autosyncTime {
-  padding: 0px;
-  font-family: Helvetica;
-  font-size: 12px;
-  height: 18px;
+	padding: 0px;
+	font-family: Helvetica;
+	font-size: 12px;
+	height: 18px;
 }
 
 #sync_progress {
@@ -311,7 +315,7 @@ div#message:has(a[href*="facebook_messenger_deprecation_warning"]) {
 	border-left-color: #dba617 !important;
 }
 
-#mainform .actions{
+#mainform .actions {
 	display: flex;
 	max-width: 635px;
 	flex-direction: column;

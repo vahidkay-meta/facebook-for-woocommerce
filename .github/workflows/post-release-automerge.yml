@@ -1,5 +1,5 @@
-name: 'Merge the release to develop'
-run-name:  Merge the released `${{ github.head_ref }}` from `trunk` to `develop`
+name: "Merge the release to develop"
+run-name: Merge the released `${{ github.head_ref }}` from `trunk` to `develop`
 
 # **What it does**: Merges trunk to develop after `release/*` is merged to `trunk`.
 # **Why we have it**: To automate the release process and follow git-flow.
