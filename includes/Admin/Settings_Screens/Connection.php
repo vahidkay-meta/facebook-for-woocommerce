@@ -95,22 +95,6 @@ class Connection extends Abstract_Settings_Screen {
 
 
 	/**
-	 * Gets the catalog URL based on catalog ID and business ID.
-	 *
-	 * @param string $catalog_id The catalog ID
-	 * @param string $business_id The business ID (optional)
-	 * @return string The catalog URL
-	 */
-	private function get_catalog_url(string $catalog_id, string $business_id = ''): string 
-	{
-		if ($business_id) {
-			return "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/?business_id={$business_id}";
-		}
-		return "https://facebook.com/products/catalog/{$catalog_id}";
-	}
-
-
-	/**
 	 * Renders the screen.
 	 *
 	 * @since 2.0.0
@@ -176,9 +160,8 @@ class Connection extends Abstract_Settings_Screen {
 
 		// if the catalog ID is set, update the URL and try to get its name for display
 		$catalog_id = $static_items['catalog']['value'];
-		$business_id = $static_items['business-manager']['value'];
-		if (!empty($catalog_id)) {
-			$static_items['catalog']['url'] = $this->get_catalog_url($catalog_id, $business_id);
+		if ( !empty($catalog_id)) {
+			$static_items['catalog']['url'] = "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/";
 			try {
 				$response = facebook_for_woocommerce()->get_api()->get_catalog( $catalog_id );
 				if ( $name = $response->name ) {

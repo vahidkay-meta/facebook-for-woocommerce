@@ -13,35 +13,6 @@ class ConnectionTest extends \WP_UnitTestCase {
         $this->connection = new Connection();
     }
 
-    public function testGetCatalogUrl(): void {
-        $catalog_id = '123456' ;
-        $business_id = '789012';
-        
-        $expected_url = "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/?business_id={$business_id}";
-        
-        // Use reflection to access private method
-        $method = new \ReflectionMethod(Connection::class, 'get_catalog_url');
-        $method->setAccessible(true);
-        
-        $actual_url = $method->invoke($this->connection, $catalog_id, $business_id);
-        
-        $this->assertEquals($expected_url, $actual_url);
-    }
-
-    public function testGetCatalogUrlWithoutBusinessId(): void {
-        $catalog_id = '123456';
-        
-        $expected_url = "https://facebook.com/products/catalog/{$catalog_id}";
-        
-        // Use reflection to access private method
-        $method = new \ReflectionMethod(Connection::class, 'get_catalog_url');
-        $method->setAccessible(true);
-        
-        $actual_url = $method->invoke($this->connection, $catalog_id, '');
-        
-        $this->assertEquals($expected_url, $actual_url);
-    }
-
     public function testEnqueueAssetsWhenNotOnPage(): void {
         // Mock is_current_screen_page to return false
         $connection = $this->getMockBuilder(Connection::class)
