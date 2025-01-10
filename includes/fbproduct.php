@@ -11,6 +11,7 @@
 
 require_once __DIR__ . '/fbutils.php';
 
+use WooCommerce\Facebook\Framework\Plugin\Compatibility;
 use WooCommerce\Facebook\Framework\Helper;
 use WooCommerce\Facebook\Products;
 
@@ -457,22 +458,31 @@ class WC_Facebook_Product {
 
 		$sale_price = $this->woo_product->get_sale_price();
 		$sale_price_effective_date = '';
-
-		$sale_start =
-			( $date     = $this->woo_product->get_date_on_sale_from() )
-				? date_i18n( WC_DateTime::ATOM, $date->getOffsetTimestamp() )
-				: self::MIN_DATE_1 . self::MIN_TIME;
-
-		$sale_end =
-			( $date   = $this->woo_product->get_date_on_sale_to() )
-				? date_i18n( WC_DateTime::ATOM, $date->getOffsetTimestamp() )
-				: self::MAX_DATE . self::MAX_TIME;
+		$sale_start = '';
+		$sale_end = '';
 
 		// check if sale exist
 		if ( is_numeric( $sale_price ) && $sale_price > 0 ) {
-			$sale_price_effective_date = $sale_start . '/' . $sale_end;
-			$sale_price =
+			$sale_start =
+				( $date     = $this->woo_product->get_date_on_sale_from() )
+					? date_i18n( WC_DateTime::ATOM, $date->getOffsetTimestamp() )
+					: self::MIN_DATE_1 . self::MIN_TIME;
+			$sale_end =
+				( $date   = $this->woo_product->get_date_on_sale_to() )
+					? date_i18n( WC_DateTime::ATOM, $date->getOffsetTimestamp() )
+					: self::MAX_DATE . self::MAX_TIME;
+			$sale_price_effective_date =
+				( $sale_start == self::MIN_DATE_1 . self::MIN_TIME && $sale_end == self::MAX_DATE . self::MAX_TIME )
+				? ''
+				: $sale_start . '/' . $sale_end;
+				$sale_price =
 				intval( round( $this->get_price_plus_tax( $sale_price ) * 100 ) );
+
+			// Set Sale start and end as empty if set to default values
+			if ( $sale_start == self::MIN_DATE_1 . self::MIN_TIME && $sale_end == self::MAX_DATE . self::MAX_TIME ) {
+				$sale_start = '';
+				$sale_end   = '';
+			}
 		}
 
 		// check if sale is expired and sale time range is valid
@@ -715,9 +725,20 @@ class WC_Facebook_Product {
 			$product_data = $this->apply_enhanced_catalog_fields_from_attributes( $product_data, $google_product_category );
 		}
 
-		// add the Commerce values (only stock quantity for the moment)
-		if ( Products::is_product_ready_for_commerce( $this->woo_product ) ) {
+		// Add stock quantity if the product or variant is stock managed.
+		// In case if variant is not stock managed but parent is, fallback on parent value.
+		if ( $this->woo_product->managing_stock() ) {
 			$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $this->woo_product->get_stock_quantity() );
+		} else if ( $this->woo_product->is_type( 'variation' ) ) {
+			$parent_product = wc_get_product( $this->woo_product->get_parent_id() );
+			if ( $parent_product && $parent_product->managing_stock() ) {	
+				$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $parent_product->get_stock_quantity() );
+			}
+		}
+
+		// Add GTIN (Global Trade Item Number)
+		if ( Compatibility::is_wc_version_gte( '9.1.0' ) && $gtin = $this->woo_product->get_global_unique_id() ) {
+			$product_data['gtin'] = $gtin;
 		}
 
 		// Only use checkout URLs if they exist.

@@ -209,13 +209,13 @@ class Advertise extends Abstract_Settings_Screen {
 			data-hide-manage-button="true"
 			data-fbe-extras="<?php echo esc_attr( $fbe_extras ); ?>"
 			data-fbe-scopes="manage_business_extension"
-			data-fbe-redirect-uri="https://mariner9.s3.amazonaws.com/"
+			data-fbe-redirect-uri="https://business.facebook.com/fbe-iframe-handler"
 			data-title="<?php esc_attr_e( 'If you are connected to Facebook but cannot display ads, please contact Facebook support.', 'facebook-for-woocommerce' ); ?>"></div>
 		<div
 			class="fb-lwi-ads-insights"
 			data-fbe-extras="<?php echo esc_attr( $fbe_extras ); ?>"
 			data-fbe-scopes="manage_business_extension"
-			data-fbe-redirect-uri="https://mariner9.s3.amazonaws.com/"></div>
+			data-fbe-redirect-uri="https://business.facebook.com/fbe-iframe-handler"></div>
 		<?php
 		$this->maybe_render_learn_more_link( __( 'Advertising', 'facebook-for-woocommerce' ) );
 
