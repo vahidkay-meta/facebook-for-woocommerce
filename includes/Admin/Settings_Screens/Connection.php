@@ -160,7 +160,7 @@ class Connection extends Abstract_Settings_Screen {
 
 		// if the catalog ID is set, update the URL and try to get its name for display
 		$catalog_id = $static_items['catalog']['value'];
-		if ( !empty($catalog_id)) {
+		if ( !empty( $catalog_id ) ) {
 			$static_items['catalog']['url'] = "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/";
 			try {
 				$response = facebook_for_woocommerce()->get_api()->get_catalog( $catalog_id );
