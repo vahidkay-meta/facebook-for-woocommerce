@@ -134,7 +134,7 @@ class Product_Categories {
 		$category_field = new Google_Product_Category_Field();
 		?>
 			<div class="form-field term-<?php echo esc_attr( self::FIELD_GOOGLE_PRODUCT_CATEGORY_ID ); ?>-wrap">
-				<span><?php echo esc_html( self::get_enhanced_catalog_explanation_text() ); ?></span>
+				<span> 1<?php echo esc_html( self::get_enhanced_catalog_explanation_text() ); ?></span>
 				<br/>
 				<br/>
 				<?php Enhanced_Catalog_Attribute_Fields::render_hidden_input_can_show_attributes(); ?>
@@ -157,6 +157,15 @@ class Product_Categories {
 	public static function get_enhanced_catalog_explanation_text() {
 		return __( 'Facebook catalogs now support category specific fields, to make best use of them you need to select a category. WooCommerce uses the Google taxonomy as it is the most widely accepted form of categorisation. If no Google product category is chosen, the WooCommerce product category will be used instead.', 'facebook-for-woocommerce' );
 	}
+	
+	/**
+	 * Returns the text that explains why certain fields should be inputed for ad performance
+	 *
+	 * @return string the explanation text
+	 */
+	public static function get_wip_catalog_explanation_text() {
+		return __('[WIP] To optimize ad performance, we recommend providing additional product attributes. WooCommerce attributes that you\'ve provided will be greyed out.');
+	}
 
 
 	/**
@@ -174,7 +183,7 @@ class Product_Categories {
 		?>
 			<tr class="form-field">
 				<td colspan="2">
-					<span><?php echo esc_html( self::get_enhanced_catalog_explanation_text() ); ?></span>
+					<span> 2<?php echo esc_html( self::get_enhanced_catalog_explanation_text() ); ?></span>
 				</td>
 			</tr>
 			<tr class="form-field term-<?php echo esc_attr( self::FIELD_GOOGLE_PRODUCT_CATEGORY_ID ); ?>-wrap">
@@ -358,7 +367,7 @@ class Product_Categories {
 	 * @return string
 	 */
 	public function render_enhanced_catalog_attributes_title() {
-		return __( 'Category Specific Attributes', 'facebook-for-woocommerce' );
+		return __( 'Category Specific Attributes1', 'facebook-for-woocommerce' );
 	}
 
 	/**
