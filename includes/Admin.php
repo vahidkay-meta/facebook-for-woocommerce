@@ -1270,6 +1270,24 @@ class Admin {
 					)
 				);
 
+				woocommerce_wp_text_input(
+					array(
+						'id'    => \WC_Facebook_Product::FB_BRAND,
+						'label' => __( 'Brand', 'facebook-for-woocommerce' ),
+						'value' => $fb_brand,
+						'class' => 'enable-if-sync-enabled',
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'    => \WC_Facebook_Product::FB_MPN,
+						'label' => __( 'Manufacturer Parts Number (MPN)', 'facebook-for-woocommerce' ),
+						'value' => $fb_mpn,
+						'class' => 'enable-if-sync-enabled',
+					)
+				);
+
 				woocommerce_wp_hidden_input(
 					array(
 						'id'    => \WC_Facebook_Product::FB_REMOVE_FROM_SYNC,
