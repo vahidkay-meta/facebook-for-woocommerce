@@ -5,6 +5,29 @@ declare(strict_types=1);
 class fbproductTest extends WP_UnitTestCase {
 	private $parent_fb_product;
 
+	/** @var \WC_Product_Simple */
+	protected $product;
+
+	/** @var \WC_Facebook_Product */
+	protected $fb_product;
+
+	public function setUp(): void {
+		parent::setUp();
+
+		// creating a simple product
+		$this->product = new \WC_Product_Simple();
+		$this->product->set_name('Test Product');
+		$this->product->set_regular_price('10');
+		$this->product->save();
+
+		$this->fb_product = new WC_Facebook_Product($this->product);
+	}
+
+	public function tearDown(): void {
+		parent::tearDown();
+		$this->product->delete(true);
+	}
+
 	/**
 	 * Test it gets description from post meta.
 	 * @return void
@@ -254,7 +277,7 @@ class fbproductTest extends WP_UnitTestCase {
 
 		$woo_variation = wc_get_product($woo_product->get_children()[0]);
 		$woo_variation->set_manage_stock('yes');
-		$woo_variation->set_stock_quantity(23);		
+		$woo_variation->set_stock_quantity(23);
 
 		$fb_parent_product = new \WC_Facebook_Product($woo_product);
 		$fb_product = new \WC_Facebook_Product( $woo_variation, $fb_parent_product );
@@ -306,13 +329,13 @@ class fbproductTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test GTIN is added for simple product 
+	 * Test GTIN is added for simple product
 	 * @return void
 	 */
 	public function test_gtin_for_simple_product_set() {
 		$woo_product = WC_Helper_Product::create_simple_product();
 		$woo_product->set_global_unique_id(9504000059446);
-		
+
 		$fb_product = new \WC_Facebook_Product( $woo_product );
 		$data = $fb_product->prepare_product();
 
@@ -360,4 +383,65 @@ class fbproductTest extends WP_UnitTestCase {
 
 		$this->assertEquals(isset($data['gtin']), false);
 	}
+
+    public function test_prepare_product_with_default_fields() {
+        // test when no fb specific fields are set
+        $product_data = $this->fb_product->prepare_product();
+
+        $this->assertArrayHasKey('custom_fields', $product_data);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_description']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+    }
+
+    public function test_prepare_product_with_custom_fields() {
+        // Set facebook specific fields
+        $fb_description = 'Facebook specific description';
+        $fb_price = '15';
+        $fb_image = 'https:example.com/fb-image.jpg';
+
+        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, $fb_price);
+        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_IMAGE, $fb_image);
+
+        $product_data = $this->fb_product->prepare_product();
+
+        $this->assertArrayHasKey('custom_fields', $product_data);
+        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        $this->assertEquals(true, $product_data['custom_fields']['has_fb_price']);
+        $this->assertEquals(true, $product_data['custom_fields']['has_fb_image']);
+    }
+
+    public function test_prepare_product_with_mixed_fields() {
+        // Set only facebook description
+        $fb_description = 'Facebook specific description';
+
+        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+
+        $product_data = $this->fb_product->prepare_product();
+
+        $this->assertArrayHasKey('custom_fields', $product_data);
+        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+    }
+
+    public function test_prepare_product_items_batch() {
+        // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
+        $fb_description = 'Facebook specific description';
+
+        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+
+        $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
+
+        $this->assertArrayHasKey('custom_fields', $product_data);
+        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
+        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+
+        // Also verify the main product data structure for items batch
+        $this->assertArrayHasKey('title', $product_data);
+        $this->assertArrayHasKey('description', $product_data);
+        $this->assertArrayHasKey('image_link', $product_data);
+    }
 }
