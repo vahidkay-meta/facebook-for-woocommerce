@@ -360,4 +360,83 @@ class fbproductTest extends WP_UnitTestCase {
 
 		$this->assertEquals(isset($data['gtin']), false);
 	}
+
+	/**
+	 * Test Brand is added for simple product 
+	 * @return void
+	 */
+	public function test_brand_for_simple_product_set() {
+		$woo_product = WC_Helper_Product::create_simple_product();
+		$facebook_product = new \WC_Facebook_Product( $woo_product );
+		$facebook_product->set_fb_brand('Nike');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_product );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['brand'], 'Nike' );
+	}
+
+	/**
+	 * Test MPN is added for simple product 
+	 * @return void
+	 */
+	public function test_mpn_for_simple_product_set() {
+		$woo_product = WC_Helper_Product::create_simple_product();
+		$facebook_product = new \WC_Facebook_Product( $woo_product );
+		$facebook_product->set_fb_mpn('123456789');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_product );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['mpn'], '123456789' );
+	}
+
+	/**
+	 * Test MPN is added for variable product 
+	 * @return void
+	 */
+	public function test_mpn_for_variable_product_set() {
+		$woo_product = WC_Helper_Product::create_variation_product();
+		$woo_variation = wc_get_product($woo_product->get_children()[0]);
+		$facebook_product = new \WC_Facebook_Product( $woo_variation, new \WC_Facebook_Product( $woo_product ) );
+		$facebook_product->set_fb_mpn('987654321');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_variation, new \WC_Facebook_Product( $woo_product ) );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['mpn'], '987654321' );
+	}
+
+	/**
+	 * Test it gets brand from parent product if it is a variation.
+	 * @return void
+	 */
+	public function test_get_fb_brand_variable_products() {
+		// Create a variable product and set the brand for the parent
+		$variable_product = WC_Helper_Product::create_variation_product();
+		$facebook_product_parent = new \WC_Facebook_Product($variable_product);
+		$facebook_product_parent->set_fb_brand('Nike');
+		$facebook_product_parent->save();
+
+		// Get the variation product
+		$variation = wc_get_product($variable_product->get_children()[0]);
+
+		// Create a Facebook product instance for the variation
+		$facebook_product_variation = new \WC_Facebook_Product($variation);
+
+		// Retrieve the brand from the variation
+		$brand = $facebook_product_variation->get_fb_brand();
+		$this->assertEquals($brand, 'Nike');
+
+		// Set a different brand for the variation
+		$facebook_product_variation->set_fb_brand('Adidas');
+		$facebook_product_variation->save();
+
+		// Retrieve the brand again and check if it reflects the new value
+		$brand = $facebook_product_variation->get_fb_brand();
+		$this->assertEquals($brand, 'Adidas');
+	}
 }
