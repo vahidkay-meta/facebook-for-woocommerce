@@ -254,7 +254,7 @@ class fbproductTest extends WP_UnitTestCase {
 
 		$woo_variation = wc_get_product($woo_product->get_children()[0]);
 		$woo_variation->set_manage_stock('yes');
-		$woo_variation->set_stock_quantity(23);		
+		$woo_variation->set_stock_quantity(23);
 
 		$fb_parent_product = new \WC_Facebook_Product($woo_product);
 		$fb_product = new \WC_Facebook_Product( $woo_variation, $fb_parent_product );
@@ -306,13 +306,13 @@ class fbproductTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test GTIN is added for simple product 
+	 * Test GTIN is added for simple product
 	 * @return void
 	 */
 	public function test_gtin_for_simple_product_set() {
 		$woo_product = WC_Helper_Product::create_simple_product();
 		$woo_product->set_global_unique_id(9504000059446);
-		
+
 		$fb_product = new \WC_Facebook_Product( $woo_product );
 		$data = $fb_product->prepare_product();
 
@@ -359,5 +359,149 @@ class fbproductTest extends WP_UnitTestCase {
 		$data = $fb_product->prepare_product();
 
 		$this->assertEquals(isset($data['gtin']), false);
+	}
+
+	/**
+	 * Test Data Provider for product category attributes
+	 */
+	public function provide_category_data()
+	{
+		return [
+			// Only FB attributes
+			[
+				173,
+				array(
+				),
+				array(
+					"size" => "medium",
+					"gender" => "female"
+				),
+				array(
+					"size" => "medium",
+					"gender" => "female"
+				),
+			],
+			// Only Woo attributes
+			[
+				173,
+				array(
+					"size" => "medium",
+					"gender" => "female"
+				),
+				array(
+				),
+				array(
+					"size" => "medium",
+					"gender" => "female"
+				),
+			],
+			// Both Woo and FB attributes
+			[
+				173,
+				array(
+					"color" => "black",
+					"material" => "cotton"
+				),
+				array(
+					"size" => "medium",
+					"gender" => "female"
+				),
+				array(
+					"color" => "black",
+					"material" => "cotton",
+					"size" => "medium",
+					"gender" => "female"
+				),
+			],
+			// Woo attributes with space, '-' and different casing of enum attribute
+			[
+				173,
+				array(
+					"age group" => "Teen",
+					"is-costume" => "yes",
+					"Sunglasses Width" => "narrow"
+				),
+				array(
+				),
+				array(
+					"age_group" => "Teen",
+					"is_costume" => "yes",
+					"sunglasses_width" => "narrow"
+				),
+			],
+			// FB attributes overriding Woo attributes
+			[
+				173,
+				array(
+					"age_group" => "teen",
+					"size" => "medium",
+				),
+				array(
+					"age_group" => "toddler",
+					"size" => "large",
+				),
+				array(
+					"age_group" => "toddler",
+					"size" => "large",
+				),
+			],
+		];
+	}
+
+	/**
+	 * Test that attribute related fields are being set correctly while preparing product.
+	 *
+	 * @dataProvider provide_category_data
+	 * @return void
+	 */
+	public function test_enhanced_catalog_fields_from_attributes(
+		$category_id,
+		$woo_attributes,
+		$fb_attributes,
+		$expected_attributes
+	) {
+		$product          = WC_Helper_Product::create_simple_product();
+		$product->update_meta_data('_wc_facebook_google_product_category', $category_id);
+
+		// Set Woo attributes
+		$attributes = array();
+		$position = 0;
+		foreach ($woo_attributes as $key => $value) {
+			$attribute = new WC_Product_Attribute();
+			$attribute->set_id(0);
+			$attribute->set_name($key);
+			$attribute->set_options(array($value));
+			$attribute->set_position($position++);
+			$attribute->set_visible(1);
+			$attribute->set_variation(0);
+			$attributes[] = $attribute;
+		}
+		$product->set_attributes($attributes);
+
+		// Set FB sttributes
+		foreach ($fb_attributes as $key => $value) {
+			$product->update_meta_data('_wc_facebook_enhanced_catalog_attributes_'.$key, $value);
+		}
+		$product->save_meta_data();
+
+		// Prepare Product and validate assertions
+		$facebook_product = new \WC_Facebook_Product($product);
+		$product_data = $facebook_product->prepare_product(
+			$facebook_product->get_id(),
+			\WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH
+		);
+		$this->assertEquals($product_data['google_product_category'], $category_id);
+		foreach ($expected_attributes as $key => $value) {
+			$this->assertEquals($product_data[$key], $value);
+		}
+
+		$product_data = $facebook_product->prepare_product(
+			$facebook_product->get_id(),
+			\WC_Facebook_Product::PRODUCT_PREP_TYPE_FEED
+		);
+		$this->assertEquals($product_data['category'], 173);
+		foreach ($expected_attributes as $key => $value) {
+			$this->assertEquals($product_data[$key], $value);
+		}
 	}
 }

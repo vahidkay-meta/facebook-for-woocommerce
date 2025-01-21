@@ -801,8 +801,7 @@ class WC_Facebook_Product {
 		}
 		$enhanced_data = array();
 
-		$category_attrs = $category_handler->get_attributes_with_fallback_to_parent_category( $google_category_id );
-		$all_attributes = $this->get_matched_attributes_for_product( $this->woo_product, $category_attrs );
+		$all_attributes = $category_handler->get_attributes_with_fallback_to_parent_category( $google_category_id );
 
 		foreach ( $all_attributes as $attribute ) {
 			$value            = Products::get_enhanced_catalog_attribute( $attribute['key'], $this->woo_product );
@@ -823,33 +822,6 @@ class WC_Facebook_Product {
 		}
 
 		return array_merge( $product_data, $enhanced_data );
-	}
-
-
-	/**
-	 * Filters list of attributes to only those available for a given product
-	 *
-	 * @param \WC_Product $product WooCommerce Product
-	 * @param array       $all_attributes List of Enhanced Catalog attributes to match
-	 * @return array
-	 */
-	public function get_matched_attributes_for_product( $product, $all_attributes ) {
-		$matched_attributes = array();
-		$sanitized_keys     = array_map(
-			function( $key ) {
-					return \WC_Facebookcommerce_Utils::sanitize_variant_name( $key, false );
-			},
-			array_keys( $product->get_attributes() )
-		);
-
-		$matched_attributes = array_filter(
-			$all_attributes,
-			function( $attribute ) use ( $sanitized_keys ) {
-				return in_array( $attribute['key'], $sanitized_keys );
-			}
-		);
-
-		return $matched_attributes;
 	}
 
 
