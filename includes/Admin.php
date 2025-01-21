@@ -1278,18 +1278,6 @@ class Admin {
 				);
 				?>
 			</div>
-			<?php
-			$commerce_handler = facebook_for_woocommerce()->get_commerce_handler();
-			?>
-			<?php if ( $commerce_handler->is_connected() && $commerce_handler->is_available() ) : ?>
-				<div class='wc-facebook-commerce-options-group options_group'>
-					<?php
-					if ( $product instanceof \WC_Product ) {
-						\WooCommerce\Facebook\Admin\Products::render_commerce_fields( $product );
-					}
-					?>
-			</div>
-			<?php endif; ?>
 			<div class='wc-facebook-commerce-options-group options_group'>
 				<?php \WooCommerce\Facebook\Admin\Products::render_google_product_category_fields_and_enhanced_attributes( $product ); ?>
 			</div>
