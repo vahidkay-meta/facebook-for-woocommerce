@@ -528,9 +528,9 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_data['price']                      = '199 USD';
 		$facebook_product_data['google_product_category']    = 1718;
 		$facebook_product_data['custom_fields']	= [
-			'has_fb_description' => 'yes',
-			'has_fb_price' => 'yes',
-			'has_fb_image' => 'yes'
+			'has_fb_description' => true,
+			'has_fb_price' => true,
+			'has_fb_image' => true
 		];
 
 		$requests = WC_Facebookcommerce_Utils::prepare_product_requests_items_batch($facebook_product_data);
@@ -562,9 +562,9 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_to_update = new WC_Facebook_Product( $product_to_update->get_id() );
 		$updated_product_data = $facebook_product_to_update->prepare_product(null, \WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH );
 		
-		$this->assertEquals('yes', $updated_product_data['custom_fields']['has_fb_description']);
-		$this->assertEquals('yes', $updated_product_data['custom_fields']['has_fb_price']);
-		$this->assertEquals('yes', $updated_product_data['custom_fields']['has_fb_image']);
+		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_description']);
+		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_price']);
+		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_image']);
 
 		// Verify the actual values are still stored in meta
 		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
