@@ -3,7 +3,7 @@ Contributors: facebook, automattic, woothemes
 Tags: facebook, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.7
-Stable tag: 3.3.0
+Stable tag: 3.3.1
 Requires PHP: 7.4
 MySQL: 5.6 or greater
 License: GPLv2 or later
@@ -39,6 +39,19 @@ When opening a bug on GitHub, please give us as many details as possible.
 * Current version of Facebook-for-WooCommerce, WooCommerce, Wordpress, PHP
 
 == Changelog ==
+
+= 3.3.2 - 2025-01-21 =
+* Fix - a bug that arose from reliance on the plugin version compatibility tag by @vinkmeta in #2856
+* Fix - Update catalog link in connections tab to point to Catalog by @devbodaghe in #2848
+* Fix - Product URL links now point to items tab by @vinkmeta in #2852
+* Tweak - Removed sell on Instagram by @mshymon in #2854
+* Tweak - Add custom fields to product data structure by @devbodaghe in #2836
+* Fix - Multiple issues with Fixed FB Attribute Syncing by @vinkmeta in #2860
+
+= 3.3.1 - 2024-12-06 = 
+* Fix - Sale price effective date by @vinkmeta in #2809
+* Fix - Sync stock quantity when available by @mshymon in #2811
+* Fix - Sync product GTIN when available by @mshymon in #2810
 
 = 3.3.0 - 2024-11-07 =
 * Add - Extension navigation tabs on Product Sets screens.
