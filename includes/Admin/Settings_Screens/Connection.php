@@ -159,16 +159,23 @@ class Connection extends Abstract_Settings_Screen {
 		);
 
 		// if the catalog ID is set, update the URL and try to get its name for display
-		if ( $catalog_id = $static_items['catalog']['value'] ) {
-
-			$static_items['catalog']['url'] = "https://facebook.com/products/catalogs/{$catalog_id}";
-
+		$catalog_id = $static_items['catalog']['value'];
+		if ( !empty( $catalog_id ) ) {
+			$static_items['catalog']['url'] = "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/";
 			try {
 				$response = facebook_for_woocommerce()->get_api()->get_catalog( $catalog_id );
 				if ( $name = $response->name ) {
 					$static_items['catalog']['value'] = $name;
 				}
 			} catch ( ApiException $exception ) {
+				// Log the exception with additional information
+				facebook_for_woocommerce()->log(
+					sprintf(
+						'Connection failed for catalog %s: %s ',
+						$catalog_id,
+						$exception->getMessage(),
+					)
+				);
 			}
 		}
 

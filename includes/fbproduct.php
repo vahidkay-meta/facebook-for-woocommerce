@@ -662,6 +662,8 @@ class WC_Facebook_Product {
 			$brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
 		}
 
+		$custom_fields = $this->get_facebook_specific_fields();
+
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
 			$product_data = array(
 				'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
@@ -675,6 +677,7 @@ class WC_Facebook_Product {
 				'price'                 => $this->get_fb_price( true ),
 				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
+				'custom_fields'			=> $custom_fields
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
 			$gpc_field_name = 'google_product_category';
@@ -706,6 +709,7 @@ class WC_Facebook_Product {
 				'currency'              => get_woocommerce_currency(),
 				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
+				'custom_fields'			=> $custom_fields
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {
@@ -731,13 +735,13 @@ class WC_Facebook_Product {
 			$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $this->woo_product->get_stock_quantity() );
 		} else if ( $this->woo_product->is_type( 'variation' ) ) {
 			$parent_product = wc_get_product( $this->woo_product->get_parent_id() );
-			if ( $parent_product && $parent_product->managing_stock() ) {	
+			if ( $parent_product && $parent_product->managing_stock() ) {
 				$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $parent_product->get_stock_quantity() );
 			}
 		}
 
 		// Add GTIN (Global Trade Item Number)
-		if ( Compatibility::is_wc_version_gte( '9.1.0' ) && $gtin = $this->woo_product->get_global_unique_id() ) {
+		if ( method_exists( $this->woo_product, 'get_global_unique_id' ) && $gtin = $this->woo_product->get_global_unique_id() ) {
 			$product_data['gtin'] = $gtin;
 		}
 
@@ -801,8 +805,7 @@ class WC_Facebook_Product {
 		}
 		$enhanced_data = array();
 
-		$category_attrs = $category_handler->get_attributes_with_fallback_to_parent_category( $google_category_id );
-		$all_attributes = $this->get_matched_attributes_for_product( $this->woo_product, $category_attrs );
+		$all_attributes = $category_handler->get_attributes_with_fallback_to_parent_category( $google_category_id );
 
 		foreach ( $all_attributes as $attribute ) {
 			$value            = Products::get_enhanced_catalog_attribute( $attribute['key'], $this->woo_product );
@@ -823,33 +826,6 @@ class WC_Facebook_Product {
 		}
 
 		return array_merge( $product_data, $enhanced_data );
-	}
-
-
-	/**
-	 * Filters list of attributes to only those available for a given product
-	 *
-	 * @param \WC_Product $product WooCommerce Product
-	 * @param array       $all_attributes List of Enhanced Catalog attributes to match
-	 * @return array
-	 */
-	public function get_matched_attributes_for_product( $product, $all_attributes ) {
-		$matched_attributes = array();
-		$sanitized_keys     = array_map(
-			function( $key ) {
-					return \WC_Facebookcommerce_Utils::sanitize_variant_name( $key, false );
-			},
-			array_keys( $product->get_attributes() )
-		);
-
-		$matched_attributes = array_filter(
-			$all_attributes,
-			function( $attribute ) use ( $sanitized_keys ) {
-				return in_array( $attribute['key'], $sanitized_keys );
-			}
-		);
-
-		return $matched_attributes;
 	}
 
 
@@ -1064,5 +1040,17 @@ class WC_Facebook_Product {
 		return $final_variants;
 	}
 
+	/**
+	 * Returns information about which fields are using Facebook-specific values.
+	 *
+	 * @return array
+	 */
+	private function get_facebook_specific_fields(): array {
+		return array(
+			'has_fb_description' => (bool) get_post_meta($this->id, self::FB_PRODUCT_DESCRIPTION, true),
+			'has_fb_price'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_PRICE, true),
+			'has_fb_image'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_IMAGE, true)
+		);
+	}
 
 }

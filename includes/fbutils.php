@@ -635,6 +635,13 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 			return $name;
 		}
 
+		/*
+		* Sanitize attribute names inline with FB name
+		*/
+		public static function sanitize_attribute_name( $name ) {
+			return str_replace(array('-', ' '), '_', $name);
+		}
+
 		public static function validateGender( $gender ) {
 			if ( $gender && ! isset( self::$validGenderArray[ $gender ] ) ) {
 				$first_char = strtolower( substr( $gender, 0, 1 ) );
