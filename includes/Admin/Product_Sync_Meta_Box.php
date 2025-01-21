@@ -80,8 +80,7 @@ class Product_Sync_Meta_Box {
 
 			?>
 
-			<?php echo esc_html__( 'Facebook ID:', 'facebook-for-woocommerce' ); ?>
-			<a href="https://facebook.com/<?php echo esc_attr( $fb_product_id ); ?>" target="_blank"><?php echo esc_html( $fb_product_id ); ?></a>
+			<a href="https://business.facebook.com/commerce/catalogs/<?php echo esc_attr( $fb_integration->get_product_catalog_id() ); ?>/products/" target="_blank"><?php echo esc_html( 'View product on Meta catalog' ); ?></a>
 
 			<?php if ( \WC_Facebookcommerce_Utils::is_variable_type( $fb_product->get_type() ) ) : ?>
 

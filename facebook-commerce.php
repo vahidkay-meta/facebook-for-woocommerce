@@ -1630,8 +1630,10 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 
 		if ( $fb_product_item_id ) {
 			$this->display_success_message(
-				'Created product  <a href="https://facebook.com/' . $fb_product_item_id .
-				'" target="_blank">' . $fb_product_item_id . '</a> on Facebook.'
+				'<a href="https://business.facebook.com/commerce/catalogs/'.
+				$this->get_product_catalog_id().
+				'/products/'. '" target="_blank">' .
+				'View product on Meta catalog</a>'
 			);
 		}
 	}
