@@ -1497,8 +1497,6 @@ class Admin {
 			$posted_param = 'variable_' . \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION;
 			$description  = isset( $_POST[ $posted_param ][ $index ] ) ? sanitize_text_field( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : null;
 			$posted_param = 'variable_' . \WC_Facebookcommerce_Integration::FB_RICH_TEXT_DESCRIPTION;
-			// $rich_text_description  = isset( $_POST[ $posted_param ][ $index ] ) ? sanitize_text_field( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : null;
-			$rich_text_description  = 'Nene';
 			$posted_param = 'variable_' . \WC_Facebook_Product::FB_MPN;
 			$fb_mpn  = isset( $_POST[ $posted_param ][ $index ] ) ? sanitize_text_field( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : null;
 			$posted_param = 'variable_fb_product_image_source';
@@ -1508,7 +1506,6 @@ class Admin {
 			$posted_param = 'variable_' . \WC_Facebook_Product::FB_PRODUCT_PRICE;
 			$price        = isset( $_POST[ $posted_param ][ $index ] ) ? wc_format_decimal( wc_clean( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) ) : '';
 			$variation->update_meta_data( \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $description );
-			$variation->update_meta_data( 'rich_text_description', $rich_text_description );
 			$variation->update_meta_data( Products::PRODUCT_IMAGE_SOURCE_META_KEY, $image_source );
 			$variation->update_meta_data( \WC_Facebook_Product::FB_MPN, $fb_mpn );
 			$variation->update_meta_data( \WC_Facebook_Product::FB_PRODUCT_IMAGE, $image_url );
