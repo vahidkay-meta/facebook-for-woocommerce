@@ -64,7 +64,7 @@ class FBCategories {
 		// TODO: can perform more validations here.
 		switch ( $attribute['type'] ) {
 			case 'enum':
-				return in_array( $value, $attribute['enum_values'] );
+				return in_array( strtolower( $value ), $attribute['enum_values'] );
 			case 'boolean':
 				return in_array( $value, array( 'yes', 'no' ) );
 			default:
