@@ -1,25 +1,38 @@
-.term-wc_facebook_google_product_category_id-wrap #wc-facebook-google-product-category-fields {
+.term-wc_facebook_google_product_category_id-wrap
+	#wc-facebook-google-product-category-fields {
 	width: 50%;
 }
 
-.term-wc_facebook_google_product_category_id-wrap .wc-facebook-google-product-category-field select {
+.term-wc_facebook_google_product_category_id-wrap
+	.wc-facebook-google-product-category-field
+	select {
 	float: none;
 	width: 100%;
 	max-width: none;
 }
 
-.term-wc_facebook_google_product_category_id-wrap #wc-facebook-google-product-category-fields .select2-container {
+.term-wc_facebook_google_product_category_id-wrap
+	#wc-facebook-google-product-category-fields
+	.select2-container {
 	float: none;
 	width: 100% !important;
 }
 
-tr[class*="term-wc_facebook_enhanced_catalog_attribute"]:not(.term-wc_facebook_enhanced_catalog_attributes_id-title-wrap) > th > label {
+tr[class*="term-wc_facebook_enhanced_catalog_attribute"]:not(
+		.term-wc_facebook_enhanced_catalog_attributes_id-title-wrap
+	)
+	> th
+	> label {
 	position: relative;
 	display: block;
 }
 
-tr[class*="term-wc_facebook_enhanced_catalog_attribute"]:not(.term-wc_facebook_enhanced_catalog_attributes_id-title-wrap) > th > label > span.woocommerce-help-tip {
+tr[class*="term-wc_facebook_enhanced_catalog_attribute"]:not(
+		.term-wc_facebook_enhanced_catalog_attributes_id-title-wrap
+	)
+	> th
+	> label
+	> span.woocommerce-help-tip {
 	position: absolute;
 	right: 15px;
 }
-

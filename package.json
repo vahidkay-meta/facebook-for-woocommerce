@@ -13,7 +13,8 @@
   },
   "devDependencies": {
     "@wordpress/env": "^9.10.0",
-    "@wordpress/scripts": "^14.0.0"
+    "@wordpress/scripts": "^14.0.0",
+    "prettier": "3.3.3"
   },
   "scripts": {
     "prearchive": "rm -rf vendor && composer install --no-dev && composer dump-autoload -o",

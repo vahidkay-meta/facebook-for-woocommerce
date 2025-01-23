@@ -14,12 +14,19 @@
 #woocommerce-product-data .fb-product-image-source-field .wc-radios li {
 	margin-bottom: 0;
 }
-#woocommerce-product-data .fb-product-image-source-field .wc-radios li:last-child {
+#woocommerce-product-data
+	.fb-product-image-source-field
+	.wc-radios
+	li:last-child {
 	padding-bottom: 0;
 }
 
 /* add padding-top for first radio button in variation fields */
-#woocommerce-product-data .woocommerce_variation .fb-product-image-source-field .wc-radios li:first-child {
+#woocommerce-product-data
+	.woocommerce_variation
+	.fb-product-image-source-field
+	.wc-radios
+	li:first-child {
 	padding-top: 10px;
 }
 
@@ -49,8 +56,14 @@
 	position: relative;
 	width: 113px;
 }
-#woocommerce-product-data .wc_facebook_commerce_enabled_field label .woocommerce-help-tip,
-#woocommerce-product-data .wc_facebook_commerce_fields label .woocommerce-help-tip {
+#woocommerce-product-data
+	.wc_facebook_commerce_enabled_field
+	label
+	.woocommerce-help-tip,
+#woocommerce-product-data
+	.wc_facebook_commerce_fields
+	label
+	.woocommerce-help-tip {
 	margin: 0;
 	position: absolute;
 	top: 4px;
@@ -67,7 +80,9 @@
 	max-width: none;
 }
 
-#woocommerce-product-data #wc-facebook-google-product-category-fields .select2-container {
+#woocommerce-product-data
+	#wc-facebook-google-product-category-fields
+	.select2-container {
 	float: none;
 	width: 100% !important;
 }
