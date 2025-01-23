@@ -14,6 +14,8 @@ require_once __DIR__ . '/fbutils.php';
 use WooCommerce\Facebook\Framework\Plugin\Compatibility;
 use WooCommerce\Facebook\Framework\Helper;
 use WooCommerce\Facebook\Products;
+use WooCommerce\Facebook\Admin;
+
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,6 +35,7 @@ class WC_Facebook_Product {
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
+	const FB_PRODUCT_CONDITION   = 'fb_product_condition';
     const FB_PRODUCT_VIDEO         = 'fb_product_video';
     const FB_VARIANT_IMAGE           = 'fb_image';
     const FB_VISIBILITY              = 'fb_visibility';
@@ -425,6 +428,17 @@ class WC_Facebook_Product {
 		);
 	}
 
+		public function set_condition( $fb_condition ) {
+		$fb_condition = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_condition )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_PRODUCT_CONDITION,
+				$fb_condition
+			);
+	}
+
 	public function set_price( $price ) {
 		if ( is_numeric( $price ) ) {
 			update_post_meta(
@@ -709,6 +723,25 @@ class WC_Facebook_Product {
 		);
 	}
 
+	public function get_fb_condition() {
+		// Get condition directly from post meta
+		$fb_condition = get_post_meta(
+			$this->id,
+			self::FB_PRODUCT_CONDITION,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_condition ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_condition = get_post_meta($parent_id, self::FB_PRODUCT_CONDITION, true);
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_condition) ?: Admin::CONDITION_REFURBISHED ;
+	}
+
 
 	public function update_visibility( $is_product_page, $visible_box_checked ) {
 		$visibility = get_post_meta( $this->id, self::FB_VISIBILITY, true );
@@ -838,7 +871,8 @@ class WC_Facebook_Product {
 					'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-					'retailer_id'           => $retailer_id,
+					'condition'            	=> $this->get_fb_condition(),
+				'retailer_id'           => $retailer_id,
 					'price'                 => $this->get_fb_price( true ),
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
@@ -868,7 +902,8 @@ class WC_Facebook_Product {
 					 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
 					 */
 					'category'              => $categories['categories'],
-					'product_type'          => $categories['categories'],
+					'condition'            	=> $this->get_fb_condition(),
+				'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 					'retailer_id'           => $retailer_id,
