@@ -693,7 +693,7 @@ class ApiTest extends WP_UnitTestCase {
 			$this->assertEquals( 'GET', $parsed_args['method'] );
 			$this->assertEquals( "{$this->endpoint}{$this->version}/{$facebook_product_catalog_id}/product_feeds", $url );
 			return [
-				'body'     => '{"data":[{"id":"1068839467367301","file_name":"WooCommerce Catalog - Feed","name":"WooCommerce Catalog - Feed"}],"paging":{"cursors":{"before":"QVFIUmJybjEwNU81U29oZAXdmcXl2MEhBdWthLVhSUlhUcV9PLWtSR1RQVkJqTnlWVTRtQzRvTExRdjZAheDlsZA0JKYUkxaHJLOVZAqYmU2eVZAYQXJRNG5pRXp3","after":"QVFIUmJybjEwNU81U29oZAXdmcXl2MEhBdWthLVhSUlhUcV9PLWtSR1RQVkJqTnlWVTRtQzRvTExRdjZAheDlsZA0JKYUkxaHJLOVZAqYmU2eVZAYQXJRNG5pRXp3"}}}',
+				'body'     => '{"data":[{"id":"1068839467367301","file_name":"WooCommerce Catalog - ProductFeed","name":"WooCommerce Catalog - ProductFeed"}],"paging":{"cursors":{"before":"QVFIUmJybjEwNU81U29oZAXdmcXl2MEhBdWthLVhSUlhUcV9PLWtSR1RQVkJqTnlWVTRtQzRvTExRdjZAheDlsZA0JKYUkxaHJLOVZAqYmU2eVZAYQXJRNG5pRXp3","after":"QVFIUmJybjEwNU81U29oZAXdmcXl2MEhBdWthLVhSUlhUcV9PLWtSR1RQVkJqTnlWVTRtQzRvTExRdjZAheDlsZA0JKYUkxaHJLOVZAqYmU2eVZAYQXJRNG5pRXp3"}}}',
 				'response' => [
 					'code'    => 200,
 					'message' => 'OK',
@@ -708,8 +708,8 @@ class ApiTest extends WP_UnitTestCase {
 			[
 				[
 					'id'        => '1068839467367301',
-					'file_name' => 'WooCommerce Catalog - Feed',
-					'name'      => 'WooCommerce Catalog - Feed',
+					'file_name' => 'WooCommerce Catalog - ProductFeed',
+					'name'      => 'WooCommerce Catalog - ProductFeed',
 				],
 			],
 			$response->data

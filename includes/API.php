@@ -505,10 +505,12 @@ class API extends Base {
 
 
 	/**
-	 * @param string $product_feed_id Facebook Product Feed ID.
+	 * @param string $product_feed_id Facebook Product ProductFeed ID.
+	 *
 	 * @return Response
 	 * @throws ApiException
 	 * @throws API\Exceptions\Request_Limit_Reached
+	 * Todo: update to read_product_feed or refactor how we specify which feed
 	 */
 	public function read_feed( string $product_feed_id ) {
 		$request = new API\ProductCatalog\ProductFeeds\Read\Request( $product_feed_id );
