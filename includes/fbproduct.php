@@ -34,10 +34,10 @@ class WC_Facebook_Product {
 	// to this object.
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
-	const FB_SIZE			     = 'fb_size';
 	const FB_COLOR			     = 'fb_color';
 	const FB_MATERIAL		     = 'fb_material';
 	const FB_PATTERN		     = 'fb_pattern';
+	const FB_SIZE			     = 'fb_size';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
 	const FB_PRODUCT_CONDITION   = 'fb_product_condition';
 	const FB_AGE_GROUP			 = 'fb_age_group';
@@ -977,6 +977,9 @@ class WC_Facebook_Product {
 				'material'            	=> Helper::str_truncate( $this->get_fb_material(), 100 ),
 				'size'            		=> $this->get_fb_size(),
 				'age_group'            	=> $this->get_fb_age_group(),
+				'gender'            	=> $this->get_fb_gender(),
+				'size'            		=> $this->get_fb_size(),
+				'age_group'            	=> $this->get_fb_age_group(),
 				'condition'            	=> $this->get_fb_condition(),
 				'retailer_id'           => $retailer_id,
 					'price'                 => $this->get_fb_price( true ),
@@ -1007,6 +1010,15 @@ class WC_Facebook_Product {
 				 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
 				 */
 				'category'              => $categories['categories'],
+				'gender'            	=> $this->get_fb_gender(),
+				'size'            		=> $this->get_fb_size(),
+				'color'            		=> $this->get_fb_color(),
+				'pattern'            	=> Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'            	=> Helper::str_truncate( $this->get_fb_material(), 200 ),
+				'age_group'            	=> $this->get_fb_age_group(),
+				'gender'            	=> $this->get_fb_gender(),
+				'size'            		=> $this->get_fb_size(),
+				'age_group'            	=> $this->get_fb_age_group(),
 				'condition'            	=> $this->get_fb_condition(),
 				'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),

@@ -83,6 +83,38 @@ class Admin {
 
 
 
+	/** @var string the "adult" age group */
+	const AGE_GROUP_ADULT = 'adult';
+
+	/** @var string the "all ages" age group */
+	const AGE_GROUP_ALL_AGES = 'all_ages';
+
+	/** @var string the "teen" age group */
+	const AGE_GROUP_TEEN = 'teen';
+
+	/** @var string the "kids" age group */
+	const AGE_GROUP_KIDS = 'kids';
+
+	/** @var string the "toddler" age group */
+	const AGE_GROUP_TODDLER = 'toddler';
+
+	/** @var string the "infant" age group */
+	const AGE_GROUP_INFANT = 'infant';
+
+	/** @var string the "newborn" age group */
+	const AGE_GROUP_NEWBORN = 'newborn';
+
+	/** @var string the "male" gender */
+	const GENDER_MALE = 'male';
+
+	/** @var string the "female" gender */
+	const GENDER_FEMALE = 'female';
+
+	/** @var string the "unisex" gender */
+	const GENDER_UNISEX = 'unisex';
+
+
+
 
 	/**
 	 * Admin constructor.
@@ -1448,7 +1480,7 @@ class Admin {
 
 				woocommerce_wp_select(
 					array(
-						'id'      => 'wc_facebook_condition',
+						'id'          => \WC_Facebook_Product::FB_PRODUCT_CONDITION,
 						'label'   => __( 'Condition', 'facebook-for-woocommerce' ),
 						'options' => array(
 								'' => __( 'Select condition', 'facebook-for-woocommerce' ), // Add empty option
@@ -1546,6 +1578,52 @@ class Admin {
 						'cols'        => 40,
 						'rows'        => 60,
 						'value'       => $pattern,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				woocommerce_wp_select(
+					array(
+						'id'          => \WC_Facebook_Product::FB_AGE_GROUP,
+						'label'       => __( 'Age Group', 'facebook-for-woocommerce' ),
+						'options'     => array(
+							self::AGE_GROUP_ADULT     => __( 'Adult', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_ALL_AGES  => __( 'All Ages', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_TEEN      => __( 'Teen', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_KIDS      => __( 'Kids', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_TODDLER   => __( 'Toddler', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_INFANT    => __( 'Infant', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_NEWBORN   => __( 'Newborn', 'facebook-for-woocommerce' ),
+        				),
+						'value'       => $age_group,
+						'desc_tip'    => true,
+						'description' => __( 'Choose the age group for the product.', 'facebook-for-woocommerce' ),
+					)
+				);
+
+				woocommerce_wp_select(
+					array(
+						'id'          => \WC_Facebook_Product::FB_GENDER,
+						'label'       => __( 'Gender', 'facebook-for-woocommerce' ),
+						'options'     => array(
+							self::GENDER_MALE   => __( 'Male', 'facebook-for-woocommerce' ),
+							self::GENDER_FEMALE => __( 'Female', 'facebook-for-woocommerce' ),
+							self::GENDER_UNISEX => __( 'Unisex', 'facebook-for-woocommerce' ),
+						),
+						'value'       => $gender, 
+						'desc_tip'    => true,
+						'description' => __( 'Choose the gender for the product.', 'facebook-for-woocommerce' ),
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_SIZE,
+						'label'       => __( 'Size', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Size of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $size,
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
