@@ -51,6 +51,38 @@ class Admin {
 	/** @var string the "refurbished" condition */
 	const CONDITION_REFURBISHED = 'refurbished';
 
+	/** @var string the "adult" age group */
+	const AGE_GROUP_ADULT = 'adult';
+
+	/** @var string the "all ages" age group */
+	const AGE_GROUP_ALL_AGES = 'all_ages';
+
+	/** @var string the "teen" age group */
+	const AGE_GROUP_TEEN = 'teen';
+
+	/** @var string the "kids" age group */
+	const AGE_GROUP_KIDS = 'kids';
+
+	/** @var string the "toddler" age group */
+	const AGE_GROUP_TODDLER = 'toddler';
+
+	/** @var string the "infant" age group */
+	const AGE_GROUP_INFANT = 'infant';
+
+	/** @var string the "newborn" age group */
+	const AGE_GROUP_NEWBORN = 'newborn';
+
+	/** @var string the "male" gender */
+	const GENDER_MALE = 'male';
+
+	/** @var string the "female" gender */
+	const GENDER_FEMALE = 'female';
+
+	/** @var string the "unisex" gender */
+	const GENDER_UNISEX = 'unisex';
+
+
+
 
 	/**
 	 * Admin constructor.
@@ -1253,7 +1285,10 @@ class Admin {
         $video_urls   = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
 		$fb_brand     = get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) ? get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) : get_post_meta( $post->ID, '_wc_facebook_enhanced_catalog_attributes_brand', true );
 		$fb_mpn       = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MPN, true );
-		$condition    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true ) ; // Set default to 'New'
+		$condition    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true ) ; 
+		$age_group    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_AGE_GROUP, true ) ;
+		$gender    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_GENDER, true ) ;
+		$size    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_SIZE, true ) ;
 
 		if ( $sync_enabled ) {
 			$sync_mode = $is_visible ? self::SYNC_MODE_SYNC_AND_SHOW : self::SYNC_MODE_SYNC_AND_HIDE;
@@ -1401,7 +1436,7 @@ class Admin {
 
 				woocommerce_wp_select(
 					array(
-						'id'      => 'wc_facebook_condition',
+						'id'          => \WC_Facebook_Product::FB_PRODUCT_CONDITION,
 						'label'   => __( 'Condition', 'facebook-for-woocommerce' ),
 						'options' => array(
 							self::CONDITION_NEW => __( 'New', 'facebook-for-woocommerce' ),
@@ -1414,6 +1449,52 @@ class Admin {
 						)
 				);
 
+				woocommerce_wp_select(
+					array(
+						'id'          => \WC_Facebook_Product::FB_AGE_GROUP,
+						'label'       => __( 'Age Group', 'facebook-for-woocommerce' ),
+						'options'     => array(
+							self::AGE_GROUP_ADULT     => __( 'Adult', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_ALL_AGES  => __( 'All Ages', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_TEEN      => __( 'Teen', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_KIDS      => __( 'Kids', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_TODDLER   => __( 'Toddler', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_INFANT    => __( 'Infant', 'facebook-for-woocommerce' ),
+							self::AGE_GROUP_NEWBORN   => __( 'Newborn', 'facebook-for-woocommerce' ),
+        				),
+						'value'       => $age_group,
+						'desc_tip'    => true,
+						'description' => __( 'Choose the age group for the product.', 'facebook-for-woocommerce' ),
+					)
+				);
+
+				woocommerce_wp_select(
+					array(
+						'id'          => \WC_Facebook_Product::FB_GENDER,
+						'label'       => __( 'Gender', 'facebook-for-woocommerce' ),
+						'options'     => array(
+							self::GENDER_MALE   => __( 'Male', 'facebook-for-woocommerce' ),
+							self::GENDER_FEMALE => __( 'Female', 'facebook-for-woocommerce' ),
+							self::GENDER_UNISEX => __( 'Unisex', 'facebook-for-woocommerce' ),
+						),
+						'value'       => $gender, 
+						'desc_tip'    => true,
+						'description' => __( 'Choose the gender for the product.', 'facebook-for-woocommerce' ),
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_SIZE,
+						'label'       => __( 'Size', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Size of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $size,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
 			?>
 
 			<div class='wc-facebook-commerce-options-group options_group'>
@@ -1454,6 +1535,7 @@ class Admin {
 		$description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $parent );		
 		$price        = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_PRICE, $parent );
 		$image_url    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_IMAGE, $parent );
+		$condition    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_CONDITION, $parent );
 		$image_source = $variation->get_meta( Products::PRODUCT_IMAGE_SOURCE_META_KEY );
 		$fb_mpn    	  = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_MPN, $parent );
 
@@ -1554,6 +1636,23 @@ class Admin {
 			)
 		);
 
+
+		woocommerce_wp_select(
+			array(
+				'id'      => 'wc_facebook_condition',
+				'label'   => __( 'Condition', 'facebook-for-woocommerce' ),
+				'options' => array(
+					self::CONDITION_NEW => __( 'New', 'facebook-for-woocommerce' ),
+					self::CONDITION_REFURBISHED => __( 'Refurbished', 'facebook-for-woocommerce' ),
+					self::CONDITION_USED => __( 'Used', 'facebook-for-woocommerce' ),
+				),
+				'value'       => $condition,
+				'desc_tip'    => true,
+				'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
+				)
+		);
+
+
 	}
 
 
@@ -1610,6 +1709,8 @@ class Admin {
 			$posted_param = 'variable_fb_product_image_source';
 			$image_source = isset( $_POST[ $posted_param ][ $index ] ) ? sanitize_key( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : '';
 			$posted_param = 'variable_' . \WC_Facebook_Product::FB_PRODUCT_IMAGE;
+			$image_url    = isset( $_POST[ $posted_param ][ $index ] ) ? esc_url_raw( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : null;
+			$posted_param = 'variable_' . \WC_Facebook_Product::FB_PRODUCT_CONDITION;
 			$image_url    = isset( $_POST[ $posted_param ][ $index ] ) ? esc_url_raw( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : null;
             $posted_param = 'variable_' . \WC_Facebook_Product::FB_PRODUCT_VIDEO;
             $video_urls   = isset( $_POST[ $posted_param ][ $index ] ) ? esc_url_raw( wp_unslash( $_POST[ $posted_param ][ $index ] ) ) : [];

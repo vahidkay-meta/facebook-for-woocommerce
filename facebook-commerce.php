@@ -879,6 +879,7 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 			$product->update_meta_data( Products::PRODUCT_IMAGE_SOURCE_META_KEY, sanitize_key( wp_unslash( $_POST['fb_product_image_source'] ) ) );
 			$product->save_meta_data();
 		}
+		$i = $_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ];
 
 		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ] ) ) {
 			$woo_product->set_product_image( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ] ) ) );
@@ -899,6 +900,14 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 
 		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) {
 			$woo_product->set_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
+			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
+			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}

@@ -34,8 +34,11 @@ class WC_Facebook_Product {
 	// to this object.
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
+	const FB_SIZE			     = 'fb_size';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
 	const FB_PRODUCT_CONDITION   = 'fb_product_condition';
+	const FB_AGE_GROUP			 = 'fb_age_group';
+	const FB_GENDER			 	 = 'fb_gender';
     const FB_PRODUCT_VIDEO         = 'fb_product_video';
     const FB_VARIANT_IMAGE           = 'fb_image';
     const FB_VISIBILITY              = 'fb_visibility';
@@ -428,14 +431,49 @@ class WC_Facebook_Product {
 		);
 	}
 
-		public function set_condition( $fb_condition ) {
-		$fb_condition = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $fb_condition )
+	public function set_condition( $condition ) {
+		$condition = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $condition )
 		);
 			update_post_meta(
 				$this->id,
 				self::FB_PRODUCT_CONDITION,
-				$fb_condition
+				$condition
+			);
+	}
+
+
+	public function set_age_group( $age_group ) {
+		$age_group = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $age_group )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_AGE_GROUP,
+				$age_group
+			);
+	}
+
+	public function set_gender( $gender ) {
+		$gender = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $gender )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_GENDER,
+				$gender
+			);
+	}
+
+
+	public function set_size( $size ) {
+		$size = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $size )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_SIZE,
+				$size
 			);
 	}
 
@@ -739,7 +777,66 @@ class WC_Facebook_Product {
 			}
 		}
 
-		return WC_Facebookcommerce_Utils::clean_string( $fb_condition) ?: Admin::CONDITION_REFURBISHED ;
+		return WC_Facebookcommerce_Utils::clean_string( $fb_condition) ?: Admin::CONDITION_NEW ;
+	}
+
+
+	public function get_fb_age_group() {
+		// Get age group directly from post meta
+		$fb_age_group = get_post_meta(
+			$this->id,
+			self::FB_AGE_GROUP,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_age_group ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_age_group = get_post_meta($parent_id, self::FB_AGE_GROUP, true);
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_age_group );
+	}
+
+	public function get_fb_gender() {
+		// Get gender directly from post meta
+		$fb_gender= get_post_meta(
+			$this->id,
+			self::FB_GENDER,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_gender ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_gender = get_post_meta($parent_id, self::FB_GENDER, true);
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_gender );
+	}
+
+
+	public function get_fb_size() {
+		// Get size directly from post meta
+		$fb_size= get_post_meta(
+			$this->id,
+			self::FB_SIZE,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_size ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_size = get_post_meta($parent_id, self::FB_GENDER, true);
+			}
+		}
+
+		return mb_substr(WC_Facebookcommerce_Utils::clean_string($fb_size), 0, 200);
 	}
 
 
@@ -871,7 +968,10 @@ class WC_Facebook_Product {
 					'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-					'condition'            	=> $this->get_fb_condition(),
+					'gender'            	=> $this->get_fb_gender(),
+				'size'            		=> $this->get_fb_size(),
+				'age_group'            	=> $this->get_fb_age_group(),
+				'condition'            	=> $this->get_fb_condition(),
 				'retailer_id'           => $retailer_id,
 					'price'                 => $this->get_fb_price( true ),
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
@@ -902,7 +1002,10 @@ class WC_Facebook_Product {
 					 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
 					 */
 					'category'              => $categories['categories'],
-					'condition'            	=> $this->get_fb_condition(),
+					'gender'            	=> $this->get_fb_gender(),
+				'size'            		=> $this->get_fb_size(),
+				'age_group'            	=> $this->get_fb_age_group(),
+				'condition'            	=> $this->get_fb_condition(),
 				'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
