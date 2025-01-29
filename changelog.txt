@@ -8,7 +8,7 @@
 * Tweak - Add custom fields to product data structure by @devbodaghe in #2836
 * Fix - Multiple issues with Fixed FB Attribute Syncing by @vinkmeta in #2860
 
-= 3.3.1 - 2024-12-06 = 
+= 3.3.1 - 2024-12-06 =
 * Fix - Sale price effective date by @vinkmeta in #2809
 * Fix - Sync stock quantity when available by @mshymon in #2811
 * Fix - Sync product GTIN when available by @mshymon in #2810
