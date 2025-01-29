@@ -22,8 +22,9 @@ use WooCommerce\Facebook\Utilities\Heartbeat;
  * @since 1.11.0
  */
 abstract class AbstractFeed {
-	public const GENERATE_FEED_ACTION   = 'wc_facebook_regenerate_feed_';
-	public const REQUEST_FEED_ACTION    = 'wc_facebook_get_feed_data_';
+	public const GENERATE_FEED_ACTION = 'wc_facebook_regenerate_feed_';
+	public const REQUEST_FEED_ACTION = 'woocommerce_api_wc_facebook_get_feed_data_';
+	public const FEED_GEN_COMPLETE_ACTION = 'wc_facebook_feed_generation_completed_';
 	public const OPTION_FEED_URL_SECRET = 'wc_facebook_feed_url_secret_';
 
 	/**
@@ -34,6 +35,21 @@ abstract class AbstractFeed {
 	private static string $data_stream_name;
 
 	/**
+	 * The feed generator instance for the given feed.
+	 *
+	 * @var FeedGenerator
+	 */
+	protected FeedGenerator $feed_generator;
+
+	/**
+	 * The feed handler instance for the given feed.
+	 *
+	 * @var \WC_Facebook_Product_Feed
+	 * Todo: replace with generic feed_handler class
+	 */
+	protected \WC_Facebook_Product_Feed $feed_handler;
+
+	/**
 	 * Constructor.
 	 *
 	 * Initializes the feed with the given data stream name and adds the necessary hooks.
@@ -41,8 +57,8 @@ abstract class AbstractFeed {
 	 * @param string $data_stream_name The name of the data stream.
 	 */
 	public function __construct( string $data_stream_name ) {
-		$this->add_hooks();
 		self::$data_stream_name = $data_stream_name;
+		$this->add_hooks();
 	}
 
 	/**
@@ -51,7 +67,8 @@ abstract class AbstractFeed {
 	private function add_hooks() {
 		add_action( Heartbeat::HOURLY, $this->schedule_feed_generation() );
 		add_action( self::modify_action_name( self::GENERATE_FEED_ACTION ), $this->regenerate_feed() );
-		add_action( self::modify_action_name( 'woocommerce_api_' . self::REQUEST_FEED_ACTION ), $this->handle_feed_data_request() );
+		add_action( self::modify_action_name( self::REQUEST_FEED_ACTION ), $this->handle_feed_data_request() );
+		add_action( self::modify_action_name( self::FEED_GEN_COMPLETE_ACTION ), $this->send_request_to_upload_feed() );
 	}
 
 	/**
@@ -64,7 +81,8 @@ abstract class AbstractFeed {
 	/**
 	 * Regenerates the product feed.
 	 *
-	 * This method must be implemented by the concrete feed class.
+	 * This method is responsible for initiating the regeneration of the product feed.
+	 * The method ensures that the feed is regenerated based on the defined schedule.
 	 */
 	abstract public function regenerate_feed();
 

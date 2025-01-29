@@ -25,6 +25,12 @@ use WooCommerce\Facebook\Framework\Plugin\Exception as PluginException;
  */
 class ProductFeed extends AbstractFeed {
 
+	public function __construct( string $data_stream_name ) {
+		parent::__construct( $data_stream_name );
+		$this->feed_generator = facebook_for_woocommerce()->job_manager->generate_product_feed_job;
+		$this->feed_handler   = new \WC_Facebook_Product_Feed();
+	}
+
 	/**
 	 *
 	 * Logs the request, tracks the feed file request, and serves the product feed file.
@@ -98,11 +104,9 @@ class ProductFeed extends AbstractFeed {
 	 */
 	public function regenerate_feed() {
 		if ( facebook_for_woocommerce()->get_integration()->is_new_style_feed_generation_enabled() ) {
-			$generate_feed_job = facebook_for_woocommerce()->job_manager->generate_product_feed_job;
-			$generate_feed_job->queue_start();
+			$this->feed_generator->queue_start();
 		} else {
-			$feed_handler = new \WC_Facebook_Product_Feed();
-			$feed_handler->generate_feed();
+			$this->feed_handler->generate_feed();
 		}
 	}
 
