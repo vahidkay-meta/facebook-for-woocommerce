@@ -35,6 +35,9 @@ class WC_Facebook_Product {
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
 	const FB_SIZE			     = 'fb_size';
+	const FB_COLOR			     = 'fb_color';
+	const FB_MATERIAL		     = 'fb_material';
+	const FB_PATTERN		     = 'fb_pattern';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
 	const FB_PRODUCT_CONDITION   = 'fb_product_condition';
 	const FB_AGE_GROUP			 = 'fb_age_group';
@@ -969,6 +972,9 @@ class WC_Facebook_Product {
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 					'gender'            	=> $this->get_fb_gender(),
+				'color'            		=> $this->get_fb_color(),
+				'pattern'            	=> Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'            	=> Helper::str_truncate( $this->get_fb_material(), 100 ),
 				'size'            		=> $this->get_fb_size(),
 				'age_group'            	=> $this->get_fb_age_group(),
 				'condition'            	=> $this->get_fb_condition(),
@@ -985,26 +991,22 @@ class WC_Facebook_Product {
 			}
 		} else {
 			$product_data = array(
-					'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
-					'description'           => $this->get_fb_description(),
-					'image_url'             => $image_urls[0],
-					'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
-					'url'                   => $product_url,
-					'rich_text_description' => $this->get_rich_text_description(),
-					/**
-					 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
-					 * This field should have the Google product category for the item. Google product category is not a required field
-					 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
-					 * it when a Google product category is set.
-					 *
-					 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
-					 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
-					 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
-					 */
-					'category'              => $categories['categories'],
-					'gender'            	=> $this->get_fb_gender(),
-				'size'            		=> $this->get_fb_size(),
-				'age_group'            	=> $this->get_fb_age_group(),
+				'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
+				'description'           => $this->get_fb_description(),
+				'image_url'             => $image_urls[0],
+				'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
+				'url'                   => $product_url,
+				/**
+				 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
+				 * This field should have the Google product category for the item. Google product category is not a required field
+				 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
+				 * it when a Google product category is set.
+				 *
+				 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
+				 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
+				 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
+				 */
+				'category'              => $categories['categories'],
 				'condition'            	=> $this->get_fb_condition(),
 				'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),

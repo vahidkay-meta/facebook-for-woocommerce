@@ -1289,6 +1289,9 @@ class Admin {
 		$age_group    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_AGE_GROUP, true ) ;
 		$gender    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_GENDER, true ) ;
 		$size    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_SIZE, true ) ;
+		$color    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_COLOR, true ) ;
+		$material  	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MATERIAL, true ) ;
+		$pattern   	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PATTERN, true ) ;
 
 		if ( $sync_enabled ) {
 			$sync_mode = $is_visible ? self::SYNC_MODE_SYNC_AND_SHOW : self::SYNC_MODE_SYNC_AND_HIDE;
@@ -1492,6 +1495,45 @@ class Admin {
 						'cols'        => 40,
 						'rows'        => 60,
 						'value'       => $size,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_COLOR,
+						'label'       => __( 'Color', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Color of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $color,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_MATERIAL,
+						'label'       => __( 'Material', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Material of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $material,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_PATTERN,
+						'label'       => __( 'Pattern', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Pattern of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $pattern,
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
