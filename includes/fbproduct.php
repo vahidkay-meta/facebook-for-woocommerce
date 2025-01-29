@@ -38,6 +38,9 @@ class WC_Facebook_Product {
 	const FB_MATERIAL		     = 'fb_material';
 	const FB_PATTERN		     = 'fb_pattern';
 	const FB_SIZE			     = 'fb_size';
+	const FB_COLOR			     = 'fb_color';
+	const FB_MATERIAL		     = 'fb_material';
+	const FB_PATTERN		     = 'fb_pattern';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
 	const FB_PRODUCT_CONDITION   = 'fb_product_condition';
 	const FB_AGE_GROUP			 = 'fb_age_group';
@@ -492,7 +495,40 @@ class WC_Facebook_Product {
 			$gender
 		);
 	}
+		
+	public function set_color( $color ) {
+		$color = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $color )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_COLOR,
+				$color
+			);
+	}
 	
+	public function set_pattern( $pattern ) {
+		$pattern = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $pattern )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_PATTERN,
+				$pattern
+			);
+	}
+	
+	public function set_material( $material ) {
+		$material = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $material )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_MATERIAL,
+				$material
+			);
+	}
+
 	public function set_fb_color( $fb_color ) {
 		$gender = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $fb_color )
@@ -878,6 +914,65 @@ class WC_Facebook_Product {
 
 		return mb_substr(WC_Facebookcommerce_Utils::clean_string($fb_size), 0, 200);
 	}
+	
+	
+	public function get_fb_color() {
+		// Get color directly from post meta
+		$fb_size= get_post_meta(
+			$this->id,
+			self::FB_COLOR,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_size ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_size = get_post_meta($parent_id, self::FB_COLOR, true);
+			}
+		}
+
+		return mb_substr(WC_Facebookcommerce_Utils::clean_string($fb_size), 0, 200);
+	}
+	
+	public function get_fb_material() {
+		// Get material directly from post meta
+		$fb_material = get_post_meta(
+			$this->id,
+			self::FB_MATERIAL,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_material ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_material = get_post_meta($parent_id, self::FB_MATERIAL, true);
+			}
+		}
+
+		return mb_substr(WC_Facebookcommerce_Utils::clean_string($fb_material), 0, 200);
+	}
+	
+	
+	public function get_fb_pattern() {
+		// Get color directly from post meta
+		$fb_pattern = get_post_meta(
+			$this->id,
+			self::FB_PATTERN,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_pattern ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_pattern = get_post_meta($parent_id, self::FB_PATTERN, true);
+			}
+		}
+
+		return mb_substr(WC_Facebookcommerce_Utils::clean_string($fb_pattern), 0, 200);
+	}
 
 
 	public function update_visibility( $is_product_page, $visible_box_checked ) {
@@ -1015,6 +1110,9 @@ class WC_Facebook_Product {
 				'size'            		=> $this->get_fb_size(),
 				'age_group'            	=> $this->get_fb_age_group(),
 				'gender'            	=> $this->get_fb_gender(),
+				'color'            		=> $this->get_fb_color(),
+				'pattern'            	=> Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'            	=> Helper::str_truncate( $this->get_fb_material(), 100 ),
 				'size'            		=> $this->get_fb_size(),
 				'age_group'            	=> $this->get_fb_age_group(),
 				'condition'            	=> $this->get_fb_condition(),
@@ -1054,6 +1152,9 @@ class WC_Facebook_Product {
 				'age_group'            	=> $this->get_fb_age_group(),
 				'gender'            	=> $this->get_fb_gender(),
 				'size'            		=> $this->get_fb_size(),
+				'color'            		=> $this->get_fb_color(),
+				'pattern'            	=> Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'            	=> Helper::str_truncate( $this->get_fb_material(), 200 ),
 				'age_group'            	=> $this->get_fb_age_group(),
 				'condition'            	=> $this->get_fb_condition(),
 				'product_type'          => $categories['categories'],

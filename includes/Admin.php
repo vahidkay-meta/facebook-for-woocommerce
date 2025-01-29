@@ -1583,6 +1583,45 @@ class Admin {
 					)
 				);
 				
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_COLOR,
+						'label'       => __( 'Color', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Color of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $color,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_MATERIAL,
+						'label'       => __( 'Material', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Material of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $material,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+				
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_PATTERN,
+						'label'       => __( 'Pattern', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Pattern of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $pattern,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
 			?>
 
 			<div class='wc-facebook-commerce-options-group options_group'>
