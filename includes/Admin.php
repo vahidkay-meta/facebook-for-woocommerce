@@ -115,6 +115,8 @@ class Admin {
 		$this->product_sets       = new Admin\Product_Sets();
 		// add a modal in admin product pages
 		add_action( 'admin_footer', array( $this, 'render_modal_template' ) );
+		add_action('admin_footer', array($this, 'add_tab_switch_script'));
+
 
 		// add admin notice to inform that disabled products may need to be deleted manually
 		add_action( 'admin_notices', array( $this, 'maybe_show_product_disabled_sync_notice' ) );
@@ -145,6 +147,8 @@ class Admin {
 		// add Variation edit fields
 		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'add_product_variation_edit_fields' ), 10, 3 );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'save_product_variation_edit_fields' ), 10, 2 );
+
+		add_action('wp_ajax_get_facebook_product_data', array($this, 'ajax_get_facebook_product_data'));
 
 		// add custom taxonomy for Product Sets
 		add_filter( 'gettext', array( $this, 'change_custom_taxonomy_tip' ), 20, 2 );
@@ -1285,7 +1289,7 @@ class Admin {
         $video_urls   = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
 		$fb_brand     = get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) ? get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) : get_post_meta( $post->ID, '_wc_facebook_enhanced_catalog_attributes_brand', true );
 		$fb_mpn       = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MPN, true );
-		$condition    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true ) ; 
+		$condition    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true ) ;
 		$age_group    = get_post_meta( $post->ID, \WC_Facebook_Product::FB_AGE_GROUP, true ) ;
 		$gender    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_GENDER, true ) ;
 		$size    	  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_SIZE, true ) ;
@@ -1480,7 +1484,7 @@ class Admin {
 							self::GENDER_FEMALE => __( 'Female', 'facebook-for-woocommerce' ),
 							self::GENDER_UNISEX => __( 'Unisex', 'facebook-for-woocommerce' ),
 						),
-						'value'       => $gender, 
+						'value'       => $gender,
 						'desc_tip'    => true,
 						'description' => __( 'Choose the gender for the product.', 'facebook-for-woocommerce' ),
 					)
@@ -1498,7 +1502,7 @@ class Admin {
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
-				
+
 				woocommerce_wp_text_input(
 					array(
 						'id'          => \WC_Facebook_Product::FB_COLOR,
@@ -1511,7 +1515,7 @@ class Admin {
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
-				
+
 				woocommerce_wp_text_input(
 					array(
 						'id'          => \WC_Facebook_Product::FB_MATERIAL,
@@ -1524,7 +1528,7 @@ class Admin {
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
-				
+
 				woocommerce_wp_text_input(
 					array(
 						'id'          => \WC_Facebook_Product::FB_PATTERN,
@@ -1809,6 +1813,83 @@ class Admin {
 		</script>
 		<?php
 	}
+
+	public function add_tab_switch_script() {
+		global $post;
+		if (!$post || get_post_type($post) !== 'product') {
+			return;
+		}
+		?>
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$('.product_data_tabs li').on('click', function() {
+					var tabClass = $(this).attr('class');
+					if (tabClass.includes('fb_commerce_tab')) {
+						console.log('12344');
+						var productId = <?php echo esc_js($post->ID); ?>;
+						$.ajax({
+							url: ajaxurl,
+							type: 'POST',
+							data: {
+								action: 'get_facebook_product_data',
+								product_id: productId,
+								nonce: '<?php echo wp_create_nonce('get_facebook_product_data'); ?>'
+							},
+							success: function(response) {
+								if (response.success) {
+										console.log('Data updated successfully');
+										// Update fields with the latest data
+										$('#wc_facebook_product_price').val(response.data.price);
+										$('#wc_facebook_product_image').val(response.data.image);
+										// Update other fields as needed
+								} else {
+										console.log('Error: ' + response.data);
+										alert('Failed to update data. Please try again.');
+								}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+								console.log('AJAX error: ' + textStatus + ', ' + errorThrown);
+								// alert('An error occurred while fetching data. Please check your connection and try again.');
+						}
+						});
+					}
+				});
+			});
+		</script>
+		<?php
+	}
+
+	public function ajax_get_facebook_product_data() {
+
+		check_ajax_referer('get_facebook_product_data', 'nonce');
+    wp_send_json_success(['message' => 'AJAX is working']);
+
+		// check_ajax_referer('get_facebook_product_data', 'nonce');
+
+		// $a= check_ajax_referer('get_facebook_product_data', 'nonce');
+
+
+		// $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+		// if ($product_id) {
+		// 	$product = wc_get_product($product_id);
+		// 	if ($product) {
+		// 		$price = get_post_meta($product_id, \WC_Facebook_Product::FB_PRODUCT_PRICE, true);
+		// 		$image = get_post_meta($product_id, \WC_Facebook_Product::FB_PRODUCT_IMAGE, true);
+		// 		// Fetch other data as needed
+
+		// 		wp_send_json_success([
+		// 			'price' => $price,
+		// 			'image' => $image,
+		// 			// Include other data
+		// 		]);
+		// 	}
+		// }
+		// wp_send_json_error('Invalid product ID');
+	}
+
+	// Hook the AJAX handler
+
+
 
 
 }
