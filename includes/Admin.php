@@ -152,6 +152,8 @@ class Admin {
 
 		// add custom taxonomy for Product Sets
 		add_filter( 'gettext', array( $this, 'change_custom_taxonomy_tip' ), 20, 2 );
+
+		add_action('wp_ajax_sync_facebook_attributes', array($this, 'ajax_sync_facebook_attributes'));
 	}
 
 	/**
@@ -1825,32 +1827,30 @@ class Admin {
 				$('.product_data_tabs li').on('click', function() {
 					var tabClass = $(this).attr('class');
 					if (tabClass.includes('fb_commerce_tab')) {
-						console.log('12344');
-						var productId = <?php echo esc_js($post->ID); ?>;
 						$.ajax({
 							url: ajaxurl,
 							type: 'POST',
 							data: {
-								action: 'get_facebook_product_data',
-								product_id: productId,
-								nonce: '<?php echo wp_create_nonce('get_facebook_product_data'); ?>'
+								action: 'sync_facebook_attributes',
+								product_id: <?php echo esc_js($post->ID); ?>,
+								nonce: '<?php echo wp_create_nonce('sync_facebook_attributes'); ?>'
 							},
 							success: function(response) {
-								if (response.success) {
-										console.log('Data updated successfully');
-										// Update fields with the latest data
-										$('#wc_facebook_product_price').val(response.data.price);
-										$('#wc_facebook_product_image').val(response.data.image);
-										// Update other fields as needed
-								} else {
-										console.log('Error: ' + response.data);
-										alert('Failed to update data. Please try again.');
+								if (response.success && response.data) {
+									if (response.data.material) {
+										$('#<?php echo \WC_Facebook_Product::FB_MATERIAL ?>').val(response.data.material);
+									}
+									if (response.data.color) {
+										$('#<?php echo \WC_Facebook_Product::FB_COLOR ?>').val(response.data.color);
+									}
+									if (response.data.size) {
+										$('#<?php echo \WC_Facebook_Product::FB_SIZE ?>').val(response.data.size);
+									}
+									if (response.data.pattern) {
+										$('#<?php echo \WC_Facebook_Product::FB_PATTERN ?>').val(response.data.pattern);
+									}
 								}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-								console.log('AJAX error: ' + textStatus + ', ' + errorThrown);
-								// alert('An error occurred while fetching data. Please check your connection and try again.');
-						}
+							}
 						});
 					}
 				});
@@ -1859,35 +1859,60 @@ class Admin {
 		<?php
 	}
 
-	public function ajax_get_facebook_product_data() {
-
-		check_ajax_referer('get_facebook_product_data', 'nonce');
-    wp_send_json_success(['message' => 'AJAX is working']);
-
-		// check_ajax_referer('get_facebook_product_data', 'nonce');
-
-		// $a= check_ajax_referer('get_facebook_product_data', 'nonce');
-
-
-		// $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
-		// if ($product_id) {
-		// 	$product = wc_get_product($product_id);
-		// 	if ($product) {
-		// 		$price = get_post_meta($product_id, \WC_Facebook_Product::FB_PRODUCT_PRICE, true);
-		// 		$image = get_post_meta($product_id, \WC_Facebook_Product::FB_PRODUCT_IMAGE, true);
-		// 		// Fetch other data as needed
-
-		// 		wp_send_json_success([
-		// 			'price' => $price,
-		// 			'image' => $image,
-		// 			// Include other data
-		// 		]);
-		// 	}
-		// }
-		// wp_send_json_error('Invalid product ID');
-	}
 
 	// Hook the AJAX handler
+
+	private function sync_product_attributes($product_id) {
+		$product = wc_get_product($product_id);
+		if (!$product) {
+			return [];
+		}
+
+		$attributes = $product->get_attributes();
+		$facebook_fields = [];
+
+		$attribute_map = [
+			'material' => \WC_Facebook_Product::FB_MATERIAL,
+			'color'    => \WC_Facebook_Product::FB_COLOR,
+			'size'     => \WC_Facebook_Product::FB_SIZE,
+			'pattern'  => \WC_Facebook_Product::FB_PATTERN,
+		];
+
+		foreach ($attributes as $attribute) {
+			$attribute_name = strtolower($attribute->get_name());
+			
+			if (isset($attribute_map[$attribute_name])) {
+				$values = [];
+				
+				if ($attribute->is_taxonomy()) {
+					$terms = $attribute->get_terms();
+					if ($terms) {
+						$values = wp_list_pluck($terms, 'name');
+					}
+				} else {
+					$values = $attribute->get_options();
+				}
+				
+				if (!empty($values)) {
+					$facebook_fields[$attribute_name] = $values[0];
+					update_post_meta($product_id, $attribute_map[$attribute_name], $values[0]);
+				}
+			}
+		}
+
+		return $facebook_fields;
+	}
+
+	public function ajax_sync_facebook_attributes() {
+		check_ajax_referer('sync_facebook_attributes', 'nonce');
+		
+		$product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+		if ($product_id) {
+			$synced_fields = $this->sync_product_attributes($product_id);
+			wp_send_json_success($synced_fields);
+		}
+		wp_send_json_error('Invalid product ID');
+	}
 
 
 
