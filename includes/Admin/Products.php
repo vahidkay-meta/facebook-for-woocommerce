@@ -77,7 +77,6 @@ class Products {
 					<?php self::render_enhanced_catalog_attributes_tooltip(); ?>
 				</label>
 			</p>
-			abcde
 			<?php $enhanced_attribute_fields->render( $category_id ); ?>
 		<?php
 	}
@@ -106,7 +105,7 @@ class Products {
 	 * @return string
 	 */
 	public static function render_enhanced_catalog_attributes_title() {
-		return __( 'Category Specific Attributes2', 'facebook-for-woocommerce' );
+		return __( 'Category Specific Attributes', 'facebook-for-woocommerce' );
 	}
 
 	/**

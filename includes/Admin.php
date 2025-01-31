@@ -1353,7 +1353,7 @@ class Admin {
 				woocommerce_wp_radio(
 					array(
 						'id'            => 'fb_product_image_source',
-						'label'         => __( '1Facebook Product Image', 'facebook-for-woocommerce' ),
+						'label'         => __( 'Facebook Product Image', 'facebook-for-woocommerce' ),
 						'desc_tip'      => true,
 						'description'   => __( 'Choose the product image that should be synced to the Facebook catalog and displayed for this product.', 'facebook-for-woocommerce' ),
 						'options'       => array(
