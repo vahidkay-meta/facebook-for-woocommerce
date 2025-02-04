@@ -47,7 +47,7 @@ class Enhanced_Catalog_Attribute_Fields {
 	 */
 	private $category_handler;
 
-	public function __construct( $page_type, ?\WP_Term $term = null, ?\WC_Product $product = null ) {
+	public function __construct( $page_type, \WP_Term $term = null, \WC_Product $product = null ) {
 		$this->page_type        = $page_type;
 		$this->term             = $term;
 		$this->product          = $product;
@@ -143,14 +143,16 @@ class Enhanced_Catalog_Attribute_Fields {
 		}
 
 		array_multisort( $priority, SORT_DESC, $recommended_attributes );
-
-		foreach ( $recommended_attributes as $attribute ) {
-			$this->render_attribute( $attribute );
-		}
-
 		$selector_value      = $this->get_value( self::OPTIONAL_SELECTOR_KEY, $category_id );
 		$is_showing_optional = 'on' === $selector_value;
 		$this->render_selector_checkbox( $is_showing_optional );
+
+
+		foreach ( $recommended_attributes as $attribute ) {
+			$this->render_attribute( $attribute, true, $is_showing_optional );
+		}
+
+
 
 		foreach ( $optional_attributes as $attribute ) {
 			$this->render_attribute( $attribute, true, $is_showing_optional );
@@ -159,7 +161,7 @@ class Enhanced_Catalog_Attribute_Fields {
 
 	private function render_selector_checkbox( $is_showing_optional ) {
 		$selector_id    = self::FIELD_ENHANCED_CATALOG_ATTRIBUTE_PREFIX . self::OPTIONAL_SELECTOR_KEY;
-		$selector_label = __( 'Show advanced options', 'facebook-for-woocommerce' );
+		$selector_label = __( 'Show more attributes', 'facebook-for-woocommerce' );
 		$checked_attr   = $is_showing_optional ? 'checked="checked"' : '';
 
 		if ( self::PAGE_TYPE_EDIT_PRODUCT === $this->page_type ) {
