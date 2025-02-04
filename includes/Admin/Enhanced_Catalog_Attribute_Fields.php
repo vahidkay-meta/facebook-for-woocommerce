@@ -246,7 +246,6 @@ class Enhanced_Catalog_Attribute_Fields {
 		?>
 		<label for="<?php echo esc_attr( $attr_id ); ?>">
 			<?php echo esc_html( $label ); ?>
-			<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		</label>
 		<?php
 	}
@@ -282,6 +281,7 @@ class Enhanced_Catalog_Attribute_Fields {
 				<option value="<?php echo esc_attr( $opt ); ?>" <?php echo esc_attr( $selected_attr ); ?>> <?php echo esc_html( $opt ); ?></option>
 			<?php } ?>
 		</select/>
+		<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		<?php
 	}
 
@@ -291,6 +291,7 @@ class Enhanced_Catalog_Attribute_Fields {
 		}
 		?>
 		<input type="text" value="<?php echo esc_attr( $attribute['value'] ); ?>" name="<?php echo esc_attr( $attr_id ); ?>" id="<?php echo esc_attr( $attr_id ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>"/>
+		<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		<?php
 	}
 }
