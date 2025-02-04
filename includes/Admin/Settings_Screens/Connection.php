@@ -289,11 +289,11 @@ class Connection extends Abstract_Settings_Screen {
 				<?php if ( $is_connected ) : ?>
 
 					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_disconnect_url() ); ?>" class="button button-primary uninstall" onclick="return confirmDialog();">
-						<?php esc_html_e( 'Disconnect Connection', 'facebook-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Disconnect', 'facebook-for-woocommerce' ); ?>
 					</a>
 					<script>
 						function confirmDialog() {
-							return confirm('Are you sure you want to disconnect your Facebook connection?');
+							return confirm( 'Are you sure you want to disconnect from Facebook?' );
 						}
 					</script>
 

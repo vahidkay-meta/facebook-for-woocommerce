@@ -167,12 +167,12 @@ class ApiTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests delete user permission performs a request to delete user permission.
+	 * Tests delete mbe request performs a request to delete facebook connection.
 	 *
 	 * @return void
 	 * @throws ApiException In case of failed request.
 	 */
-	public function test_delete_mbe_connection_deletes_user_permission_request() {
+	public function test_delete_mbe_connection_deletes_mbe_request() {
 		$external_business_id = 'wordpress-facebook-62c3f1add134a';
 
 		$response = function( $result, $parsed_args, $url ) use ( $external_business_id ) {
