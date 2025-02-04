@@ -164,7 +164,7 @@ class Product_Categories {
 	 * @return string the explanation text
 	 */
 	public static function get_wip_catalog_explanation_text() {
-		return __('[WIP] To optimize ad performance, we recommend providing additional product attributes. WooCommerce attributes that you\'ve provided will be greyed out.');
+		return __('To optimize ad performance, we recommend providing these additional product attributes in WooCommerce. Updates made here will be overwritten with attributes provided in WooCommerce.');
 	}
 
 
