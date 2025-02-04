@@ -27,9 +27,12 @@ class Product_Sets extends Abstract_Settings_Screen {
 	 * Connection constructor.
 	 */
 	public function __construct() {
-		add_action('init', [$this, 'initHook']);
+		add_action( 'init', array( $this, 'initHook' ) );
 	}
 
+	/**
+	 * Initializes this class's settings screen properties.
+	 */
 	public function initHook(): void {
 		$this->id    = self::ID;
 		$this->label = __( 'Product sets', 'facebook-for-woocommerce' );

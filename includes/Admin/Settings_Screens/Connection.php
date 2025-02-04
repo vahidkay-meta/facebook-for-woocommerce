@@ -30,13 +30,16 @@ class Connection extends Abstract_Settings_Screen {
 	 * Connection constructor.
 	 */
 	public function __construct() {
-		add_action('init', [$this, 'initHook']);
+		add_action( 'init', array( $this, 'initHook' ) );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 
 		add_action( 'admin_notices', array( $this, 'add_notices' ) );
 	}
 
+	/**
+	 * Initializes this class's settings screen properties.
+	 */
 	public function initHook(): void {
 		$this->id    = self::ID;
 		$this->label = __( 'Connection', 'facebook-for-woocommerce' );
