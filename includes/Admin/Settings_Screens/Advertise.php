@@ -35,7 +35,7 @@ class Advertise extends Abstract_Settings_Screen {
 	}
 
 	/**
-	 * Initializes this class's settings screen properties.
+	 * Initializes this settings page's properties.
 	 */
 	public function initHook(): void {
 		$this->id                = self::ID;
