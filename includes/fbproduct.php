@@ -47,7 +47,7 @@ class WC_Facebook_Product {
 	const MAX_TIME   = 'T23:59+00:00';
 	const MIN_TIME   = 'T00:00+00:00';
 
-	static $use_checkout_url                    = array(
+	static $use_checkout_url = array(
 		'simple'    => 1,
 		'variable'  => 1,
 		'variation' => 1,
