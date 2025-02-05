@@ -22,6 +22,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class FBCategories {
 
+	private $keys_to_exclude = ['brand' => true];
+
 	/**
 	 * Fetches the attribute from a category using attribute key.
 	 *
@@ -129,7 +131,14 @@ class FBCategories {
 		$return_attributes = array();
 		foreach ( $category['attributes'] as $attribute_hash ) {
 			// Get attribute array from the stored hash version
-			$return_attributes[] = $this->get_attribute_field_by_hash( $attribute_hash );
+			$attribute = $this->get_attribute_field_by_hash( $attribute_hash );
+
+			// Skip if attribute is invalid or its key is in the exclude list
+			if ( ! is_array( $attribute ) || empty( $attribute['key'] ) || isset( $this->keys_to_exclude[ $attribute['key'] ] ) ) {
+				continue;
+			}
+
+			$return_attributes[] = $attribute;
 		}
 
 		return $return_attributes;
