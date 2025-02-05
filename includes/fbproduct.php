@@ -47,7 +47,6 @@ class WC_Facebook_Product {
 	const MAX_TIME   = 'T23:59+00:00';
 	const MIN_TIME   = 'T00:00+00:00';
 
-	public static $rich_text_description_source = WC_Facebookcommerce_Utils::WC_DESCRIPTION;
 	static $use_checkout_url                    = array(
 		'simple'    => 1,
 		'variable'  => 1,
@@ -69,11 +68,6 @@ class WC_Facebook_Product {
 	 */
 	private $fb_description;
 
-
-	/**
-	 * @var string Facebook Rich Text Description.
-	 */
-	private $fb_rich_text_description;
 
 	/**
 	 * @var array Gallery URLs.
@@ -533,9 +527,9 @@ class WC_Facebook_Product {
 	 * Get the rich text description for a product.
 	 *
 	 * This function retrieves the rich text product description based on the following logic:
-	 * 1. Check if the facebook rich text description is set and not empty.
+	 * 1. Check if the Facebook rich text description is set and not empty.
 	 * 2. If the rich text description is available, use it as the preferred description.
-	 * 3. Otherwise, fall back to the plain text description made available by Woocommerce.
+	 * 3. Otherwise, fall back to the plain text description made available by WooCommerce.
 	 *
 	 * @return string The rich text description for the product.
 	 */
@@ -551,16 +545,12 @@ class WC_Facebook_Product {
 
 		// Try to get rich text description from post meta if description has been set
 		if ( empty( $rich_text_description ) ) {
-			$temp_rich_text_description = get_post_meta(
+			$rich_text_description = get_post_meta(
 				$this->id,
 				self::FB_RICH_TEXT_DESCRIPTION,
 				true
 			);
 
-			if ( $temp_rich_text_description ) {
-				self::$rich_text_description_source = WC_Facebookcommerce_Utils::FB_DESCRIPTION;
-				$rich_text_description              = $temp_rich_text_description;
-			}
 		}
 
 		// For variable products, we want to use the rich text description of the variant.
@@ -600,7 +590,7 @@ class WC_Facebook_Product {
 	 */
 	public function add_sale_price( $product_data, $for_items_batch = false ) {
 
-		$sale_price                = $this->woo_product->get_sale_price();
+		$sale_price = $this->woo_product->get_sale_price();
 		$sale_price_effective_date = '';
 		$sale_start = '';
 		$sale_end = '';
@@ -619,7 +609,7 @@ class WC_Facebook_Product {
 				( $sale_start == self::MIN_DATE_1 . self::MIN_TIME && $sale_end == self::MAX_DATE . self::MAX_TIME )
 				? ''
 				: $sale_start . '/' . $sale_end;
-				$sale_price                =
+				$sale_price =
 				intval( round( $this->get_price_plus_tax( $sale_price ) * 100 ) );
 
 			// Set Sale start and end as empty if set to default values
@@ -812,7 +802,7 @@ class WC_Facebook_Product {
 		WC_Facebookcommerce_Utils::get_product_categories( $id );
 
 		// Get brand attribute.
-		$brand          = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
+		$brand = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
 		$brand_taxonomy = get_the_term_list( $id, 'product_brand', '', ', ' );
 
 		if ( $brand ) {
@@ -823,15 +813,14 @@ class WC_Facebook_Product {
 			$brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
 		}
 
-		$rich_text_description = $this->get_rich_text_description();
 		$custom_fields = $this->get_facebook_specific_fields();
 
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
-			$product_data   = array_merge(
+			$product_data   = array(
 				array(
 					'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 					'description'           => $this->get_fb_description(),
-					'rich_text_description' => $rich_text_description,
+					'rich_text_description' => $this->get_rich_text_description(),
 					'image_link'            => $image_urls[0],
 					'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 					'link'                  => $product_url,
@@ -842,7 +831,7 @@ class WC_Facebook_Product {
 					'price'                 => $this->get_fb_price( true ),
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
-				'custom_fields'			=> $custom_fields,
+					'custom_fields'			=> $custom_fields,
 				),
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
@@ -851,14 +840,14 @@ class WC_Facebook_Product {
 				$product_data['video'] = $video_urls;
 			}
 		} else {
-			$product_data = array_merge(
+			$product_data = array(
 				array(
 					'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 					'description'           => $this->get_fb_description(),
 					'image_url'             => $image_urls[0],
 					'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
 					'url'                   => $product_url,
-					'rich_text_description' => $rich_text_description,
+					'rich_text_description' => $this->get_rich_text_description(),
 					/**
 					 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
 					 * This field should have the Google product category for the item. Google product category is not a required field
@@ -1256,4 +1245,3 @@ class WC_Facebook_Product {
 	}
 
 }
-
