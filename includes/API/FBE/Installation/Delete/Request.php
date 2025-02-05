@@ -17,13 +17,13 @@ use WooCommerce\Facebook\API\FBE\Installation;
 /**
  * FBE installation API delete request object.
  *
- * @since 3.0.0
+ * @since 3.3.3
  */
 class Request extends Installation\Request {
 	/**
 	 * API request constructor.
 	 *
-	 * @since 3.0.0
+	 * @since 3.3.3
 	 *
 	 * @param string $external_business_id external business_id
 	 */
