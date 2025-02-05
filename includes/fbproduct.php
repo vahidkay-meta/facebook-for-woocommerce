@@ -817,7 +817,6 @@ class WC_Facebook_Product {
 
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
 			$product_data   = array(
-				array(
 					'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 					'description'           => $this->get_fb_description(),
 					'rich_text_description' => $this->get_rich_text_description(),
@@ -832,7 +831,6 @@ class WC_Facebook_Product {
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 					'custom_fields'			=> $custom_fields,
-				),
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
 			$gpc_field_name = 'google_product_category';
@@ -841,7 +839,6 @@ class WC_Facebook_Product {
 			}
 		} else {
 			$product_data = array(
-				array(
 					'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
 					'description'           => $this->get_fb_description(),
 					'image_url'             => $image_urls[0],
@@ -868,7 +865,6 @@ class WC_Facebook_Product {
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
 					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 					'custom_fields'			=> $custom_fields
-				),
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {
