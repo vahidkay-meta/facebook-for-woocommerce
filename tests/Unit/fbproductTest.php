@@ -570,24 +570,24 @@ class fbproductTest extends WP_UnitTestCase {
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
     }
 
-    public function test_prepare_product_items_batch() {
-        // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
-        $fb_description = 'Facebook specific description';
+  public function test_prepare_product_items_batch() {
+      // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
+      $fb_description = 'Facebook specific description';
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+      update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
 
-        $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
+      $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
 
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+      $this->assertArrayHasKey('custom_fields', $product_data);
+      $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+      $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
+      $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
 
-        // Also verify the main product data structure for items batch
-        $this->assertArrayHasKey('title', $product_data);
-        $this->assertArrayHasKey('description', $product_data);
-        $this->assertArrayHasKey('image_link', $product_data);
-    }
+      // Also verify the main product data structure for items batch
+      $this->assertArrayHasKey('title', $product_data);
+      $this->assertArrayHasKey('description', $product_data);
+      $this->assertArrayHasKey('image_link', $product_data);
+  }
 
 	/**
 	 * Test Brand is added for simple product 
