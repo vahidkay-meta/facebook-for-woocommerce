@@ -40,6 +40,10 @@ When opening a bug on GitHub, please give us as many details as possible.
 
 == Changelog ==
 
+= 3.3.3 - 2025-02-06 = 
+* Fix - Use of recommended delete connection endpoint over delete permission endpoint by atuld123 in #2844
+* Add - Expose Brand & MPN to Woocommerce UI by @devbodaghe in #2842
+
 = 3.3.2 - 2025-01-21 =
 * Fix - a bug that arose from reliance on the plugin version compatibility tag by @vinkmeta in #2856
 * Fix - Update catalog link in connections tab to point to Catalog by @devbodaghe in #2848
