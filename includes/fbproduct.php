@@ -36,6 +36,9 @@ class WC_Facebook_Product {
 	const FB_VARIANT_IMAGE       = 'fb_image';
 	const FB_VISIBILITY          = 'fb_visibility';
 	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_BRAND               = 'fb_brand';
+	const FB_VARIABLE_BRAND      = 'fb_variable_brand';
+	const FB_MPN              	 = 'fb_mpn';
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -358,6 +361,28 @@ class WC_Facebook_Product {
 		}
 	}
 
+	public function set_fb_brand( $fb_brand ) {
+		$fb_brand = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_brand )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_BRAND,
+			$fb_brand
+		);
+	}
+
+	public function set_fb_mpn( $fb_mpn ) {
+		$fb_mpn = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_mpn )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_MPN,
+			$fb_mpn
+		);
+	}
+
 	public function set_price( $price ) {
 		if ( is_numeric( $price ) ) {
 			update_post_meta(
@@ -389,6 +414,38 @@ class WC_Facebook_Product {
 			self::FB_VARIANT_IMAGE,
 			$this->fb_use_parent_image
 		);
+	}
+
+	public function get_fb_brand() {
+		// Get brand directly from post meta
+		$fb_brand = get_post_meta(
+			$this->id,
+			self::FB_BRAND,
+			true
+		);
+
+		// If empty and this is a variation, get the parent brand
+		if ( empty( $fb_brand ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_brand = get_post_meta($parent_id, self::FB_BRAND, true);
+			}
+		}
+
+		// Fallback to brand attribute or store name if no brand found
+		if ( empty( $fb_brand ) ) {
+			$brand = get_post_meta( $this->id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
+			$brand_taxonomy = get_the_term_list( $this->id, 'product_brand', '', ', ' );
+			if ( $brand ) {
+				$fb_brand = $brand;
+			} elseif ( !is_wp_error( $brand_taxonomy ) && $brand_taxonomy ) {
+				$fb_brand = $brand_taxonomy;
+			} else {
+				$fb_brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_brand );
 	}
 
 	public function get_fb_description() {
@@ -498,6 +555,23 @@ class WC_Facebook_Product {
 		return $product_data;
 	}
 
+	public function get_fb_mpn() {
+		$fb_mpn = get_post_meta(
+			$this->id,
+			self::FB_MPN,
+			true
+		);
+
+		// If empty and this is a variation, get the parent MPN
+		if ( empty( $fb_mpn ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_mpn = get_post_meta($parent_id, self::FB_MPN, true);
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_mpn );
+	}
 
 	public function get_price_plus_tax( $price ) {
 		$woo_product = $this->woo_product;
@@ -650,17 +724,7 @@ class WC_Facebook_Product {
 		$categories =
 		WC_Facebookcommerce_Utils::get_product_categories( $id );
 
-		// Get brand attribute.
-		$brand = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
-		$brand_taxonomy = get_the_term_list( $id, 'product_brand', '', ', ' );
-
-		if ( $brand ) {
-			$brand = WC_Facebookcommerce_Utils::clean_string( $brand );
-		} elseif ( !is_wp_error( $brand_taxonomy ) && $brand_taxonomy ) {
-			$brand = WC_Facebookcommerce_Utils::clean_string( $brand_taxonomy );
-		} else {
-			$brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
-		}
+		$custom_fields = $this->get_facebook_specific_fields();
 
 		$custom_fields = $this->get_facebook_specific_fields();
 
@@ -672,7 +736,8 @@ class WC_Facebook_Product {
 				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
 				'link'                  => $product_url,
 				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $brand, 100 ),
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 				'retailer_id'           => $retailer_id,
 				'price'                 => $this->get_fb_price( true ),
 				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
@@ -703,7 +768,8 @@ class WC_Facebook_Product {
 				 */
 				'category'              => $categories['categories'],
 				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $brand, 100 ),
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 				'retailer_id'           => $retailer_id,
 				'price'                 => $this->get_fb_price(),
 				'currency'              => get_woocommerce_currency(),
@@ -830,6 +896,36 @@ class WC_Facebook_Product {
 
 
 	/**
+	 * Filters list of attributes to only those available for a given product
+	 *
+	 * @param \WC_Product $product WooCommerce Product
+	 * @param array       $all_attributes List of Enhanced Catalog attributes to match
+	 * @return array
+	 */
+	public function get_matched_attributes_for_product( $product, $all_attributes ) {
+		$matched_attributes = array();
+		$sanitized_keys     = array_map(
+			function( $key ) {
+					return \WC_Facebookcommerce_Utils::sanitize_variant_name( $key, false );
+			},
+			array_keys( $product->get_attributes() )
+		);
+
+		$matched_attributes = array_filter(
+			$all_attributes,
+			function( $attribute ) use ( $sanitized_keys ) {
+				if ( is_array( $attribute ) && isset( $attribute['key'] ) ) {
+					return in_array( $attribute['key'], $sanitized_keys );
+				}
+				return false; // Return false if $attribute is not valid
+			}
+		);
+
+		return $matched_attributes;
+	}
+
+
+	/**
 	 * Normalizes variant data for Facebook.
 	 *
 	 * @param array $product_data variation product data
@@ -856,6 +952,11 @@ class WC_Facebook_Product {
 		// Loop through variants (size, color, etc) if they exist
 		// For each product field type, pull the single variant
 		foreach ( $variant_names as $original_variant_name ) {
+
+			// Ensure that the attribute exists before accessing it
+			if ( !isset( $attributes[ $original_variant_name ] ) ) {
+				continue; // Skip if the attribute is not set
+			}
 
 			// don't handle any attributes that are designated as Commerce attributes
 			if ( in_array( str_replace( 'attribute_', '', strtolower( $original_variant_name ) ), Products::get_distinct_product_attributes( $this->woo_product ), true ) ) {

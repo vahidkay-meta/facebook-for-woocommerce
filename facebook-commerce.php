@@ -793,6 +793,7 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 
 		$products_to_delete_from_facebook = $this->get_removed_from_sync_products_to_delete();
 		if ( $product->is_type( 'variable' ) ) {
+			$this->save_variable_product_settings( $product );
 			// check variations for deletion
 			foreach ( $products_to_delete_from_facebook as $delete_product_id ) {
 				$delete_product = wc_get_product( $delete_product_id );
@@ -842,6 +843,19 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 	}
 
 	/**
+	* Saves the submitted Facebook settings for a variable product.
+	*
+	*
+	* @param \WC_Product $product The variable product object.
+	*/
+	private function save_variable_product_settings( WC_Product $product ) {
+		$woo_product = new WC_Facebook_Product( $product->get_id() );
+		if ( isset( $_POST[ WC_Facebook_Product::FB_VARIABLE_BRAND ] ) ) {
+			$woo_product->set_fb_brand( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_VARIABLE_BRAND ] ) ) );
+		}
+	}
+
+	/**
 	 * Saves the submitted Facebook settings for a product.
 	 *
 	 * @since 1.10.0
@@ -867,6 +881,14 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 
 		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ] ) ) {
 			$woo_product->set_product_image( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ] ) ) );
+		}
+
+		if ( isset( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) {
+			$woo_product->set_fb_brand( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) );
+		}
+
+		if ( isset( $_POST[ WC_Facebook_Product::FB_MPN ] ) ) {
+			$woo_product->set_fb_mpn( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_MPN ] ) ) );
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}

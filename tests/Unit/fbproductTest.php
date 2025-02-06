@@ -570,22 +570,101 @@ class fbproductTest extends WP_UnitTestCase {
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
     }
 
-    public function test_prepare_product_items_batch() {
-        // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
-        $fb_description = 'Facebook specific description';
+  public function test_prepare_product_items_batch() {
+      // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
+      $fb_description = 'Facebook specific description';
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+      update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
 
-        $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
+      $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
 
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+      $this->assertArrayHasKey('custom_fields', $product_data);
+      $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+      $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
+      $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
 
-        // Also verify the main product data structure for items batch
-        $this->assertArrayHasKey('title', $product_data);
-        $this->assertArrayHasKey('description', $product_data);
-        $this->assertArrayHasKey('image_link', $product_data);
-    }
+      // Also verify the main product data structure for items batch
+      $this->assertArrayHasKey('title', $product_data);
+      $this->assertArrayHasKey('description', $product_data);
+      $this->assertArrayHasKey('image_link', $product_data);
+  }
+
+	/**
+	 * Test Brand is added for simple product 
+	 * @return void
+	 */
+	public function test_brand_for_simple_product_set() {
+		$woo_product = WC_Helper_Product::create_simple_product();
+		$facebook_product = new \WC_Facebook_Product( $woo_product );
+		$facebook_product->set_fb_brand('Nike');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_product );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['brand'], 'Nike' );
+	}
+
+	/**
+	 * Test MPN is added for simple product 
+	 * @return void
+	 */
+	public function test_mpn_for_simple_product_set() {
+		$woo_product = WC_Helper_Product::create_simple_product();
+		$facebook_product = new \WC_Facebook_Product( $woo_product );
+		$facebook_product->set_fb_mpn('123456789');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_product );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['mpn'], '123456789' );
+	}
+
+	/**
+	 * Test MPN is added for variable product 
+	 * @return void
+	 */
+	public function test_mpn_for_variable_product_set() {
+		$woo_product = WC_Helper_Product::create_variation_product();
+		$woo_variation = wc_get_product($woo_product->get_children()[0]);
+		$facebook_product = new \WC_Facebook_Product( $woo_variation, new \WC_Facebook_Product( $woo_product ) );
+		$facebook_product->set_fb_mpn('987654321');
+		$facebook_product->save();
+
+		$fb_product = new \WC_Facebook_Product( $woo_variation, new \WC_Facebook_Product( $woo_product ) );
+		$data = $fb_product->prepare_product();
+
+		$this->assertEquals( $data['mpn'], '987654321' );
+	}
+
+	/**
+	 * Test it gets brand from parent product if it is a variation.
+	 * @return void
+	 */
+	public function test_get_fb_brand_variable_products() {
+		// Create a variable product and set the brand for the parent
+		$variable_product = WC_Helper_Product::create_variation_product();
+		$facebook_product_parent = new \WC_Facebook_Product($variable_product);
+		$facebook_product_parent->set_fb_brand('Nike');
+		$facebook_product_parent->save();
+
+		// Get the variation product
+		$variation = wc_get_product($variable_product->get_children()[0]);
+
+		// Create a Facebook product instance for the variation
+		$facebook_product_variation = new \WC_Facebook_Product($variation);
+
+		// Retrieve the brand from the variation
+		$brand = $facebook_product_variation->get_fb_brand();
+		$this->assertEquals($brand, 'Nike');
+
+		// Set a different brand for the variation
+		$facebook_product_variation->set_fb_brand('Adidas');
+		$facebook_product_variation->save();
+
+		// Retrieve the brand again and check if it reflects the new value
+		$brand = $facebook_product_variation->get_fb_brand();
+		$this->assertEquals($brand, 'Adidas');
+	}
 }

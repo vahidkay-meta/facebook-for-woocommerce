@@ -381,13 +381,22 @@ class Connection {
 			wp_die( esc_html__( 'You do not have permission to uninstall Facebook Business Extension.', 'facebook-for-woocommerce' ) );
 		}
 		try {
-			$response = facebook_for_woocommerce()->get_api()->get_user();
-			$id       = $response->get_id();
-			if ( null !== $id ) {
-				$response = facebook_for_woocommerce()->get_api()->delete_user_permission( (string) $id , 'manage_business_extension' );
+			$external_business_id = $this->get_external_business_id();
+			if ( null != $external_business_id ) {
+				$response = facebook_for_woocommerce()->get_api()->delete_mbe_connection((string) $external_business_id );
 				facebook_for_woocommerce()->get_message_handler()->add_message( __( 'Disconnection successful.', 'facebook-for-woocommerce' ) );
+
+				$body = wp_remote_retrieve_body( $response );
+				$body = json_decode( $body, true );
+				if ( ! is_array( $body ) || empty( $body['data'] ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+					facebook_for_woocommerce()->log( 'Failed to disconnect' );
+					facebook_for_woocommerce()->log( print_r( $body, true ) );
+					throw new ApiException(
+						sprintf(wp_remote_retrieve_response_message( $response ))
+					);
+				}
 			} else {
-				facebook_for_woocommerce()->log( 'User id not found for the disconnection procedure, connection will be reset.' );
+				facebook_for_woocommerce()->log( 'External business id not found for the disconnection procedure, connection will be reset.' );
 			}
 		} catch ( ApiException $exception ) {
 			facebook_for_woocommerce()->log( sprintf( 'An error occurred during disconnection: %s.', $exception->getMessage() ) );
@@ -589,20 +598,6 @@ class Connection {
 		 * @param string $connect_url connect URL
 		 */
 		return apply_filters( 'wc_facebook_commerce_connect_url', $connect_url );
-	}
-
-
-	/**
-	 * Gets the URL to manage the connection.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @return string
-	 */
-	public function get_manage_url() {
-		$app_id      = $this->get_client_id();
-		$business_id = $this->get_external_business_id();
-		return "https://www.facebook.com/facebook_business_extension?app_id={$app_id}&external_business_id={$business_id}";
 	}
 
 
