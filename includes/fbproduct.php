@@ -371,16 +371,56 @@ class WC_Facebook_Product {
         );
     }
 
-	public function set_product_image( $image ) {
-		if ( $image !== null && strlen( $image ) !== 0 ) {
-			$image = WC_Facebookcommerce_Utils::clean_string( $image );
-			$image = WC_Facebookcommerce_Utils::make_url( $image );
-			update_post_meta(
-				$this->id,
-				self::FB_PRODUCT_IMAGE,
-				$image
-			);
-		}
+    public function set_product_image( $image ) {
+        if ( $image !== null && strlen( $image ) !== 0 ) {
+            $image = WC_Facebookcommerce_Utils::clean_string( $image );
+            $image = WC_Facebookcommerce_Utils::make_url( $image );
+            update_post_meta(
+                $this->id,
+                self::FB_PRODUCT_IMAGE,
+                $image
+            );
+        }
+    }
+
+	public function set_product_video_urls( $attachment_ids ) {
+		$video_urls = array_filter(array_map(function($id) {
+            return trim(wp_get_attachment_url($id));
+        }, explode(',', $attachment_ids)));
+        update_post_meta(
+            $this->id,
+            self::FB_PRODUCT_VIDEO,
+            $video_urls
+        );
+	}
+
+	public function set_rich_text_description( $rich_text_description ) {
+		$rich_text_description       =
+			WC_Facebookcommerce_Utils::clean_string( $rich_text_description, false );
+		$this->rich_text_description = $rich_text_description;
+		update_post_meta(
+			$this->id,
+			self::FB_RICH_TEXT_DESCRIPTION,
+			$rich_text_description
+		);
+	}
+
+	public function set_product_video_urls( $video_urls ) {
+		 $attachment_id_array = explode(',', $video_urls);
+        // Remove any empty values
+        $attachment_id_array = array_filter($attachment_id_array);
+        // Trim each ID to remove any whitespace
+        $attachment_id_array = array_map('trim', $attachment_id_array);
+        $video_urls = array_map(function($attachment_id) {
+            return wp_get_attachment_url($attachment_id);
+        }, $attachment_id_array);
+        // Filter out any false values (in case an ID doesn't correspond to a valid attachment)
+        $video_urls = array_filter($video_urls);
+        update_post_meta(
+            $this->id,
+            self::FB_PRODUCT_VIDEO,
+            $video_urls
+        );
 	}
 
 	public function set_rich_text_description( $rich_text_description ) {
