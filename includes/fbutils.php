@@ -34,9 +34,6 @@ if ( ! class_exists( 'WC_Facebookcommerce_Utils' ) ) :
 		const FB_VARIANT_PATTERN = 'pattern';
 		const FB_VARIANT_GENDER  = 'gender';
 
-		const FB_DESCRIPTION = 'fb_description';
-		const WC_DESCRIPTION = 'wc_description';
-
 		public static $ems        = null;
 		public static $store_name = null;
 

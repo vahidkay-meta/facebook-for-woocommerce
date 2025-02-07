@@ -68,7 +68,6 @@ class WC_Facebook_Product {
 	 */
 	private $fb_description;
 
-
 	/**
 	 * @var array Gallery URLs.
 	 */
@@ -801,18 +800,6 @@ class WC_Facebook_Product {
 		$categories =
 		WC_Facebookcommerce_Utils::get_product_categories( $id );
 
-		// Get brand attribute.
-		$brand = get_post_meta( $id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
-		$brand_taxonomy = get_the_term_list( $id, 'product_brand', '', ', ' );
-
-		if ( $brand ) {
-			$brand = WC_Facebookcommerce_Utils::clean_string( $brand );
-		} elseif ( ! is_wp_error( $brand_taxonomy ) && $brand_taxonomy ) {
-			$brand = WC_Facebookcommerce_Utils::clean_string( $brand_taxonomy );
-		} else {
-			$brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
-		}
-
 		$custom_fields = $this->get_facebook_specific_fields();
 
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
@@ -825,7 +812,7 @@ class WC_Facebook_Product {
 					'link'                  => $product_url,
 					'product_type'          => $categories['categories'],
 					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
-				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
+					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
 					'retailer_id'           => $retailer_id,
 					'price'                 => $this->get_fb_price( true ),
 					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
@@ -1002,8 +989,11 @@ class WC_Facebook_Product {
 
 		$matched_attributes = array_filter(
 			$all_attributes,
-			function ( $attribute ) use ( $sanitized_keys ) {
-				return in_array( $attribute['key'], $sanitized_keys );
+			function( $attribute ) use ( $sanitized_keys ) {
+				if ( is_array( $attribute ) && isset( $attribute['key'] ) ) {
+					return in_array( $attribute['key'], $sanitized_keys );
+				}
+				return false; // Return false if $attribute is not valid
 			}
 		);
 
