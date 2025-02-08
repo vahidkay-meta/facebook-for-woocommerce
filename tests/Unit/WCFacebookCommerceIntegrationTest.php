@@ -528,11 +528,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_data['rich_text_description']		 = 'Facebook product description.';
 		$facebook_product_data['price']                      = '199 USD';
 		$facebook_product_data['google_product_category']    = 1718;
-		$facebook_product_data['custom_fields']	= [
-			'has_fb_description' => true,
-			'has_fb_price' => true,
-			'has_fb_image' => true
-		];
 
 		$requests = WC_Facebookcommerce_Utils::prepare_product_requests_items_batch($facebook_product_data);
 
