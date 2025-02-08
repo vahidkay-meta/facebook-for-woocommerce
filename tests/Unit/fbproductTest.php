@@ -527,7 +527,7 @@ class fbproductTest extends WP_UnitTestCase {
 			$this->assertEquals($product_data[$key], $value);
 		}
 	}
-  
+
     public function test_prepare_product_with_default_fields() {
         // test when no fb specific fields are set
         $product_data = $this->fb_product->prepare_product();
@@ -590,7 +590,7 @@ class fbproductTest extends WP_UnitTestCase {
     }
 
 	/**
-	 * Test Brand is added for simple product 
+	 * Test Brand is added for simple product
 	 * @return void
 	 */
 	public function test_brand_for_simple_product_set() {
@@ -606,7 +606,7 @@ class fbproductTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test MPN is added for simple product 
+	 * Test MPN is added for simple product
 	 * @return void
 	 */
 	public function test_mpn_for_simple_product_set() {
@@ -622,7 +622,7 @@ class fbproductTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test MPN is added for variable product 
+	 * Test MPN is added for variable product
 	 * @return void
 	 */
 	public function test_mpn_for_variable_product_set() {
