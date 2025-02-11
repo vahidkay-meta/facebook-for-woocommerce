@@ -25,6 +25,15 @@ class Connection extends Abstract_Settings_Screen {
 	/** @var string screen ID */
 	const ID = 'connection';
 
+	/** @var string Facebook app ID from Connection handler */
+	const APP_ID = \WooCommerce\Facebook\Handlers\Connection::CLIENT_ID;
+
+	/** @var string Business name */
+	const BUSINESS_NAME = 'WooCommerce';
+
+	/** @var string Client token */
+	const CLIENT_TOKEN = '195311308289826|52dcd04d6c7ed113121b5eb4be23b4a7';
+
 
 	/**
 	 * Connection constructor.
@@ -38,6 +47,9 @@ class Connection extends Abstract_Settings_Screen {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 
 		add_action( 'admin_notices', array( $this, 'add_notices' ) );
+
+		// Add action to enqueue the message handler script
+		add_action('admin_footer', array($this, 'render_message_handler'));
 	}
 
 
@@ -255,60 +267,55 @@ class Connection extends Abstract_Settings_Screen {
 	 * @param bool $is_connected whether the plugin is connected
 	 */
 	private function render_facebook_box( $is_connected ) {
+		$connection = facebook_for_woocommerce()->get_connection_handler();
+		$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generateIframeSplashUrl(
+			$is_connected,
+			$connection->get_plugin(),
+			$connection->get_external_business_id()
+		);
+		?>
+		<iframe 
+			src="<?php echo esc_url( $iframe_url ); ?>" 
+			width="100%" 
+			height="600" 
+			frameborder="0" 
+			style="background: transparent;"
+			id="facebook-commerce-iframe"
+		></iframe>
+		<?php
+	}
 
-		if ( $is_connected ) {
-			$title = __( 'Reach the Right People and Sell More Online', 'facebook-for-woocommerce' );
-		} else {
-			$title = __( 'Grow your business on Facebook', 'facebook-for-woocommerce' );
+	/**
+	 * Renders the message handler script in the footer.
+	 *
+	 * @since 2.0.0
+	 */
+	public function render_message_handler() {
+		if (!$this->is_current_screen_page()) {
+			return;
 		}
 
-		$subtitle = __( 'Use this WooCommerce and Facebook integration to:', 'facebook-for-woocommerce' );
-		$benefits = array(
-			__( 'Create an ad in a few steps', 'facebook-for-woocommerce' ),
-			__( 'Use built-in best practices for online sales', 'facebook-for-woocommerce' ),
-			__( 'Get reporting on sales and revenue', 'facebook-for-woocommerce' ),
-		);
-
 		?>
+		<script type="text/javascript">
+			(function($) {
+				window.addEventListener('message', function(event) {
+					// Verify the message origin
+					console.log(event);
+					if (event.origin !== 'https://www.commercepartnerhub.com') {
+						return;
+					}
 
-		<div id="wc-facebook-connection-box">
-
-			<div class="logo"></div>
-
-			<h1><?php echo esc_html( $title ); ?></h1>
-			<h2><?php echo esc_html( $subtitle ); ?></h2>
-
-			<ul class="benefits">
-				<?php foreach ( $benefits as $key => $benefit ) : ?>
-					<li class="benefit benefit-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $benefit ); ?></li>
-				<?php endforeach; ?>
-			</ul>
-
-			<div class="actions">
-
-				<?php if ( $is_connected ) : ?>
-
-					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_disconnect_url() ); ?>" class="button button-primary uninstall" onclick="return confirmDialog();">
-						<?php esc_html_e( 'Disconnect', 'facebook-for-woocommerce' ); ?>
-					</a>
-					<script>
-						function confirmDialog() {
-							return confirm( 'Are you sure you want to disconnect from Facebook?' );
-						}
-					</script>
-
-				<?php else : ?>
-
-					<a href="<?php echo esc_url( facebook_for_woocommerce()->get_connection_handler()->get_connect_url() ); ?>" class="button button-primary">
-						<?php esc_html_e( 'Get Started', 'facebook-for-woocommerce' ); ?>
-					</a>
-
-				<?php endif; ?>
-
-			</div>
-
-		</div>
-
+					const data = event.data;
+					
+					// Handle the access token if present
+					if (data && data.accessToken) {
+						// Send the token to our REST API endpoint
+						console.log(data)
+						alert('Access token received');
+					}
+				}, false);
+			})(jQuery);
+		</script>
 		<?php
 	}
 
