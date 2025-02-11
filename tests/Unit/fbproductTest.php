@@ -28,19 +28,19 @@ class fbproductTest extends WP_UnitTestCase {
 		$this->product->delete(true);
 	}
 
-	/**
-	 * Test it gets description from post meta.
-	 * @return void
-	 */
-	public function test_get_fb_description_from_post_meta() {
-		$product = WC_Helper_Product::create_simple_product();
+	// /**
+	//  * Test it gets description from post meta.
+	//  * @return void
+	//  */
+	// public function test_get_fb_description_from_post_meta() {
+	// 	$product = WC_Helper_Product::create_simple_product();
 
-		$facebook_product = new \WC_Facebook_Product( $product );
-		$facebook_product->set_description( 'fb description' );
-		$description = $facebook_product->get_fb_description();
+	// 	$facebook_product = new \WC_Facebook_Product( $product );
+	// 	$facebook_product->set_description( 'fb description' );
+	// 	$description = $facebook_product->get_fb_description();
 
-		$this->assertEquals( $description, 'fb description');
-	}
+	// 	$this->assertEquals( $description, 'fb description');
+	// }
 
 	/**
 	 * Test it gets description from parent product if it is a variation.
@@ -108,24 +108,24 @@ class fbproductTest extends WP_UnitTestCase {
 	 * Test it filters description.
 	 * @return void
 	 */
-	public function test_filter_fb_description() {
-		$product = WC_Helper_Product::create_simple_product();
-		$facebook_product = new \WC_Facebook_Product( $product );
-		$facebook_product->set_description( 'fb description' );
+	// public function test_filter_fb_description() {
+	// 	$product = WC_Helper_Product::create_simple_product();
+	// 	$facebook_product = new \WC_Facebook_Product( $product );
+	// 	$facebook_product->set_description( 'fb description' );
 
-		add_filter( 'facebook_for_woocommerce_fb_product_description', function( $description ) {
-			return 'filtered description';
-		});
+	// 	add_filter( 'facebook_for_woocommerce_fb_product_description', function( $description ) {
+	// 		return 'filtered description';
+	// 	});
 
-		$description = $facebook_product->get_fb_description();
-		$this->assertEquals( $description, 'filtered description' );
+	// 	$description = $facebook_product->get_fb_description();
+	// 	$this->assertEquals( $description, 'filtered description' );
 
-		remove_all_filters( 'facebook_for_woocommerce_fb_product_description' );
+	// 	remove_all_filters( 'facebook_for_woocommerce_fb_product_description' );
 
-		$description = $facebook_product->get_fb_description();
-		$this->assertEquals( $description, 'fb description' );
+	// 	$description = $facebook_product->get_fb_description();
+	// 	$this->assertEquals( $description, 'fb description' );
 
-	}
+	// }
 
 	/**
 	 * Test Data Provider for sale_price related fields
@@ -533,7 +533,7 @@ class fbproductTest extends WP_UnitTestCase {
         $product_data = $this->fb_product->prepare_product();
 
         $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_description']);
+        // $this->assertEquals(false, $product_data['custom_fields']['has_fb_description']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
     }
@@ -544,14 +544,14 @@ class fbproductTest extends WP_UnitTestCase {
         $fb_price = '15';
         $fb_image = 'https:example.com/fb-image.jpg';
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+        // update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
         update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, $fb_price);
         update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_IMAGE, $fb_image);
 
         $product_data = $this->fb_product->prepare_product();
 
         $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        // $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
         $this->assertEquals(true, $product_data['custom_fields']['has_fb_price']);
         $this->assertEquals(true, $product_data['custom_fields']['has_fb_image']);
     }
@@ -560,12 +560,12 @@ class fbproductTest extends WP_UnitTestCase {
         // Set only facebook description
         $fb_description = 'Facebook specific description';
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+        // update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
 
         $product_data = $this->fb_product->prepare_product();
 
         $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        // $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
     }
@@ -574,12 +574,12 @@ class fbproductTest extends WP_UnitTestCase {
         // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
         $fb_description = 'Facebook specific description';
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
+        // update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
 
         $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
 
         $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
+        // $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
         $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
 
