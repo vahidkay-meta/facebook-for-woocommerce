@@ -495,7 +495,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 
 		$_POST[ WC_Facebook_Product::FB_REMOVE_FROM_SYNC ] = $product_to_delete->get_id();
 
-		// $_POST[ WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION ] = 'Facebook product description.';
 		$_POST[ WC_Facebook_Product::FB_PRODUCT_PRICE ]                   = '199';
 		$_POST['fb_product_image_source']                                 = 'Image source meta key value.';
 		$_POST[ WC_Facebook_Product::FB_PRODUCT_IMAGE ]                   = 'Facebook product image.';
@@ -563,7 +562,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_image']);
 
 		// Verify the actual values are still stored in meta
-		// $this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
 		$this->assertEquals( '199', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, true ) );
 		$this->assertEquals( 'http://example.orgFacebook product image.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_IMAGE, true ) );
 	}
