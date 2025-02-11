@@ -30,7 +30,6 @@ class WC_Facebook_Product {
 
 	// Should match facebook-commerce.php while we migrate that code over
 	// to this object.
-	const FB_PRODUCT_DESCRIPTION = 'fb_product_description';
 	const FB_PRODUCT_PRICE       = 'fb_product_price';
 	const FB_PRODUCT_IMAGE       = 'fb_product_image';
 	const FB_VARIANT_IMAGE       = 'fb_image';
@@ -337,18 +336,6 @@ class WC_Facebook_Product {
 		return null;
 	}
 
-	public function set_description( $description ) {
-		$description          = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $description )
-		);
-		$this->fb_description = $description;
-		update_post_meta(
-			$this->id,
-			self::FB_PRODUCT_DESCRIPTION,
-			$description
-		);
-	}
-
 	public function set_product_image( $image ) {
 		if ( $image !== null && strlen( $image ) !== 0 ) {
 			$image = WC_Facebookcommerce_Utils::clean_string( $image );
@@ -453,15 +440,6 @@ class WC_Facebook_Product {
 
 		if ( $this->fb_description ) {
 			$description = $this->fb_description;
-		}
-
-		if ( empty( $description ) ) {
-			// Try to get description from post meta
-			$description = get_post_meta(
-				$this->id,
-				self::FB_PRODUCT_DESCRIPTION,
-				true
-			);
 		}
 
 		// Check if the product type is a variation and no description is found yet
@@ -1146,7 +1124,6 @@ class WC_Facebook_Product {
 	 */
 	private function get_facebook_specific_fields(): array {
 		return array(
-			'has_fb_description' => (bool) get_post_meta($this->id, self::FB_PRODUCT_DESCRIPTION, true),
 			'has_fb_price'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_PRICE, true),
 			'has_fb_image'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_IMAGE, true)
 		);
