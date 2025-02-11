@@ -525,10 +525,10 @@ class WC_Facebook_Product {
 	/**
 	 * Get the rich text description for a product.
 	 *
-	 * This function retrieves the rich text product description based on the following logic:
+	 * This function retrieves the rich text product description, prioritizing Facebook
+	 * rich text descriptions over WooCommerce product descriptions.
 	 * 1. Check if the Facebook rich text description is set and not empty.
-	 * 2. If the rich text description is available, use it as the preferred description.
-	 * 3. Otherwise, fall back to the plain text description made available by WooCommerce.
+	 * 2. If the rich text description is not set or empty, use the WooCommerce RTD if available.
 	 *
 	 * @return string The rich text description for the product.
 	 */
@@ -563,7 +563,7 @@ class WC_Facebook_Product {
 			}
 		}
 
-		// If no description is found from meta or variation, get from post
+		// If no description is found from meta or variation, get from product
 		if ( empty( $rich_text_description ) ) {
 			$post         = $this->get_post_data();
 			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, false );
