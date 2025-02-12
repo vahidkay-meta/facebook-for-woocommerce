@@ -1951,7 +1951,7 @@ class Admin {
 									// Always remove existing badges first
 									$field.next('.synced-badge').remove();
 									
-									if (response.data && response.data[key]) {
+									if (response.data && response.data[key] !== '') {
 										// Field has a synced value
 										$field
 											.val(response.data[key])
@@ -1961,18 +1961,14 @@ class Admin {
 										// Only add badge if it hasn't been added yet
 										if (!syncedBadgeState[key]) {
 											$field.after('<span class="synced-badge">Synced from product attribute</span>');
-												syncedBadgeState[key] = true;
+											syncedBadgeState[key] = true;
 										}
 									} else {
 										// Field has no synced value or attribute was removed
 										$field
+											.val('') // Always set to empty string when attribute is removed
 											.prop('disabled', false)
 											.removeClass('synced-attribute');
-										
-										// Only clear the value if it was previously synced
-										if ($field.hasClass('synced-attribute')) {
-											$field.val('');
-										}
 										
 										// Reset the badge state
 										syncedBadgeState[key] = false;
@@ -1987,10 +1983,7 @@ class Admin {
 				$('.product_data_tabs').on('click', '.remove_row', function(e) {
 					// Wait a brief moment for WooCommerce to remove the attribute
 					setTimeout(function() {
-						// Only trigger if we're on the Facebook tab
-						if ($('.fb_commerce_tab').hasClass('active')) {
-							syncFacebookAttributes();
-						}
+						syncFacebookAttributes();
 					}, 100);
 				});
 
@@ -2041,6 +2034,7 @@ class Admin {
 		$attribute_map = [
 			'material' => \WC_Facebook_Product::FB_MATERIAL,
 			'color'    => \WC_Facebook_Product::FB_COLOR,
+			'colour'   => \WC_Facebook_Product::FB_COLOR, // Add support for British spelling
 			'size'     => \WC_Facebook_Product::FB_SIZE,
 			'pattern'  => \WC_Facebook_Product::FB_PATTERN,
 		];
@@ -2049,24 +2043,41 @@ class Admin {
 		foreach ($attribute_map as $attribute_name => $meta_key) {
 			$attribute_exists = false;
 			foreach ($attributes as $attribute) {
-				if (strtolower($attribute->get_name()) === $attribute_name) {
+				// Normalize attribute name for comparison
+				$normalized_attr_name = strtolower($attribute->get_name());
+				// Check if this is either 'color' or 'colour' when checking the color field
+				if ($normalized_attr_name === $attribute_name || 
+					($meta_key === \WC_Facebook_Product::FB_COLOR && 
+					 ($normalized_attr_name === 'color' || $normalized_attr_name === 'colour'))) {
 					$attribute_exists = true;
 					break;
 				}
 			}
 			
-			if (!$attribute_exists) {
-				// If attribute doesn't exist anymore, clear the meta
+			if (!$attribute_exists && !isset($facebook_fields[array_search($meta_key, $attribute_map)])) {
+				// Only clear if no variant of the attribute exists
 				delete_post_meta($product_id, $meta_key);
-				$facebook_fields[$attribute_name] = '';
+				// For color/colour, we want to set the field name as 'color'
+				$field_name = ($meta_key === \WC_Facebook_Product::FB_COLOR) ? 'color' : $attribute_name;
+				$facebook_fields[$field_name] = '';
 			}
 		}
 
 		// Then process existing attributes
 		foreach ($attributes as $attribute) {
-			$attribute_name = strtolower($attribute->get_name());
+			$normalized_attr_name = strtolower($attribute->get_name());
 			
-			if (isset($attribute_map[$attribute_name])) {
+			// Special handling for color/colour
+			if ($normalized_attr_name === 'color' || $normalized_attr_name === 'colour') {
+				$meta_key = \WC_Facebook_Product::FB_COLOR;
+				$field_name = 'color'; // Always use 'color' for the field name
+			} else {
+				// For other attributes, proceed as normal
+				$meta_key = $attribute_map[$normalized_attr_name] ?? null;
+				$field_name = $normalized_attr_name;
+			}
+			
+			if ($meta_key) {
 				$values = [];
 				
 				if ($attribute->is_taxonomy()) {
@@ -2079,12 +2090,12 @@ class Admin {
 				}
 				
 				if (!empty($values)) {
-					$facebook_fields[$attribute_name] = $values[0];
-					update_post_meta($product_id, $attribute_map[$attribute_name], $values[0]);
+					$facebook_fields[$field_name] = $values[0];
+					update_post_meta($product_id, $meta_key, $values[0]);
 				} else {
 					// If attribute exists but has no values, clear the meta
-					delete_post_meta($product_id, $attribute_map[$attribute_name]);
-					$facebook_fields[$attribute_name] = '';
+					delete_post_meta($product_id, $meta_key);
+					$facebook_fields[$field_name] = '';
 				}
 			}
 		}
