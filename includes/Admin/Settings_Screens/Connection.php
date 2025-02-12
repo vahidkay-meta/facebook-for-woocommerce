@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) or exit;
 
 use WooCommerce\Facebook\Admin\Abstract_Settings_Screen;
 use WooCommerce\Facebook\Framework\Api\Exception as ApiException;
+use WooCommerce\Facebook\Handlers\MetaExtension;
 
 /**
  * The Connection settings screen object.
@@ -27,12 +28,6 @@ class Connection extends Abstract_Settings_Screen {
 
 	/** @var string Facebook app ID from Connection handler */
 	const APP_ID = \WooCommerce\Facebook\Handlers\Connection::CLIENT_ID;
-
-	/** @var string Business name */
-	const BUSINESS_NAME = 'WooCommerce';
-
-	/** @var string Client token */
-	const CLIENT_TOKEN = '195311308289826|52dcd04d6c7ed113121b5eb4be23b4a7';
 
 
 	/**
@@ -268,17 +263,18 @@ class Connection extends Abstract_Settings_Screen {
 	 */
 	private function render_facebook_box( $is_connected ) {
 		$connection = facebook_for_woocommerce()->get_connection_handler();
-		$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generateIframeSplashUrl(
+		$iframe_url = MetaExtension::generateIframeSplashUrl(
 			$is_connected,
 			$connection->get_plugin(),
-			$connection->get_external_business_id()
+			$connection->get_external_business_id(),
+			$connection->get_timezone_string()
 		);
 		?>
-		<iframe 
-			src="<?php echo esc_url( $iframe_url ); ?>" 
-			width="100%" 
-			height="600" 
-			frameborder="0" 
+		<iframe
+			src="<?php echo esc_url( $iframe_url ); ?>"
+			width="100%"
+			height="600"
+			frameborder="0"
 			style="background: transparent;"
 			id="facebook-commerce-iframe"
 		></iframe>
@@ -301,12 +297,12 @@ class Connection extends Abstract_Settings_Screen {
 				window.addEventListener('message', function(event) {
 					// Verify the message origin
 					console.log(event);
-					if (event.origin !== 'https://www.commercepartnerhub.com') {
+					if (!event.origin.match(/^https:\/\/(www\.|www\.my-od\.)?commercepartnerhub\.com$/)) {
 						return;
 					}
 
 					const data = event.data;
-					
+
 					// Handle the access token if present
 					if (data && data.accessToken) {
 						// Send the token to our REST API endpoint
