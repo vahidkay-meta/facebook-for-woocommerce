@@ -82,40 +82,6 @@ class Admin {
 	const GENDER_UNISEX = 'unisex';
 
 
-
-	/** @var string the "adult" age group */
-	const AGE_GROUP_ADULT = 'adult';
-
-	/** @var string the "all ages" age group */
-	const AGE_GROUP_ALL_AGES = 'all_ages';
-
-	/** @var string the "teen" age group */
-	const AGE_GROUP_TEEN = 'teen';
-
-	/** @var string the "kids" age group */
-	const AGE_GROUP_KIDS = 'kids';
-
-	/** @var string the "toddler" age group */
-	const AGE_GROUP_TODDLER = 'toddler';
-
-	/** @var string the "infant" age group */
-	const AGE_GROUP_INFANT = 'infant';
-
-	/** @var string the "newborn" age group */
-	const AGE_GROUP_NEWBORN = 'newborn';
-
-	/** @var string the "male" gender */
-	const GENDER_MALE = 'male';
-
-	/** @var string the "female" gender */
-	const GENDER_FEMALE = 'female';
-
-	/** @var string the "unisex" gender */
-	const GENDER_UNISEX = 'unisex';
-
-
-
-
 	/**
 	 * Admin constructor.
 	 *
@@ -1349,7 +1315,7 @@ class Admin {
 				woocommerce_wp_select(
 					array(
 						'id'      => 'wc_facebook_sync_mode',
-						'label'   => __( 'Facebook Sync', 'facebook-for-woocommerce' ),
+						'label'   => __( 'Sync to connected catalog', 'facebook-for-woocommerce' ),
 						'options' => array(
 							self::SYNC_MODE_SYNC_AND_SHOW => __( 'Sync and show in catalog', 'facebook-for-woocommerce' ),
 							self::SYNC_MODE_SYNC_AND_HIDE => __( 'Sync and hide in catalog', 'facebook-for-woocommerce' ),
@@ -1455,28 +1421,44 @@ class Admin {
 				?>
 			</div>
 			
-			<div class='options_group show_if_variable'>
+			<!-- <div class='options_group show_if_variable'>
 				<?php
 					woocommerce_wp_text_input(
 						array(
 							'id'    => \WC_Facebook_Product::FB_VARIABLE_BRAND,
-							'label' => __( 'Brand', 'facebook-for-woocommerce' ),
+							'label' => __( 'Brand2', 'facebook-for-woocommerce' ),
 							'value' => $fb_brand,
 							'class' => 'enable-if-sync-enabled',
 						)
 					);
 				?>
-			</div>
-
-			
+			</div> -->
 
 			<div class='wc_facebook_commerce_fields'>
 				<p class="text-heading">
-					<span><?php echo esc_html(  \WooCommerce\Facebook\Admin\Product_Categories::get_wip_catalog_explanation_text() ); ?></span>
+					<span><?php echo esc_html(  \WooCommerce\Facebook\Admin\Product_Categories::get_catalog_explanation_text() ); ?></span>
 				</p>
 			</div>
 
 			<?php
+
+				woocommerce_wp_text_input(
+					array(
+						'id'    => \WC_Facebook_Product::FB_MPN,
+						'label' => __( 'Manufacturer Parts Number (MPN)', 'facebook-for-woocommerce' ),
+						'value' => $fb_mpn,
+						'class' => 'enable-if-sync-enabled',
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'    => \WC_Facebook_Product::FB_BRAND,
+						'label' => __( 'Brand1', 'facebook-for-woocommerce' ),
+						'value' => $fb_brand,
+						'class' => 'enable-if-sync-enabled',
+					)
+				);
 
 				woocommerce_wp_select(
 					array(
@@ -1491,6 +1473,32 @@ class Admin {
 						'value'       => $condition,
 						'desc_tip'    => true,
 						'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_SIZE,
+						'label'       => __( 'Size', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Size of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $size,
+						'class'       => 'enable-if-sync-enabled',
+					)
+				);
+
+				woocommerce_wp_text_input(
+					array(
+						'id'          => \WC_Facebook_Product::FB_COLOR,
+						'label'       => __( 'Color', 'facebook-for-woocommerce' ),
+						'desc_tip'    => true,
+						'description' => __( 'Color of the product item', 'facebook-for-woocommerce' ),
+						'cols'        => 40,
+						'rows'        => 60,
+						'value'       => $color,
+						'class'       => 'enable-if-sync-enabled',
 					)
 				);
 
@@ -1532,32 +1540,6 @@ class Admin {
 
 				woocommerce_wp_text_input(
 					array(
-						'id'          => \WC_Facebook_Product::FB_SIZE,
-						'label'       => __( 'Size', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Size of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $size,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
-
-				woocommerce_wp_text_input(
-					array(
-						'id'          => \WC_Facebook_Product::FB_COLOR,
-						'label'       => __( 'Color', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Color of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $color,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
-
-				woocommerce_wp_text_input(
-					array(
 						'id'          => \WC_Facebook_Product::FB_MATERIAL,
 						'label'       => __( 'Material', 'facebook-for-woocommerce' ),
 						'desc_tip'    => true,
@@ -1581,52 +1563,7 @@ class Admin {
 						'class'       => 'enable-if-sync-enabled',
 					)
 				);
-				woocommerce_wp_select(
-					array(
-						'id'          => \WC_Facebook_Product::FB_AGE_GROUP,
-						'label'       => __( 'Age Group', 'facebook-for-woocommerce' ),
-						'options'     => array(
-							self::AGE_GROUP_ADULT     => __( 'Adult', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_ALL_AGES  => __( 'All Ages', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_TEEN      => __( 'Teen', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_KIDS      => __( 'Kids', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_TODDLER   => __( 'Toddler', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_INFANT    => __( 'Infant', 'facebook-for-woocommerce' ),
-							self::AGE_GROUP_NEWBORN   => __( 'Newborn', 'facebook-for-woocommerce' ),
-        				),
-						'value'       => $age_group,
-						'desc_tip'    => true,
-						'description' => __( 'Choose the age group for the product.', 'facebook-for-woocommerce' ),
-					)
-				);
-
-				woocommerce_wp_select(
-					array(
-						'id'          => \WC_Facebook_Product::FB_GENDER,
-						'label'       => __( 'Gender', 'facebook-for-woocommerce' ),
-						'options'     => array(
-							self::GENDER_MALE   => __( 'Male', 'facebook-for-woocommerce' ),
-							self::GENDER_FEMALE => __( 'Female', 'facebook-for-woocommerce' ),
-							self::GENDER_UNISEX => __( 'Unisex', 'facebook-for-woocommerce' ),
-						),
-						'value'       => $gender, 
-						'desc_tip'    => true,
-						'description' => __( 'Choose the gender for the product.', 'facebook-for-woocommerce' ),
-					)
-				);
-
-				woocommerce_wp_text_input(
-					array(
-						'id'          => \WC_Facebook_Product::FB_SIZE,
-						'label'       => __( 'Size', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Size of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $size,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
+				
 			?>
 
 			<div class='wc-facebook-commerce-options-group options_group'>
