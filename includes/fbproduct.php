@@ -302,15 +302,6 @@ class WC_Facebook_Product {
             return $video_urls;
         }
 
-       // Add attached video URLs to the list
-        if ( !empty( $attached_videos ) ) {
-            foreach ( $attached_videos as $video ) {
-                $url = wp_get_attachment_url( $video->ID );
-                if ( $url ) {
-                    $video_urls[] = array('url' => $url);
-                }
-            }
-        }
         // Add custom video URLs to the list
         if (!empty($custom_video_urls) && is_array($custom_video_urls)) {
             foreach ($custom_video_urls as $custom_url) {
@@ -319,7 +310,18 @@ class WC_Facebook_Product {
                     $video_urls[] = array('url' => $custom_url);
                 }
             }
-		}
+        }
+        
+        // Add attached video URLs to the list, excluding duplicates from custom video URLs
+        if (!empty($attached_videos)) {
+            $custom_video_url_set = array_flip(array_column($video_urls, 'url'));
+            foreach ($attached_videos as $video) {
+                $url = wp_get_attachment_url($video->ID);
+                if ($url && !isset($custom_video_url_set[$url])) {
+                    $video_urls[] = array('url' => $url);
+                }
+            }
+    }
 
 		return $video_urls;
 	}
