@@ -1649,7 +1649,6 @@ class Admin {
 	 * @param \WC_Post $post the post type for the current variation
 	 */
 	public function add_product_variation_edit_fields( $index, $variation_data, $post ) {
-
 		$variation = wc_get_product( $post );
 
 		if ( ! $variation instanceof \WC_Product_Variation ) {
@@ -1662,9 +1661,10 @@ class Admin {
 			return;
 		}
 
+		// Get variation meta values
 		$sync_enabled = 'no' !== $this->get_product_variation_meta( $variation, Products::SYNC_ENABLED_META_KEY, $parent );
 		$is_visible   = ( $visibility = $this->get_product_variation_meta( $variation, Products::VISIBILITY_META_KEY, $parent ) ) ? wc_string_to_bool( $visibility ) : true;
-		$description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $parent );		
+		$description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $parent );
 		$price        = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_PRICE, $parent );
 		$image_url    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_IMAGE, $parent );
 		$condition    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_CONDITION, $parent );
@@ -1677,38 +1677,46 @@ class Admin {
 			$sync_mode = self::SYNC_MODE_SYNC_DISABLED;
 		}
 
-		woocommerce_wp_select(
-			array(
-				'id'            => "variable_facebook_sync_mode$index",
-				'name'          => "variable_facebook_sync_mode[$index]",
-				'label'         => __( 'Facebook Sync', 'facebook-for-woocommerce' ),
-				'options'       => array(
-					self::SYNC_MODE_SYNC_AND_SHOW => __( 'Sync and show in catalog', 'facebook-for-woocommerce' ),
-					self::SYNC_MODE_SYNC_AND_HIDE => __( 'Sync and hide in catalog', 'facebook-for-woocommerce' ),
-					self::SYNC_MODE_SYNC_DISABLED => __( 'Do not sync', 'facebook-for-woocommerce' ),
-				),
-				'value'         => $sync_mode,
-				'desc_tip'    => true,
-				'description' => __( 'Choose whether to sync this product to Facebook and, if synced, whether it should be visible in the catalog.', 'facebook-for-woocommerce' ),
-				'class'         => 'js-variable-fb-sync-toggle',
-				'wrapper_class' => 'form-row form-row-full',
-			)
-		);
+		?>
+		<div class="facebook-metabox wc-metabox closed">
+			<h3>
+				<strong><?php esc_html_e( 'Facebook', 'facebook-for-woocommerce' ); ?></strong>
+				<div class="handlediv" aria-label="<?php esc_attr_e( 'Click to toggle', 'facebook-for-woocommerce' ); ?>"></div>
+			</h3>
+			<div class="wc-metabox-content" style="display: none;">
+				<?php
+				// Sync Mode Select
+				woocommerce_wp_select(
+					array(
+						'id'            => "variable_facebook_sync_mode$index",
+						'name'          => "variable_facebook_sync_mode[$index]",
+						'label'         => __( 'Facebook Sync', 'facebook-for-woocommerce' ),
+						'options'       => array(
+							self::SYNC_MODE_SYNC_AND_SHOW => __( 'Sync and show in catalog', 'facebook-for-woocommerce' ),
+							self::SYNC_MODE_SYNC_AND_HIDE => __( 'Sync and hide in catalog', 'facebook-for-woocommerce' ),
+							self::SYNC_MODE_SYNC_DISABLED => __( 'Do not sync', 'facebook-for-woocommerce' ),
+						),
+						'value'         => $sync_mode,
+						'desc_tip'      => true,
+						'description'   => __( 'Choose whether to sync this product to Facebook and, if synced, whether it should be visible in the catalog.', 'facebook-for-woocommerce' ),
+						'class'         => 'js-variable-fb-sync-toggle',
+						'wrapper_class' => 'form-row form-row-full',
+					)
+				);
 
-		woocommerce_wp_textarea_input(
-			array(
-				'id'            => sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index ),
-				'name'          => sprintf( "variable_%s[$index]", \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION ),
-				'label'         => __( 'Facebook Description', 'facebook-for-woocommerce' ),
-				'desc_tip'      => true,
-				'description'   => __( 'Custom (plain-text only) description for product on Facebook. If blank, product description will be used. If product description is blank, shortname will be used.', 'facebook-for-woocommerce' ),
-				'cols'          => 40,
-				'rows'          => 5,
-				'value'         => $description,
-				'class'         => 'enable-if-sync-enabled',
-				'wrapper_class' => 'form-row form-row-full',
-			)
-		);
+				// Description field
+				woocommerce_wp_textarea_input(
+					array(
+						'id'            => sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index ),
+						'name'          => sprintf( "variable_%s[$index]", \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION ),
+						'label'         => __( 'Facebook Description', 'facebook-for-woocommerce' ),
+						'desc_tip'      => true,
+						'description'   => __( 'Custom (plain-text only) description for product on Facebook. If blank, product description will be used. If product description is blank, shortname will be used.', 'facebook-for-woocommerce' ),
+						'value'         => $description,
+						'class'         => 'enable-if-sync-enabled',
+						'wrapper_class' => 'form-row form-row-full',
+					)
+				);
 
 		woocommerce_wp_radio(
 			array(
@@ -1786,6 +1794,70 @@ class Admin {
 		);
 
 
+				// ... Add other fields similarly ...
+				?>
+			</div>
+		</div>
+
+		<style type="text/css">
+			.facebook-metabox {
+				overflow: hidden;
+				clear: both;
+				border: 1px solid #ddd;
+				margin: 16px 0 !important;
+				background: #fff;
+				padding: 0 !important; /* Remove the previous padding */
+			}
+			.facebook-metabox h3 {
+				margin: 0 !important;
+				font-size: 1em !important;
+				padding: 0.5em 0.75em 0.5em 1em !important;
+				cursor: pointer;
+				background: #f8f9fa;
+				border-bottom: 1px solid #ddd;
+			}
+			.facebook-metabox.closed .handlediv:before {
+				content: "\f140" !important;
+			}
+			.facebook-metabox .handlediv:before {
+				content: "\f142" !important;
+				font: normal 20px/1 dashicons;
+			}
+			.facebook-metabox .wc-metabox-content {
+				padding: 1em;
+				background: #fff;
+			}
+			.facebook-metabox h3 strong {
+				line-height: 26px;
+				font-weight: 600;
+			}
+			.facebook-metabox .form-row {
+				padding: 0 12px !important;
+			}
+		</style>
+
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				// Remove any existing click handlers first
+				$('.facebook-metabox h3, .facebook-metabox .handlediv').off('click');
+				
+				// Add new click handler
+				$('.facebook-metabox h3, .facebook-metabox .handlediv').on('click', function(e) {
+					e.preventDefault(); // Prevent any default behavior
+					e.stopPropagation(); // Stop event bubbling
+					
+					var $metabox = $(this).closest('.facebook-metabox');
+					$metabox.toggleClass('closed');
+					$metabox.find('.wc-metabox-content').slideToggle();
+				});
+
+				// Ensure metaboxes start closed
+				$('.facebook-metabox').addClass('closed')
+									.find('.wc-metabox-content')
+									.hide();
+			});
+		</script>
+		<?php
 	}
 
 
