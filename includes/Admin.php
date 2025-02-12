@@ -1831,9 +1831,6 @@ class Admin {
 				line-height: 26px;
 				font-weight: 600;
 			}
-			.facebook-metabox .form-row {
-				padding: 0 12px !important;
-			}
 		</style>
 
 		<script type="text/javascript">
