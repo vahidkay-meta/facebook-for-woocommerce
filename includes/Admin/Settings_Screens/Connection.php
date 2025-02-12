@@ -266,7 +266,8 @@ class Connection extends Abstract_Settings_Screen {
 		$iframe_url = MetaExtension::generateIframeSplashUrl(
 			$is_connected,
 			$connection->get_plugin(),
-			$connection->get_external_business_id()
+			$connection->get_external_business_id(),
+			$connection->get_timezone_string()
 		);
 		?>
 		<iframe

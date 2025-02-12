@@ -8,6 +8,9 @@
 
 namespace WooCommerce\Facebook\Handlers;
 
+use WooCommerce\Facebook\Handlers\Connection;
+
+
 defined( 'ABSPATH' ) or exit;
 
 class MetaExtension {
@@ -31,7 +34,7 @@ class MetaExtension {
 	 *
 	 * @return string
 	 */
-	public static function generateIframeSplashUrl( $is_connected, $plugin, $external_business_id ) {
+	public static function generateIframeSplashUrl( $is_connected, $plugin, $external_business_id, $timezone) {
 		$external_client_metadata = array(
 			'shop_domain'                           => get_home_url(),
 			'admin_url'                             => get_admin_url(),
@@ -39,12 +42,6 @@ class MetaExtension {
 			'commerce_partner_seller_platform_type' => 'SELF_SERVE_PLATFORM',
 			'country_code'                          => WC()->countries->get_base_country(),
 		);
-
-		$timezone = get_option('timezone_string');
-
-		if (!$timezone) {
-			$timezone = "UTC";
-		}
 
 		return add_query_arg(
 			array(
