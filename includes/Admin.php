@@ -1922,6 +1922,13 @@ class Admin {
 					size: false,
 					pattern: false
 				};
+				
+				var displayAttributeState = {
+					material: false,
+					color: false,
+					size: false,
+					pattern: false
+				};
 
 				// Function to sync Facebook attributes
 				function syncFacebookAttributes() {
