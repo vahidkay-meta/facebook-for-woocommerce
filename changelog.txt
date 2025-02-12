@@ -1,5 +1,8 @@
 *** Facebook for WooCommerce Changelog ***
 
+= 3.3.5 - 2025-02-12 = 
+* Add - Rich Text Description to Woo Product Sync with Meta by devbodaghe in #2843
+
 = 3.3.4 - 2025-02-11 =
 * Fix - Fixing the issue with version number
 
