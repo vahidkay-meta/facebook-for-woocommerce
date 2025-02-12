@@ -1604,7 +1604,6 @@ class Admin {
 		$description  = $this->get_product_variation_meta( $variation, \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $parent );
 		$price        = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_PRICE, $parent );
 		$image_url    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_IMAGE, $parent );
-		$condition    = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_PRODUCT_CONDITION, $parent );
 		$image_source = $variation->get_meta( Products::PRODUCT_IMAGE_SOURCE_META_KEY );
 		$fb_mpn    	  = $this->get_product_variation_meta( $variation, \WC_Facebook_Product::FB_MPN, $parent );
 
