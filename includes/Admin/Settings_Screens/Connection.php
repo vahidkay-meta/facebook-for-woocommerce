@@ -21,12 +21,19 @@ use WooCommerce\Facebook\Framework\Api\Exception as ApiException;
  */
 class Connection extends Abstract_Settings_Screen {
 
-	
 	/** @var string screen ID */
 	const ID = 'connection';
 
-	/** @var bool feature flag for new iframe implementation */
-	const USE_IFRAME_CONNECTION = true;
+	/**
+	 * Determines if the iframe connection should be used.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return bool
+	 */
+	protected function use_iframe_connection() {
+		return true;
+	}
 
 	/**
 	 * Connection constructor.
@@ -131,7 +138,7 @@ class Connection extends Abstract_Settings_Screen {
 		 * TODO: add pixel & ad account API retrieval when we gain the ads_management permission
 		 * TODO: add the page name and link when we gain the manage_pages permission
 		 */
-		$static_items = self::USE_IFRAME_CONNECTION ? array() : array(
+		$static_items = $this->use_iframe_connection() ? array() : array(
 			'page'                          => array(
 				'label' => __( 'Page', 'facebook-for-woocommerce' ),
 				'value' => facebook_for_woocommerce()->get_integration()->get_facebook_page_id(),
@@ -260,7 +267,7 @@ class Connection extends Abstract_Settings_Screen {
 	 * @param bool $is_connected whether the plugin is connected
 	 */
 	private function render_facebook_box( $is_connected ) {
-		if (self::USE_IFRAME_CONNECTION) {
+		if ($this->use_iframe_connection()) {
 			$this->render_facebook_box_iframe($is_connected);
 		} else {
 			$this->render_facebook_box_legacy($is_connected);
