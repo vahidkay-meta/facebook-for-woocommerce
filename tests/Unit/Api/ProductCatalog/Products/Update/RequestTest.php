@@ -18,12 +18,12 @@ class RequestTest extends WP_UnitTestCase {
 	public function test_request() {
 		$product          = WC_Helper_Product::create_simple_product();
 		$facebook_product = new WC_Facebook_Product( $product );
-		$product_group_id = 'facebook-product-group-id';
+		$product_id       = 'facebook-product-id';
 		$data             = $facebook_product->prepare_product();
-		$request          = new WooCommerce\Facebook\API\ProductCatalog\Products\Update\Request( $product_group_id, $data );
+		$request          = new WooCommerce\Facebook\API\ProductCatalog\Products\Update\Request( $product_id, $data );
 
 		$this->assertEquals( 'POST', $request->get_method() );
-		$this->assertEquals( '/facebook-product-group-id', $request->get_path() );
+		$this->assertEquals( '/facebook-product-id', $request->get_path() );
 		$this->assertEquals( $data, $request->get_data() );
 	}
 }
