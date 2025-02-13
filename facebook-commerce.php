@@ -853,6 +853,50 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 		if ( isset( $_POST[ WC_Facebook_Product::FB_VARIABLE_BRAND ] ) ) {
 			$woo_product->set_fb_brand( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_VARIABLE_BRAND ] ) ) );
 		}
+
+		if ( isset( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) {
+			$woo_product->set_fb_brand( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_BRAND ] ) ) );
+		}
+
+		if ( isset( $_POST[ WC_Facebook_Product::FB_MPN ] ) ) {
+			$woo_product->set_fb_mpn( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_MPN ] ) ) );
+		}
+
+		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) {
+			$woo_product->set_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
+			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
+			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) {
+			$woo_product->set_size( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_COLOR ] ) ) {
+			$woo_product->set_color( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_COLOR ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_MATERIAL ] ) ) {
+			$woo_product->set_material( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_MATERIAL ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_PATTERN ] ) ) {
+			$woo_product->set_pattern( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PATTERN ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
+			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
+		}
+		
+		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
+			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
+		}
 	}
 
 	/**
