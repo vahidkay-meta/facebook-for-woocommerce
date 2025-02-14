@@ -1,0 +1,29 @@
+<?php
+// phpcs:ignoreFile
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * Template Name: Cart Permalink Template
+ *
+ * @package FacebookCommerce
+ */
+
+namespace WooCommerce\Facebook\Templates;
+
+defined( 'ABSPATH' ) or exit;
+
+get_header(); ?>
+
+<div id="primary" class="content-area">
+    <main id="main" class="site-main" role="main">
+        <?php
+        // Display the WooCommerce cart
+        echo do_shortcode('[woocommerce_cart]');
+        ?>
+    </main><!-- .site-main -->
+</div><!-- .content-area -->
+
+<?php get_footer(); ?>
