@@ -321,7 +321,15 @@ class WC_Facebook_Product_Feed {
 
 		foreach ( $wp_ids as $wp_id ) {
 
-			$woo_product = new WC_Facebook_Product( $wp_id );
+			$product = wc_get_product( $wp_id );
+			if ( $product instanceof WC_Product && $product->get_parent_id() ) {
+				$parent_product = wc_get_product( $product->get_parent_id() );
+				if ( $parent_product instanceof WC_Product ) {
+					$fb_product_parent = new WC_Facebook_Product( $parent_product );
+				}
+			}
+
+			$woo_product = new WC_Facebook_Product( $wp_id, $fb_product_parent );
 
 			// Skip if we don't have a valid product object.
 			if ( ! $woo_product->woo_product instanceof \WC_Product ) {
