@@ -33,7 +33,7 @@ class WC_Facebook_Product {
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
-    const FB_PRODUCT_VIDEO       = 'fb_product_video';
+    const FB_PRODUCT_VIDEO         = 'fb_product_video';
     const FB_VARIANT_IMAGE           = 'fb_image';
     const FB_VISIBILITY              = 'fb_visibility';
     const FB_REMOVE_FROM_SYNC        = 'fb_remove_from_sync';
@@ -401,17 +401,6 @@ class WC_Facebook_Product {
 			self::FB_RICH_TEXT_DESCRIPTION,
 			$rich_text_description
 		);
-	}
-	
-	public function set_product_video_urls( $attachment_ids ) {
-		$video_urls = array_filter(array_map(function($id) {
-            return trim(wp_get_attachment_url($id));
-        }, explode(',', $attachment_ids)));
-        update_post_meta(
-            $this->id,
-            self::FB_PRODUCT_VIDEO,
-            $video_urls
-        );
 	}
 
 	public function set_fb_brand( $fb_brand ) {
