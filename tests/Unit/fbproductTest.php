@@ -574,6 +574,48 @@ class fbproductTest extends WP_UnitTestCase {
 		$this->assertEquals($expected_video_urls, $product_data['video']);
 	}
 
+	public function test_set_product_video_urls() {
+        // Prepare attachment IDs
+        $attachment_ids = '123,456';
+    
+        // Mock get_video_urls_from_attachment_ids function
+        $this->fb_product = $this->getMockBuilder(WC_Facebook_Product::class)
+            ->setConstructorArgs([$this->product])
+            ->setMethods(['get_video_urls_from_attachment_ids'])
+            ->getMock();
+    
+        $this->fb_product->method('get_video_urls_from_attachment_ids')
+            ->willReturnCallback(function($id) {
+             switch ($id) {
+                 case '123':
+                     return 'http://example.com/video1.mp4';
+                 case '456':
+                     return 'http://example.com/video2.mp4';
+                 default:
+                     return '';
+             }
+            });
+        
+        // Set the video URLs in post meta
+        $video_urls = array_filter(array_map([$this->fb_product, 'get_video_urls_from_attachment_ids'], explode(',', $attachment_ids)));
+        update_post_meta( $this->fb_product->get_id(), WC_Facebook_Product::FB_PRODUCT_VIDEO, $video_urls );
+    
+        // Get the saved video URLs from post meta
+        $saved_video_urls = get_post_meta( $this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
+		
+        // Assert that the saved video URLs match the expected values
+        $this->assertEquals( $saved_video_urls, $video_urls);
+
+		// Assert that the saved video URLs are an array
+		$this->assertIsArray($saved_video_urls);
+
+		// Assert that the saved video URLs have the correct count
+		$this->assertCount(2, $saved_video_urls);
+
+		// Assert that the saved video URLs do not contain any empty strings
+		$this->assertNotContains('', $saved_video_urls);
+    }
+
     public function test_prepare_product_with_mixed_fields() {
         // Set only facebook description
         $fb_description = 'Facebook specific description';
