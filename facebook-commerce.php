@@ -862,20 +862,12 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 			$woo_product->set_fb_mpn( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_MPN ] ) ) );
 		}
 
-		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) {
-			$woo_product->set_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
-		}
-		
-		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
-			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
-		}
-		
-		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
-			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
-		}
+		// if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) {
+		// 	$woo_product->set_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
+		// }
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) {
-			$woo_product->set_size( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) );
+			$woo_product->set_fb_size( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) );
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_COLOR ] ) ) {
@@ -891,11 +883,11 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
-			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
+			$woo_product->set_fb_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
-			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
+			$woo_product->set_fb_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
 		}
 	}
 
@@ -944,19 +936,15 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 		}
 
 		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) {
-			$woo_product->set_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
+			$woo_product->set_fb_condition( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_CONDITION ] ) ) );
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
-			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
-		}
-		
-		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
-			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
+			$woo_product->set_fb_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) {
-			$woo_product->set_size( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) );
+			$woo_product->set_fb_size( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_SIZE ] ) ) );
 		}
 		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_COLOR ] ) ) {
@@ -971,12 +959,8 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 			$woo_product->set_pattern( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PATTERN ] ) ) );
 		}
 		
-		if ( isset( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) {
-			$woo_product->set_age_group( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_AGE_GROUP ] ) ) );
-		}
-		
 		if ( isset( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) {
-			$woo_product->set_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
+			$woo_product->set_fb_gender( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_GENDER ] ) ) );
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}

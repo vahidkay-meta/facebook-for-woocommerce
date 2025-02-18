@@ -434,7 +434,7 @@ class WC_Facebook_Product {
 		);
 	}
 
-	public function set_condition( $condition ) {
+	public function set_fb_condition( $condition ) {
 		$condition = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $condition )
 		);
@@ -446,18 +446,20 @@ class WC_Facebook_Product {
 	}
 
 
-	public function set_age_group( $age_group ) {
+	public function set_fb_age_group( $age_group ) {
 		$age_group = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $age_group )
 		);
-			update_post_meta(
-				$this->id,
-				self::FB_AGE_GROUP,
-				$age_group
-			);
+
+		update_post_meta(
+			$this->id,
+			self::FB_AGE_GROUP,
+			$age_group
+		);
+
 	}
 
-	public function set_gender( $gender ) {
+	public function set_fb_gender( $gender ) {
 		$gender = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $gender )
 		);
@@ -466,18 +468,34 @@ class WC_Facebook_Product {
 				self::FB_GENDER,
 				$gender
 			);
+
+			// If empty and this is a variation, get the parent gender
+		if ( empty( $gender ) && $this->is_type('variation') ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$gender = get_post_meta($parent_id, self::FB_GENDER, true);
+			}
+		}
 	}
 
 
-	public function set_size( $size ) {
+	public function set_fb_size( $size ) {
 		$size = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $size )
 		);
-			update_post_meta(
-				$this->id,
-				self::FB_SIZE,
-				$size
-			);
+		update_post_meta(
+			$this->id,
+			self::FB_SIZE,
+			$size
+		);
+
+			// If empty and this is a variation, get the parent gender
+			if ( empty( $size ) && $this->is_type('variation') ) {
+				$parent_id = $this->get_parent_id();
+				if ( $parent_id ) {
+					$size = get_post_meta($parent_id, self::FB_SIZE, true);
+				}
+			}
 	}
 
 	public function set_price( $price ) {
