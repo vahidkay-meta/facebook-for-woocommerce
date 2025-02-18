@@ -1231,15 +1231,16 @@ class Admin {
 		global $post;
 
 
-        // all products have sync enabled unless explicitly disabled
-        $sync_enabled = 'no' !== get_post_meta( $post->ID, Products::SYNC_ENABLED_META_KEY, true );
-        $is_visible   = ( $visibility = get_post_meta( $post->ID, Products::VISIBILITY_META_KEY, true ) ) ? wc_string_to_bool( $visibility ) : true;
-        $product      = wc_get_product( $post );
-        $rich_text_description  = get_post_meta( $post->ID, \WC_Facebookcommerce_Integration::FB_RICH_TEXT_DESCRIPTION, true );
-        $price        = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_PRICE, true );
-        $image_source = get_post_meta( $post->ID, Products::PRODUCT_IMAGE_SOURCE_META_KEY, true );
-        $image        = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_IMAGE, true );
-		$video_urls   = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
+		// all products have sync enabled unless explicitly disabled
+		$sync_enabled = 'no' !== get_post_meta( $post->ID, Products::SYNC_ENABLED_META_KEY, true );
+		$is_visible   = ( $visibility = get_post_meta( $post->ID, Products::VISIBILITY_META_KEY, true ) ) ? wc_string_to_bool( $visibility ) : true;
+		$product 	  = wc_get_product( $post );
+
+		$rich_text_description  = get_post_meta( $post->ID, \WC_Facebookcommerce_Integration::FB_RICH_TEXT_DESCRIPTION, true );
+		$price        = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_PRICE, true );
+		$image_source = get_post_meta( $post->ID, Products::PRODUCT_IMAGE_SOURCE_META_KEY, true );
+		$image        = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_IMAGE, true );
+        $video_urls   = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
 		$fb_brand     = get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) ? get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) : get_post_meta( $post->ID, '_wc_facebook_enhanced_catalog_attributes_brand', true );
 		$fb_mpn       = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MPN, true );
 
