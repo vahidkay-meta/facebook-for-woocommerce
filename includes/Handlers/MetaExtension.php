@@ -189,4 +189,64 @@ class MetaExtension
 
 		return new WP_REST_Response(array('success' => true, 'message' => __('Facebook settings updated successfully', 'facebook-for-woocommerce')), 200);
 	}
+
+	/**
+	 * Generates the Commerce Hub iframe management page URL.
+	 *
+	 * @param object $plugin               The plugin instance.
+	 * @param string $external_business_id External business ID.
+	 * @return string
+	 */
+	public static function generateIframeManagementUrl($plugin, $external_business_id)
+	{
+		$external_client_metadata = array(
+			'shop_domain'      => wc_get_page_permalink('shop') ?: home_url(),
+			'admin_url'        => admin_url(),
+			'client_version'   => $plugin->get_version(),
+			'commerce_partner_seller_platform_type' => 'MAGENTO_OPEN_SOURCE',
+			'country_code'     => WC()->countries->get_base_country(),
+		);
+
+		// Get the stored merchant access token
+		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
+
+		return add_query_arg(
+			array(
+				'access_client_token'      => self::CLIENT_TOKEN,
+				'business_vertical'        => 'ECOMMERCE',
+				'channel'                  => 'COMMERCE',
+				'app_id'                   => self::APP_ID,
+				'business_name'            => self::BUSINESS_NAME,
+				'currency'                 => get_woocommerce_currency(),
+				'timezone'                 => 'America/Los_Angeles',
+				'external_business_id'     => $external_business_id,
+				'installed'                => true, // This is the management view
+				'external_client_metadata' => rawurlencode(json_encode($external_client_metadata)),
+				'merchant_access_token'    => $merchant_access_token,
+			),
+			'https://www.commercepartnerhub.com/commerce_extension/management/'
+		);
+	}
+
+	/**
+	 * Renders the management iframe.
+	 *
+	 * @param object $plugin               The plugin instance.
+	 * @param string $external_business_id External business ID.
+	 * @return void
+	 */
+	public static function render_management_iframe($plugin, $external_business_id)
+	{
+		$iframe_url = self::generateIframeManagementUrl($plugin, $external_business_id);
+		?>
+		<iframe
+			src="<?php echo esc_url($iframe_url); ?>"
+			width="100%"
+			height="800"
+			frameborder="0"
+			style="background: transparent;"
+			id="facebook-commerce-management-iframe">
+		</iframe>
+		<?php
+	}
 }

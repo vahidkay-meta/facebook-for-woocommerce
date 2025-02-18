@@ -129,6 +129,19 @@ class Connection extends Abstract_Settings_Screen
 			return;
 		}
 
+		// Check if we have a merchant access token
+		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
+		
+		if (!empty($merchant_access_token)) {
+			// Render the management iframe
+			$connection = facebook_for_woocommerce()->get_connection_handler();
+			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
+				$connection->get_plugin(),
+				$connection->get_external_business_id()
+			);
+			return;
+		}
+
 		/**
 		 * Build the basic static elements.
 		 *
