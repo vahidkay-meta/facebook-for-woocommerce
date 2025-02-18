@@ -1640,7 +1640,6 @@ class Admin {
 					)
 				);
 
-				// Description field
 				woocommerce_wp_textarea_input(
 					array(
 						'id'            => sprintf( 'variable_%s%s', \WC_Facebookcommerce_Integration::FB_PRODUCT_DESCRIPTION, $index ),
@@ -1707,31 +1706,15 @@ class Admin {
 				'id'            => sprintf( 'variable_%s%s', \WC_Facebook_Product::FB_MPN, $index ),
 				'name'          => sprintf( "variable_%s[$index]", \WC_Facebook_Product::FB_MPN ),
 				'label' => __( 'Manufacturer Parts Number (MPN)', 'facebook-for-woocommerce' ),
-				'value' => $fb_mpn,
-				'class' => 'enable-if-sync-enabled',
+				'desc_tip'      => true,
+				'description'   => __( 'Manufacturer Parts Number' ),
+				'value'         => wc_format_decimal( $fb_mpn ),
+				'class'         => 'enable-if-sync-enabled',
+				'wrapper_class' => 'form-row form-full',
 			)
 		);
 
-
-		woocommerce_wp_select(
-			array(
-				'id'      => 'wc_facebook_condition',
-				'label'   => __( 'Condition', 'facebook-for-woocommerce' ),
-				'options' => array(
-						'' => __( 'Select condition', 'facebook-for-woocommerce' ), // Add empty option
-						self::CONDITION_NEW => __( 'New', 'facebook-for-woocommerce' ),
-						self::CONDITION_REFURBISHED => __( 'Refurbished', 'facebook-for-woocommerce' ),
-						self::CONDITION_USED => __( 'Used', 'facebook-for-woocommerce' ),
-				),
-				'value'       => $condition,
-				'desc_tip'    => true,
-				'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
-			)
-		);
-
-
-				// ... Add other fields similarly ...
-				?>
+			?>
 			</div>
 		</div>
 
