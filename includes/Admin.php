@@ -1257,23 +1257,6 @@ class Admin {
 
 				woocommerce_wp_text_input(
 					array(
-						'id'          => \WC_Facebook_Product::FB_PRODUCT_PRICE,
-						'label'       => sprintf(
-						 /* translators: Placeholders %1$s - WC currency symbol */
-							__( 'Facebook Price (%1$s)', 'facebook-for-woocommerce' ),
-							get_woocommerce_currency_symbol()
-						),
-						'desc_tip'    => true,
-						'description' => __( 'Custom price for product on Facebook. Please enter in monetary decimal (.) format without thousand separators and currency symbols. If blank, product price will be used.', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $price,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
-
-				woocommerce_wp_text_input(
-					array(
 						'id'    => \WC_Facebook_Product::FB_BRAND,
 						'label' => __( 'Brand', 'facebook-for-woocommerce' ),
 						'value' => $fb_brand,
@@ -1422,23 +1405,6 @@ class Admin {
 				'wrapper_class' => 'form-row form-row-full',
 				'desc_tip'      => true,
 				'description'   => __( 'Please enter an absolute URL (e.g. https://domain.com/image.jpg).', 'facebook-for-woocommerce' ),
-			)
-		);
-
-		woocommerce_wp_text_input(
-			array(
-				'id'            => sprintf( 'variable_%s%s', \WC_Facebook_Product::FB_PRODUCT_PRICE, $index ),
-				'name'          => sprintf( "variable_%s[$index]", \WC_Facebook_Product::FB_PRODUCT_PRICE ),
-				'label'         => sprintf(
-				 /* translators: Placeholders %1$s - WC currency symbol */
-					__( 'Facebook Price (%1$s)', 'facebook-for-woocommerce' ),
-					get_woocommerce_currency_symbol()
-				),
-				'desc_tip'      => true,
-				'description'   => __( 'Custom price for product on Facebook. Please enter in monetary decimal (.) format without thousand separators and currency symbols. If blank, product price will be used.', 'facebook-for-woocommerce' ),
-				'value'         => wc_format_decimal( $price ),
-				'class'         => 'enable-if-sync-enabled',
-				'wrapper_class' => 'form-row form-full',
 			)
 		);
 

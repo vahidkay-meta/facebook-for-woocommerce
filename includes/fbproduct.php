@@ -209,7 +209,6 @@ class WC_Facebook_Product {
 	/**
 	 * Determines whether the current product is a WooCommerce Bookings product.
 	 *
-	 * TODO: add an integration that filters the Facebook price instead {WV 2020-07-22}
 	 *
 	 * @since 2.0.0
 	 *

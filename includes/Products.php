@@ -324,11 +324,7 @@ class Products {
 	 * @return int
 	 */
 	public static function get_product_price( \WC_Product $product ) {
-		$facebook_price = $product->get_meta( WC_Facebook_Product::FB_PRODUCT_PRICE );
-		// use the user defined Facebook price if set
-		if ( is_numeric( $facebook_price ) ) {
-			$price = $facebook_price;
-		} elseif ( $product->is_type( 'composite' ) ) {
+		if ( $product->is_type( 'composite' ) ) {
 
 			$price = $product->get_composite_price( 'min', true );
 
@@ -352,10 +348,9 @@ class Products {
 		 * @since 2.0.0-dev.1
 		 *
 		 * @param int $price product price in cents
-		 * @param float $facebook_price user defined facebook price
 		 * @param \WC_Product $product product object
 		 */
-		return (int) apply_filters( 'wc_facebook_product_price', $price, (float) $facebook_price, $product );
+		return (int) apply_filters( 'wc_facebook_product_price', $price, $product );
 	}
 
 
