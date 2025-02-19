@@ -314,13 +314,6 @@ class Connection extends Abstract_Settings_Screen {
 			$title = __( 'Grow your business on Facebook', 'facebook-for-woocommerce' );
 		}
 
-		$subtitle = __( 'Use this WooCommerce and Facebook integration to:', 'facebook-for-woocommerce' );
-		$benefits = array(
-			__( 'Create an ad in a few steps', 'facebook-for-woocommerce' ),
-			__( 'Use built-in best practices for online sales', 'facebook-for-woocommerce' ),
-			__( 'Get reporting on sales and revenue', 'facebook-for-woocommerce' ),
-		);
-
 		?>
 		<div id="wc-facebook-connection-box">
 			<div class="logo"></div>
