@@ -176,56 +176,138 @@ class MetaExtension
 		$product_catalog_id    = isset($params['product_catalog_id']) ? sanitize_text_field($params['product_catalog_id']) : '';
 		$pixel_id              = isset($params['pixel_id']) ? sanitize_text_field($params['pixel_id']) : '';
 
-		if (empty($access_token) || empty($merchant_access_token) || empty($page_access_token)) {
-			return new WP_Error('missing_token', __('Missing required token data', 'facebook-for-woocommerce'), array('status' => 400));
+		// Only validate merchant_access_token as required
+		if (empty($merchant_access_token)) {
+			return new WP_Error('missing_token', __('Missing merchant access token', 'facebook-for-woocommerce'), array('status' => 400));
 		}
 
-		// Update the options
-		update_option('wc_facebook_access_token', $access_token);
+		// Update all available options
+		if (!empty($access_token)) {
+			update_option('wc_facebook_access_token', $access_token);
+		}
+		
 		update_option('wc_facebook_merchant_access_token', $merchant_access_token);
-		update_option('wc_facebook_page_access_token', $page_access_token);
-		update_option('wc_facebook_product_catalog_id', $product_catalog_id);
-		update_option('wc_facebook_pixel_id', $pixel_id);
+		
+		if (!empty($page_access_token)) {
+			update_option('wc_facebook_page_access_token', $page_access_token);
+		}
+		
+		if (!empty($product_catalog_id)) {
+			update_option('wc_facebook_product_catalog_id', $product_catalog_id);
+		}
+		
+		if (!empty($pixel_id)) {
+			update_option('wc_facebook_pixel_id', $pixel_id);
+		}
 
-		return new WP_REST_Response(array('success' => true, 'message' => __('Facebook settings updated successfully', 'facebook-for-woocommerce')), 200);
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __('Facebook settings updated successfully', 'facebook-for-woocommerce')
+			),
+			200
+		);
+	}
+
+	/**
+	 * Makes an API call to Facebook's Graph API.
+	 *
+	 * @param string $method HTTP method (GET, POST, etc.)
+	 * @param string $endpoint API endpoint
+	 * @param array $params Request parameters
+	 * @return array Response data
+	 */
+	private static function callApi($method, $endpoint, $params)
+	{
+		$url = 'https://graph.facebook.com/v18.0/' . $endpoint;
+		
+		if ($method === 'GET') {
+			$url = add_query_arg($params, $url);
+		}
+
+		$args = array(
+			'method'  => $method,
+			'timeout' => 30,
+			'headers' => array(
+				'Content-Type' => 'application/json',
+			),
+		);
+
+		if ($method === 'POST') {
+			$args['body'] = json_encode($params);
+		}
+
+		$response = wp_remote_request($url, $args);
+
+		if (is_wp_error($response)) {
+			throw new \Exception($response->get_error_message());
+		}
+
+		$body = wp_remote_retrieve_body($response);
+		return json_decode($body, true);
+	}
+
+	/**
+	 * Get a URL to use to render the CommerceExtension IFrame for an onboarded Store.
+	 *
+	 * @param string $external_business_id External business ID
+	 * @param string|null $access_token Access token
+	 * @return string
+	 */
+	public static function getCommerceExtensionIFrameURL($external_business_id, $access_token = null)
+	{
+		if (empty($access_token)) {
+			$access_token = get_option('wc_facebook_access_token', '');
+		}
+
+		try {
+			$request = array(
+				'access_token' => $access_token,
+				'fields'       => 'commerce_extension',
+				'fbe_external_business_id' => $external_business_id,
+			);
+
+			$response = self::callApi('GET', 'fbe_business', $request);
+
+			if (!empty($response['commerce_extension']['uri'])) {
+				$uri = $response['commerce_extension']['uri'];
+				
+				// Allow for URL override through constant or filter
+				$base_url_override = defined('FACEBOOK_COMMERCE_EXTENSION_BASE_URL') 
+					? FACEBOOK_COMMERCE_EXTENSION_BASE_URL 
+					: null;
+				
+				$base_url_override = apply_filters('wc_facebook_commerce_extension_base_url', $base_url_override);
+				
+				if ($base_url_override) {
+					$uri = str_replace('https://www.commercepartnerhub.com/', $base_url_override, $uri);
+				}
+				
+				return $uri;
+			}
+		} catch (\Exception $e) {
+			error_log('Facebook Commerce Extension URL Error: ' . $e->getMessage());
+		}
+
+		return '';
 	}
 
 	/**
 	 * Generates the Commerce Hub iframe management page URL.
 	 *
-	 * @param object $plugin               The plugin instance.
+	 * @param object $plugin The plugin instance.
 	 * @param string $external_business_id External business ID.
 	 * @return string
 	 */
 	public static function generateIframeManagementUrl($plugin, $external_business_id)
 	{
-		$external_client_metadata = array(
-			'shop_domain'      => wc_get_page_permalink('shop') ?: home_url(),
-			'admin_url'        => admin_url(),
-			'client_version'   => $plugin->get_version(),
-			'commerce_partner_seller_platform_type' => 'MAGENTO_OPEN_SOURCE',
-			'country_code'     => WC()->countries->get_base_country(),
-		);
+		$access_token = get_option('wc_facebook_access_token', '');
+		
+		if (empty($access_token)) {
+			return '';
+		}
 
-		// Get the stored merchant access token
-		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
-
-		return add_query_arg(
-			array(
-				'access_client_token'      => self::CLIENT_TOKEN,
-				'business_vertical'        => 'ECOMMERCE',
-				'channel'                  => 'COMMERCE',
-				'app_id'                   => self::APP_ID,
-				'business_name'            => self::BUSINESS_NAME,
-				'currency'                 => get_woocommerce_currency(),
-				'timezone'                 => 'America/Los_Angeles',
-				'external_business_id'     => $external_business_id,
-				'installed'                => true, // This is the management view
-				'external_client_metadata' => rawurlencode(json_encode($external_client_metadata)),
-				'merchant_access_token'    => $merchant_access_token,
-			),
-			'https://www.commercepartnerhub.com/commerce_extension/management/'
-		);
+		return self::getCommerceExtensionIFrameURL($external_business_id, $access_token);
 	}
 
 	/**
@@ -238,6 +320,11 @@ class MetaExtension
 	public static function render_management_iframe($plugin, $external_business_id)
 	{
 		$iframe_url = self::generateIframeManagementUrl($plugin, $external_business_id);
+		
+		if (empty($iframe_url)) {
+			return;
+		}
+		
 		?>
 		<iframe
 			src="<?php echo esc_url($iframe_url); ?>"

@@ -119,6 +119,19 @@ class Connection extends Abstract_Settings_Screen
 	public function render()
 	{
 
+		// Check if we have a merchant access token
+		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
+		
+		if (!empty($merchant_access_token) && $this->use_iframe_connection()) {
+			// Render the management iframe
+			$connection = facebook_for_woocommerce()->get_connection_handler();
+			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
+				$connection->get_plugin(),
+				$connection->get_external_business_id()
+			);
+			return;
+		}
+
 		$is_connected = facebook_for_woocommerce()->get_connection_handler()->is_connected();
 
 		// always render the CTA box
@@ -129,18 +142,7 @@ class Connection extends Abstract_Settings_Screen
 			return;
 		}
 
-		// Check if we have a merchant access token
-		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
 		
-		if (!empty($merchant_access_token)) {
-			// Render the management iframe
-			$connection = facebook_for_woocommerce()->get_connection_handler();
-			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
-				$connection->get_plugin(),
-				$connection->get_external_business_id()
-			);
-			return;
-		}
 
 		/**
 		 * Build the basic static elements.
@@ -381,52 +383,45 @@ class Connection extends Abstract_Settings_Screen
 		if (!$this->is_current_screen_page()) {
 			return;
 		}
-	?>
+
+		// Check if we have a merchant access token
+		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
+		
+		if (!empty($merchant_access_token)) {
+			return;
+		}
+?>
 		<script type="text/javascript">
 			window.addEventListener('message', function(event) {
-				console.log('message', event);
-				if (event.origin !== 'https://www.commercepartnerhub.com') {
-					return;
-				}
-
 				const message = event.data;
 				const messageEvent = message.event;
 
 				if (messageEvent === 'CommerceExtension::INSTALL' && message.success) {
+					const requestBody = {
+						access_token: message.access_token,
+						merchant_access_token: message.access_token,
+						page_access_token: '',
+						product_catalog_id: message.catalog_id,
+						pixel_id: message.pixel_id
+					};
+
 					fetch('/wp-json/wc-facebook/v1/update_tokens', {
-							method: 'POST',
-							credentials: 'same-origin',
-							headers: {
-								'Content-Type': 'application/json',
-								'X-WP-Nonce': '<?php echo wp_create_nonce("wp_rest"); ?>'
-							},
-							body: JSON.stringify({
-								access_token: message.access_token,
-								merchant_access_token: message.merchant_access_token,
-								page_access_token: message.page_access_token,
-								product_catalog_id: message.catalog_id,
-								pixel_id: message.pixel_id
-							})
-						})
-						.then(response => {
-							if (!response.ok) {
-								throw new Error('Network response was not ok');
-							}
-							return response.json();
-						})
-						.then(data => {
-							if (data.success) {
-								window.location.reload();
-							} else {
-								console.error('Failed to update Facebook settings:', data.message);
-							}
-						})
-						.catch(error => {
-							console.error('Error updating Facebook settings:', error);
-						});
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-WP-Nonce': '<?php echo wp_create_nonce("wp_rest"); ?>'
+						},
+						body: JSON.stringify(requestBody)
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							window.location.reload();
+						}
+					});
 				}
 
-				// Handle iframe resize events
 				if (messageEvent === 'CommerceExtension::RESIZE') {
 					const iframe = document.getElementById('facebook-commerce-iframe');
 					if (iframe && message.height) {
@@ -434,7 +429,6 @@ class Connection extends Abstract_Settings_Screen
 					}
 				}
 
-				// Handle uninstall/disconnect event
 				if (messageEvent === 'CommerceExtension::UNINSTALL') {
 					window.location.reload();
 				}
