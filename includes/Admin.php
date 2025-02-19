@@ -1437,8 +1437,23 @@ class Admin {
 			<div class='wc_facebook_commerce_fields'>
 				<p class="text-heading">
 					<span><?php echo esc_html(  \WooCommerce\Facebook\Admin\Product_Categories::get_catalog_explanation_text() ); ?></span>
+					<a href="#" class="go-to-attributes-link" style="text-decoration: underline; cursor: pointer; margin-left: 5px;">
+						<?php echo esc_html__( 'Go to attributes', 'facebook-for-woocommerce' ); ?>
+					</a>
 				</p>
 			</div>
+
+			<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$('.go-to-attributes-link').click(function(e) {
+					e.preventDefault();
+					$('li.attribute_options.attribute_tab a[href="#product_attributes"]').trigger('click');
+					$('html, body').animate({
+						scrollTop: $('#product_attributes').offset().top - 50
+					}, 500);
+				});
+			});
+			</script>
 
 			<?php
 
@@ -1908,7 +1923,34 @@ class Admin {
 					size: false,
 					pattern: false
 				};
-				
+
+				// Function to check if product is variable and has syncable attributes
+				function shouldHideFields() {
+					// Check if it's a variable product
+					if ($('select#product-type').val() !== 'variable') {
+						return false;
+					}
+
+					// Get current attributes
+					var currentAttributes = [];
+					$('#product_attributes .woocommerce_attribute').each(function() {
+						var attrName = $(this).find('.attribute_name').val();
+						if (attrName) {
+							currentAttributes.push(attrName.toLowerCase().replace('pa_', ''));
+						}
+					});
+
+					// Check if any syncable attribute exists
+					return currentAttributes.some(attr => 
+						['color', 'colour', 'size', 'pattern', 'material'].includes(attr)
+					);
+				}
+
+				// Function to update field visibility
+				function updateFieldVisibility() {
+					var hideFields = shouldHideFields();
+					
+					// Fields to toggle (all the Facebook attribute fields)
 				var displayAttributeState = {
 					material: false,
 					color: false,
