@@ -422,6 +422,29 @@ class WC_Facebook_Product {
 			$fb_brand
 		);
 	}
+	
+	
+	public function set_fb_material( $fb_material ) {
+		$fb_brand = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_material )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_MATERIAL,
+			$fb_material
+		);
+	}
+	
+	public function set_fb_pattern( $fb_pattern ) {
+		$fb_brand = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_pattern )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_PATTERN,
+			$fb_pattern
+		);
+	}
 
 	public function set_fb_mpn( $fb_mpn ) {
 		$fb_mpn = stripslashes(
@@ -458,24 +481,27 @@ class WC_Facebook_Product {
 		);
 
 	}
-
+	
 	public function set_fb_gender( $gender ) {
 		$gender = stripslashes(
 			WC_Facebookcommerce_Utils::clean_string( $gender )
 		);
-			update_post_meta(
-				$this->id,
-				self::FB_GENDER,
-				$gender
-			);
-
-			// If empty and this is a variation, get the parent gender
-		if ( empty( $gender ) && $this->is_type('variation') ) {
-			$parent_id = $this->get_parent_id();
-			if ( $parent_id ) {
-				$gender = get_post_meta($parent_id, self::FB_GENDER, true);
-			}
-		}
+		update_post_meta(
+			$this->id,
+			self::FB_GENDER,
+			$gender
+		);
+	}
+	
+	public function set_fb_color( $fb_color ) {
+		$gender = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_color )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_COLOR,
+			$fb_color
+		);
 	}
 
 
@@ -489,13 +515,6 @@ class WC_Facebook_Product {
 			$size
 		);
 
-			// If empty and this is a variation, get the parent gender
-			if ( empty( $size ) && $this->is_type('variation') ) {
-				$parent_id = $this->get_parent_id();
-				if ( $parent_id ) {
-					$size = get_post_meta($parent_id, self::FB_SIZE, true);
-				}
-			}
 	}
 
 	public function set_price( $price ) {
@@ -853,7 +872,7 @@ class WC_Facebook_Product {
 		if ( empty( $fb_size ) && $this->is_type('variation') ) {
 			$parent_id = $this->get_parent_id();
 			if ( $parent_id ) {
-				$fb_size = get_post_meta($parent_id, self::FB_GENDER, true);
+				$fb_size = get_post_meta($parent_id, self::FB_SIZE, true);
 			}
 		}
 

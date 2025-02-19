@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class FBCategories {
 
-	private $keys_to_exclude = ['brand' => true];
+	private $keys_to_exclude = ['brand' => true, 'color' => true, 'colour'=> true];
 
 	/**
 	 * Fetches the attribute from a category using attribute key.
