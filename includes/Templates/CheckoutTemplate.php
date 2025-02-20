@@ -6,7 +6,7 @@
  * This source code is licensed under the license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * Template Name: Cart Permalink Template
+ * Template Name: Checkout Template
  *
  * @package FacebookCommerce
  */
@@ -21,7 +21,7 @@ get_header(); ?>
     <main id="main" class="site-main" role="main">
         <?php
         // Display the WooCommerce cart
-        echo do_shortcode('[woocommerce_cart]');
+        echo do_shortcode('[woocommerce_checkout]');
         ?>
     </main><!-- .site-main -->
 </div><!-- .content-area -->
