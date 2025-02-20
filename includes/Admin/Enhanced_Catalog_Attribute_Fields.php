@@ -147,12 +147,9 @@ class Enhanced_Catalog_Attribute_Fields {
 		$is_showing_optional = 'on' === $selector_value;
 		$this->render_selector_checkbox( $is_showing_optional );
 
-
 		foreach ( $recommended_attributes as $attribute ) {
 			$this->render_attribute( $attribute, true, $is_showing_optional );
 		}
-
-
 
 		foreach ( $optional_attributes as $attribute ) {
 			$this->render_attribute( $attribute, true, $is_showing_optional );

@@ -82,6 +82,8 @@ class Admin {
 	const GENDER_UNISEX = 'unisex';
 
 
+
+
 	/**
 	 * Admin constructor.
 	 *
@@ -115,7 +117,6 @@ class Admin {
 		add_action( 'admin_footer', array( $this, 'render_modal_template' ) );
 		add_action('admin_footer', array($this, 'add_tab_switch_script'));
 
-
 		// add admin notice to inform that disabled products may need to be deleted manually
 		add_action( 'admin_notices', array( $this, 'maybe_show_product_disabled_sync_notice' ) );
 
@@ -145,12 +146,10 @@ class Admin {
 		// add Variation edit fields
 		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'add_product_variation_edit_fields' ), 10, 3 );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'save_product_variation_edit_fields' ), 10, 2 );
-
 		add_action('wp_ajax_get_facebook_product_data', array($this, 'ajax_get_facebook_product_data'));
 
 		// add custom taxonomy for Product Sets
 		add_filter( 'gettext', array( $this, 'change_custom_taxonomy_tip' ), 20, 2 );
-
 		add_action('wp_ajax_sync_facebook_attributes', array($this, 'ajax_sync_facebook_attributes'));
 
 		// Add styles for moving question mark icons to the right
@@ -1697,7 +1696,7 @@ class Admin {
 			array(
 				'id'            => "variable_fb_product_image_source$index",
 				'name'          => "variable_fb_product_image_source[$index]",
-				'label'         => __( '2Facebook Product Image', 'facebook-for-woocommerce' ),
+				'label'         => __( 'Facebook Product Image', 'facebook-for-woocommerce' ),
 				'desc_tip'      => true,
 				'description'   => __( 'Choose the product image that should be synced to the Facebook catalog and displayed for this product.', 'facebook-for-woocommerce' ),
 				'options'       => array(

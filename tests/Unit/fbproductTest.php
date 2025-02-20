@@ -501,7 +501,7 @@ class fbproductTest extends WP_UnitTestCase {
 		}
 		$product->set_attributes($attributes);
 
-		// Set FB sttributes
+		// Set FB attributes
 		foreach ($fb_attributes as $key => $value) {
 			$product->update_meta_data('_wc_facebook_enhanced_catalog_attributes_'.$key, $value);
 		}
