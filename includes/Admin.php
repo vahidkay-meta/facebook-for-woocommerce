@@ -1745,6 +1745,48 @@ class Admin {
 				line-height: 26px;
 				font-weight: 600;
 			}
+			.sync-indicator.dashicons-yes-alt {
+				display: inline-block;
+				margin-left: 8px;
+				cursor: help;
+				vertical-align: middle;
+				color: #46b450;
+				font-size: 16px;
+				position: relative;
+				line-height: 1;  /* Added this */
+				top: 3px;  /* Added this to fine-tune alignment */
+			}
+			
+			.sync-indicator .sync-tooltip {
+				display: none;
+				position: absolute;
+				background: #32373c;
+				padding: 8px;
+				border-radius: 3px;
+				color: #fff;
+				font-size: 13px;
+				font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+				line-height: 1.4;
+				white-space: nowrap;
+				z-index: 9999;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%) translateY(8px);
+			}
+			
+			.sync-indicator .sync-tooltip:before {
+				content: '';
+				position: absolute;
+				border: 6px solid transparent;
+				border-bottom-color: #32373c;
+				top: -12px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			
+			.sync-indicator:hover .sync-tooltip {
+				display: block;
+			}
 		</style>
 
 		<script type="text/javascript">
@@ -1942,7 +1984,7 @@ class Admin {
 									var $field = $(fieldId);
 									
 									// Always remove existing badges first
-									$field.next('.synced-badge').remove();
+									$field.next('.sync-indicator').remove();
 									
 									if (response.data && response.data[key]) {
 										// Field has a synced value
@@ -1953,8 +1995,8 @@ class Admin {
 										
 										// Only add badge if it hasn't been added yet
 										if (!syncedBadgeState[key]) {
-											$field.after('<span class="synced-badge">Synced from product attribute</span>');
-												syncedBadgeState[key] = true;
+											$field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from product attribute"><span class="sync-tooltip">Synced from product attribute</span></span>');
+											syncedBadgeState[key] = true;
 										}
 									} else {
 										// Field has no synced value or attribute was removed
@@ -2009,14 +2051,47 @@ class Admin {
 				background-color: #f0f0f1 !important;
 				cursor: not-allowed;
 			}
-			.synced-badge {
+			.sync-indicator.dashicons-yes-alt {
 				display: inline-block;
-				margin-left: 10px;
-				padding: 2px 8px;
-				background: #e0e0e0;
+				margin-left: 8px;
+				cursor: help;
+				vertical-align: middle;
+				color: #46b450;
+				font-size: 16px;
+				position: relative;
+				line-height: 1;  /* Added this */
+				top: 3px;  /* Added this to fine-tune alignment */
+			}
+			
+			.sync-indicator .sync-tooltip {
+				display: none;
+				position: absolute;
+				background: #32373c;
+				padding: 8px;
 				border-radius: 3px;
-				font-size: 12px;
-				color: #666;
+				color: #fff;
+				font-size: 13px;
+				font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+				line-height: 1.4;
+				white-space: nowrap;
+				z-index: 9999;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%) translateY(8px);
+			}
+			
+			.sync-indicator .sync-tooltip:before {
+				content: '';
+				position: absolute;
+				border: 6px solid transparent;
+				border-bottom-color: #32373c;
+				top: -12px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			
+			.sync-indicator:hover .sync-tooltip {
+				display: block;
 			}
 		</style>
 		<?php
