@@ -1902,7 +1902,7 @@ class Admin {
 
 	public function add_tab_switch_script() {
 		global $post;
-		if ( ! $post || get_post_type( $post ) !== 'product' ) {
+		if (!$post || get_post_type($post) !== 'product') {
 			return;
 		}
 		?>
@@ -1910,40 +1910,6 @@ class Admin {
 			jQuery(document).ready(function($) {
 				// State object to track badge display status
 				var syncedBadgeState = {
-					material: false,
-					color: false,
-					size: false,
-					pattern: false
-				};
-
-				// Function to check if product is variable and has syncable attributes
-				function shouldHideFields() {
-					// Check if it's a variable product
-					if ($('select#product-type').val() !== 'variable') {
-						return false;
-					}
-
-					// Get current attributes
-					var currentAttributes = [];
-					$('#product_attributes .woocommerce_attribute').each(function() {
-						var attrName = $(this).find('.attribute_name').val();
-						if (attrName) {
-							currentAttributes.push(attrName.toLowerCase().replace('pa_', ''));
-						}
-					});
-
-					// Check if any syncable attribute exists
-					return currentAttributes.some(attr => 
-						['color', 'colour', 'size', 'pattern', 'material'].includes(attr)
-					);
-				}
-
-				// Function to update field visibility
-				function updateFieldVisibility() {
-					var hideFields = shouldHideFields();
-					
-					// Fields to toggle (all the Facebook attribute fields)
-				var displayAttributeState = {
 					material: false,
 					color: false,
 					size: false,
@@ -1978,7 +1944,7 @@ class Admin {
 									// Always remove existing badges first
 									$field.next('.synced-badge').remove();
 									
-									if (response.data && response.data[key] !== '') {
+									if (response.data && response.data[key]) {
 										// Field has a synced value
 										$field
 											.val(response.data[key])
@@ -1988,7 +1954,7 @@ class Admin {
 										// Only add badge if it hasn't been added yet
 										if (!syncedBadgeState[key]) {
 											$field.after('<span class="synced-badge">Synced from product attribute</span>');
-											syncedBadgeState[key] = true;
+												syncedBadgeState[key] = true;
 										}
 									} else {
 										// Field has no synced value or attribute was removed
@@ -1996,6 +1962,11 @@ class Admin {
 											.val('') // Always set to empty string when attribute is removed
 											.prop('disabled', false)
 											.removeClass('synced-attribute');
+										
+										// Only clear the value if it was previously synced
+										if ($field.hasClass('synced-attribute')) {
+											$field.val('');
+										}
 										
 										// Reset the badge state
 										syncedBadgeState[key] = false;
@@ -2010,7 +1981,10 @@ class Admin {
 				$('.product_data_tabs').on('click', '.remove_row', function(e) {
 					// Wait a brief moment for WooCommerce to remove the attribute
 					setTimeout(function() {
-						syncFacebookAttributes();
+						// Only trigger if we're on the Facebook tab
+						if ($('.fb_commerce_tab').hasClass('active')) {
+							syncFacebookAttributes();
+						}
 					}, 100);
 				});
 
