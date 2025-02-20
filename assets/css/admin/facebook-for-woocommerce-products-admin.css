@@ -26,6 +26,10 @@
     border-bottom: 1px solid #eee;
 }
 
+#facebook_options .google_product_catgory {
+    border-top: 1px solid #eee;
+}
+
 
 .woocommerce_variable_attributes .wp-editor-wrap label {
     float: left;
