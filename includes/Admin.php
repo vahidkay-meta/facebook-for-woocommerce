@@ -1287,13 +1287,13 @@ class Admin {
 		$video_urls            = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
 		$fb_brand              = get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) ? get_post_meta( $post->ID, \WC_Facebook_Product::FB_BRAND, true ) : get_post_meta( $post->ID, '_wc_facebook_enhanced_catalog_attributes_brand', true );
 		$fb_mpn                = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MPN, true );
-		$condition             = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true );
-		$age_group             = get_post_meta( $post->ID, \WC_Facebook_Product::FB_AGE_GROUP, true );
-		$gender                = get_post_meta( $post->ID, \WC_Facebook_Product::FB_GENDER, true );
-		$size                  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_SIZE, true );
-		$color                 = get_post_meta( $post->ID, \WC_Facebook_Product::FB_COLOR, true );
-		$material              = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MATERIAL, true );
-		$pattern               = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PATTERN, true );
+		$fb_condition             = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PRODUCT_CONDITION, true );
+		$fb_age_group             = get_post_meta( $post->ID, \WC_Facebook_Product::FB_AGE_GROUP, true );
+		$fb_gender                = get_post_meta( $post->ID, \WC_Facebook_Product::FB_GENDER, true );
+		$fb_size                  = get_post_meta( $post->ID, \WC_Facebook_Product::FB_SIZE, true );
+		$fb_color                 = get_post_meta( $post->ID, \WC_Facebook_Product::FB_COLOR, true );
+		$fb_material              = get_post_meta( $post->ID, \WC_Facebook_Product::FB_MATERIAL, true );
+		$fb_pattern               = get_post_meta( $post->ID, \WC_Facebook_Product::FB_PATTERN, true );
 
 		if ( $sync_enabled ) {
 			$sync_mode = $is_visible ? self::SYNC_MODE_SYNC_AND_SHOW : self::SYNC_MODE_SYNC_AND_HIDE;
@@ -1413,9 +1413,9 @@ class Admin {
 
 			<div class='wc_facebook_commerce_fields'>
 				<p class="text-heading">
-					<span><?php echo esc_html(  \WooCommerce\Facebook\Admin\Product_Categories::get_catalog_explanation_text() ); ?></span>
+					<span><?php echo esc_html(\WooCommerce\Facebook\Admin\Product_Categories::get_catalog_explanation_text());?></span>
 					<a href="#" class="go-to-attributes-link" style="text-decoration: underline; cursor: pointer; margin-left: 5px;">
-						<?php echo esc_html__( 'Go to attributes', 'facebook-for-woocommerce' ); ?>
+						<?php echo esc_html__('Go to attributes', 'facebook-for-woocommerce' ); ?>
 					</a>
 				</p>
 			</div>
@@ -1560,45 +1560,6 @@ class Admin {
 					)
 				);
 				
-				
-				woocommerce_wp_text_input(
-					array(
-						'id'          => \WC_Facebook_Product::FB_COLOR,
-						'label'       => __( 'Color', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Color of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $color,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
-				
-				woocommerce_wp_text_input(
-					array(
-						'id'          => \WC_Facebook_Product::FB_MATERIAL,
-						'label'       => __( 'Material', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Material of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $material,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
-				
-				woocommerce_wp_text_input(
-					array(
-						'id'          => \WC_Facebook_Product::FB_PATTERN,
-						'label'       => __( 'Pattern', 'facebook-for-woocommerce' ),
-						'desc_tip'    => true,
-						'description' => __( 'Pattern of the product item', 'facebook-for-woocommerce' ),
-						'cols'        => 40,
-						'rows'        => 60,
-						'value'       => $pattern,
-						'class'       => 'enable-if-sync-enabled',
-					)
-				);
 			?>
 
 			<div class='wc-facebook-commerce-options-group options_group google_product_catgory'>
@@ -1809,21 +1770,21 @@ class Admin {
 		</script>
 		<?php
 
-		woocommerce_wp_select(
-			array(
-				'id'          => 'wc_facebook_condition',
-				'label'       => __( 'Condition', 'facebook-for-woocommerce' ),
-				'options'     => array(
-					''                          => __( 'Select condition', 'facebook-for-woocommerce' ),
-					self::CONDITION_NEW         => __( 'New', 'facebook-for-woocommerce' ),
-					self::CONDITION_REFURBISHED => __( 'Refurbished', 'facebook-for-woocommerce' ),
-					self::CONDITION_USED        => __( 'Used', 'facebook-for-woocommerce' ),
-				),
-				'value'       => $condition,
-				'desc_tip'    => true,
-				'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
-			)
-		);
+		// woocommerce_wp_select(
+		// 	array(
+		// 		'id'          => 'wc_facebook_condition',
+		// 		'label'       => __( 'Condition', 'facebook-for-woocommerce' ),
+		// 		'options'     => array(
+		// 			''                          => __( 'Select condition', 'facebook-for-woocommerce' ),
+		// 			self::CONDITION_NEW         => __( 'New', 'facebook-for-woocommerce' ),
+		// 			self::CONDITION_REFURBISHED => __( 'Refurbished', 'facebook-for-woocommerce' ),
+		// 			self::CONDITION_USED        => __( 'Used', 'facebook-for-woocommerce' ),
+		// 		),
+		// 		'value'       => $fb_condition,
+		// 		'desc_tip'    => true,
+		// 		'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
+		// 	)
+		// );
 	}
 
 
@@ -1996,17 +1957,17 @@ class Admin {
 						type: 'POST',
 						data: {
 							action: 'sync_facebook_attributes',
-							product_id: <?php echo esc_js( $post->ID ); ?>,
-							nonce: '<?php echo wp_create_nonce( 'sync_facebook_attributes' ); ?>'
+							product_id: <?php echo esc_js($post->ID); ?>,
+							nonce: '<?php echo wp_create_nonce('sync_facebook_attributes'); ?>'
 						},
 						success: function(response) {
 							if (response.success) {
 								// Array of fields to potentially update
 								var fields = {
-									'material': '<?php echo \WC_Facebook_Product::FB_MATERIAL; ?>',
-									'color': '<?php echo \WC_Facebook_Product::FB_COLOR; ?>',
-									'size': '<?php echo \WC_Facebook_Product::FB_SIZE; ?>',
-									'pattern': '<?php echo \WC_Facebook_Product::FB_PATTERN; ?>'
+									'material': '<?php echo \WC_Facebook_Product::FB_MATERIAL ?>',
+									'color': '<?php echo \WC_Facebook_Product::FB_COLOR ?>',
+									'size': '<?php echo \WC_Facebook_Product::FB_SIZE ?>',
+									'pattern': '<?php echo \WC_Facebook_Product::FB_PATTERN ?>'
 								};
 
 								// Loop through each field

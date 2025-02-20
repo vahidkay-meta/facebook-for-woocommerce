@@ -163,7 +163,7 @@ class Product_Categories {
 	 *
 	 * @return string the explanation text
 	 */
-	public static function get_wip_catalog_explanation_text() {
+	public static function get_catalog_explanation_text() {
 		return __( 'To optimize ad performance, we recommend providing these additional product attributes in WooCommerce. Updates made here will be overwritten with attributes provided in WooCommerce.' );
 	}
 
