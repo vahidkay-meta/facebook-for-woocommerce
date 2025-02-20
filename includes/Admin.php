@@ -1811,22 +1811,6 @@ class Admin {
 			});
 		</script>
 		<?php
-
-		// woocommerce_wp_select(
-		// 	array(
-		// 		'id'          => 'wc_facebook_condition',
-		// 		'label'       => __( 'Condition', 'facebook-for-woocommerce' ),
-		// 		'options'     => array(
-		// 			''                          => __( 'Select condition', 'facebook-for-woocommerce' ),
-		// 			self::CONDITION_NEW         => __( 'New', 'facebook-for-woocommerce' ),
-		// 			self::CONDITION_REFURBISHED => __( 'Refurbished', 'facebook-for-woocommerce' ),
-		// 			self::CONDITION_USED        => __( 'Used', 'facebook-for-woocommerce' ),
-		// 		),
-		// 		'value'       => $fb_condition,
-		// 		'desc_tip'    => true,
-		// 		'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
-		// 	)
-		// );
 	}
 
 
@@ -1955,7 +1939,9 @@ class Admin {
 					material: false,
 					color: false,
 					size: false,
-					pattern: false
+					pattern: false,
+					brand: false,
+					mpn: false
 				};
 
 				// Function to sync Facebook attributes
@@ -1975,7 +1961,9 @@ class Admin {
 									'material': '<?php echo \WC_Facebook_Product::FB_MATERIAL ?>',
 									'color': '<?php echo \WC_Facebook_Product::FB_COLOR ?>',
 									'size': '<?php echo \WC_Facebook_Product::FB_SIZE ?>',
-									'pattern': '<?php echo \WC_Facebook_Product::FB_PATTERN ?>'
+									'pattern': '<?php echo \WC_Facebook_Product::FB_PATTERN ?>',
+									'brand': '<?php echo \WC_Facebook_Product::FB_BRAND ?>',
+									'mpn': '<?php echo \WC_Facebook_Product::FB_MPN ?>',
 								};
 
 								// Loop through each field
@@ -2113,6 +2101,8 @@ class Admin {
 			'colour'   => \WC_Facebook_Product::FB_COLOR, // Add support for British spelling
 			'size'     => \WC_Facebook_Product::FB_SIZE,
 			'pattern'  => \WC_Facebook_Product::FB_PATTERN,
+			'brand'  => \WC_Facebook_Product::FB_BRAND,
+			'mpn'  => \WC_Facebook_Product::FB_MPN,
 		];
 
 		// First, check which fields should be cleared
