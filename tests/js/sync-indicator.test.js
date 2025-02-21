@@ -11,7 +11,7 @@ describe('Sync Indicator', () => {
 
     test('sync indicator is added correctly', () => {
         const field = $('#fb_color');
-        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from product attribute"><span class="sync-tooltip">Synced from product attribute</span></span>');
+        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from the Attributes tab."><span class="sync-tooltip">Synced from the Attributes tab.</span></span>');
         
         const indicator = field.next('.sync-indicator');
         expect(indicator.length).toBe(1);
@@ -20,7 +20,7 @@ describe('Sync Indicator', () => {
 
     test('tooltip shows on hover', () => {
         const field = $('#fb_color');
-        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from product attribute"><span class="sync-tooltip">Synced from product attribute</span></span>');
+        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from the Attributes tab."><span class="sync-tooltip">Synced from the Attributes tab.</span></span>');
         
         const indicator = field.next('.sync-indicator');
         const tooltip = indicator.find('.sync-tooltip');
@@ -46,7 +46,7 @@ describe('Sync Indicator', () => {
         };
         
         const field = $('#fb_color');
-        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from product attribute"><span class="sync-tooltip">Synced from product attribute</span></span>');
+        field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from the Attributes tab."><span class="sync-tooltip">Synced from the Attributes tab.</span></span>');
         syncedBadgeState.color = true;
         
         expect(syncedBadgeState.color).toBe(true);

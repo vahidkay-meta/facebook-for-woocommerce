@@ -1440,6 +1440,8 @@ class Admin {
 						'label' => __( 'Manufacturer Parts Number (MPN)', 'facebook-for-woocommerce' ),
 						'value' => $fb_mpn,
 						'class' => 'enable-if-sync-enabled',
+						'desc_tip'    => true,
+						'description' => __( 'Manufacturer parts number of the item', 'facebook-for-woocommerce' ),
 					)
 				);
 
@@ -1449,6 +1451,8 @@ class Admin {
 						'label' => __( 'Brand', 'facebook-for-woocommerce' ),
 						'value' => $fb_brand,
 						'class' => 'enable-if-sync-enabled',
+						'desc_tip'    => true,
+						'description' => __( 'Brand name of the item', 'facebook-for-woocommerce' ),
 					)
 				);
 
@@ -1465,7 +1469,7 @@ class Admin {
 						),
 						'value'       => $fb_condition,
 						'desc_tip'    => true,
-						'description' => __( 'Choose the condition of the product.', 'facebook-for-woocommerce' ),
+						'description' => __( 'This refers to the condition of your product. Supported values are new, refurbished and used.', 'facebook-for-woocommerce' ),
 					)
 				);
 
@@ -1983,7 +1987,7 @@ class Admin {
 										
 										// Only add badge if it hasn't been added yet
 										if (!syncedBadgeState[key]) {
-											$field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from product attribute"><span class="sync-tooltip">Synced from product attribute</span></span>');
+											$field.after('<span class="sync-indicator dashicons dashicons-yes-alt" data-tip="Synced from the Attributes tab."><span class="sync-tooltip">Synced from the Attributes tab.</span></span>');
 											syncedBadgeState[key] = true;
 										}
 									} else {
