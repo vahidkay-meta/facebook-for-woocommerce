@@ -527,12 +527,6 @@ class fbproductTest extends WP_UnitTestCase {
 			$this->assertEquals($product_data[$key], $value);
 		}
 	}
-  
-    public function test_prepare_product_with_default_fields() {
-        // test when no fb specific fields are set
-        $product_data = $this->fb_product->prepare_product();
-    }
-
 
 	public function test_prepare_product_with_video_field() {
 		// Set facebook specific fields
