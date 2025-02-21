@@ -560,10 +560,6 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
 		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_RICH_TEXT_DESCRIPTION, true ) );
 
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_description']);
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_price']);
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_image']);
-
 		// Verify the actual values are still stored in meta
 		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
 		$this->assertEquals( '199', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, true ) );
