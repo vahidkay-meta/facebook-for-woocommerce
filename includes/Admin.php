@@ -1398,19 +1398,6 @@ class Admin {
 				?>
 			</div>
 			
-			<!-- <div class='options_group show_if_variable'>
-				<?php
-					woocommerce_wp_text_input(
-						array(
-							'id'    => \WC_Facebook_Product::FB_VARIABLE_BRAND,
-							'label' => __( 'Brand2', 'facebook-for-woocommerce' ),
-							'value' => $fb_brand,
-							'class' => 'enable-if-sync-enabled',
-						)
-					);
-				?>
-			</div> -->
-
 			<div class='wc_facebook_commerce_fields'>
 				<p class="text-heading">
 					<span><?php echo esc_html(\WooCommerce\Facebook\Admin\Product_Categories::get_catalog_explanation_text());?></span>
@@ -1717,82 +1704,6 @@ class Admin {
 			</div>
 		</div>
 
-		<style type="text/css">
-			.facebook-metabox {
-				overflow: hidden;
-				clear: both;
-				border: 1px solid #ddd;
-				margin: 16px 0 !important;
-				background: #fff;
-				padding: 0 !important; /* Remove the previous padding */
-			}
-			.facebook-metabox h3 {
-				margin: 0 !important;
-				font-size: 1em !important;
-				padding: 0.5em 0.75em 0.5em 1em !important;
-				cursor: pointer;
-				background: #f8f9fa;
-				border-bottom: 1px solid #ddd;
-			}
-			.facebook-metabox.closed .handlediv:before {
-				content: "\f140" !important;
-			}
-			.facebook-metabox .handlediv:before {
-				content: "\f142" !important;
-				font: normal 20px/1 dashicons;
-			}
-			.facebook-metabox .wc-metabox-content {
-				padding: 1em;
-				background: #fff;
-			}
-			.facebook-metabox h3 strong {
-				line-height: 26px;
-				font-weight: 600;
-			}
-			.sync-indicator.dashicons-yes-alt {
-				display: inline-block;
-				margin-left: 8px;
-				cursor: help;
-				vertical-align: middle;
-				color: #46b450;
-				font-size: 16px;
-				position: relative;
-				line-height: 1;  /* Added this */
-				top: 3px;  /* Added this to fine-tune alignment */
-			}
-			
-			.sync-indicator .sync-tooltip {
-				display: none;
-				position: absolute;
-				background: #32373c;
-				padding: 8px;
-				border-radius: 3px;
-				color: #fff;
-				font-size: 13px;
-				font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-				line-height: 1.4;
-				white-space: nowrap;
-				z-index: 9999;
-				top: 100%;
-				left: 50%;
-				transform: translateX(-50%) translateY(8px);
-			}
-			
-			.sync-indicator .sync-tooltip:before {
-				content: '';
-				position: absolute;
-				border: 6px solid transparent;
-				border-bottom-color: #32373c;
-				top: -12px;
-				left: 50%;
-				transform: translateX(-50%);
-			}
-			
-			.sync-indicator:hover .sync-tooltip {
-				display: block;
-			}
-		</style>
-
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				// Remove any existing click handlers first
@@ -2038,57 +1949,8 @@ class Admin {
 				});
 			});
 		</script>
-		<style>
-			.synced-attribute {
-				background-color: #f0f0f1 !important;
-				cursor: not-allowed;
-			}
-			.sync-indicator.dashicons-yes-alt {
-				display: inline-block;
-				margin-left: 8px;
-				cursor: help;
-				vertical-align: middle;
-				color: #46b450;
-				font-size: 16px;
-				position: relative;
-				line-height: 1;  /* Added this */
-				top: 3px;  /* Added this to fine-tune alignment */
-			}
-			
-			.sync-indicator .sync-tooltip {
-				display: none;
-				position: absolute;
-				background: #32373c;
-				padding: 8px;
-				border-radius: 3px;
-				color: #fff;
-				font-size: 13px;
-				font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-				line-height: 1.4;
-				white-space: nowrap;
-				z-index: 9999;
-				top: 100%;
-				left: 50%;
-				transform: translateX(-50%) translateY(8px);
-			}
-			
-			.sync-indicator .sync-tooltip:before {
-				content: '';
-				position: absolute;
-				border: 6px solid transparent;
-				border-bottom-color: #32373c;
-				top: -12px;
-				left: 50%;
-				transform: translateX(-50%);
-			}
-			
-			.sync-indicator:hover .sync-tooltip {
-				display: block;
-			}
-		</style>
 		<?php
 	}
-
 
 	public function sync_product_attributes( $product_id ) {
 		$product = wc_get_product( $product_id );
