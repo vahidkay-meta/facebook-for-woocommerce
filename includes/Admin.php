@@ -2086,7 +2086,7 @@ class Admin {
 	}
 
 
-	private function sync_product_attributes( $product_id ) {
+	public function sync_product_attributes( $product_id ) {
 		$product = wc_get_product( $product_id );
 		if ( ! $product ) {
 			return [];
