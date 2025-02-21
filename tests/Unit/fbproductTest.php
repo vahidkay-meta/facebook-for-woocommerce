@@ -594,15 +594,6 @@ class fbproductTest extends WP_UnitTestCase {
 		$this->assertNotContains('', $saved_video_urls);
     }
 
-    public function test_prepare_product_with_mixed_fields() {
-        // Set only facebook description
-        $fb_description = 'Facebook specific description';
-
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
-
-        $product_data = $this->fb_product->prepare_product();
-    }
-
     public function test_prepare_product_items_batch() {
         // Test the PRODUCT_PREP_TYPE_ITEMS_BATCH preparation type
         $fb_description = 'Facebook specific description';
