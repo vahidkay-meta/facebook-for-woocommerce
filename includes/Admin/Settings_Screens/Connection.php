@@ -114,9 +114,9 @@ class Connection extends Abstract_Settings_Screen {
 	public function render() {
 
 		// Check if we have a merchant access token
-		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
-		
-		if (!empty($merchant_access_token) && $this->use_iframe_connection()) {
+		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
+
+		if ( ! empty( $merchant_access_token ) && $this->use_iframe_connection() ) {
 			// Render the management iframe
 			$connection = facebook_for_woocommerce()->get_connection_handler();
 			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
@@ -135,8 +135,6 @@ class Connection extends Abstract_Settings_Screen {
 		if ( ! $is_connected ) {
 			return;
 		}
-
-		
 
 		/**
 		 * Build the basic static elements.
@@ -375,12 +373,12 @@ class Connection extends Abstract_Settings_Screen {
 		}
 
 		// Check if we have a merchant access token
-		$merchant_access_token = get_option('wc_facebook_merchant_access_token', '');
-		
-		if (!empty($merchant_access_token)) {
+		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
+
+		if ( ! empty( $merchant_access_token ) ) {
 			return;
 		}
-?>
+		?>
 		<script type="text/javascript">
 			window.addEventListener('message', function(event) {
 				const message = event.data;
@@ -400,7 +398,7 @@ class Connection extends Abstract_Settings_Screen {
 						credentials: 'same-origin',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-WP-Nonce': '<?php echo wp_create_nonce("wp_rest"); ?>'
+							'X-WP-Nonce': '<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>'
 						},
 						body: JSON.stringify(requestBody)
 					})

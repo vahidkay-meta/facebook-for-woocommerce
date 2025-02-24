@@ -173,33 +173,33 @@ class MetaExtension {
 		$pixel_id              = isset( $params['pixel_id'] ) ? sanitize_text_field( $params['pixel_id'] ) : '';
 
 		// Only validate merchant_access_token as required
-		if (empty($merchant_access_token)) {
-			return new WP_Error('missing_token', __('Missing merchant access token', 'facebook-for-woocommerce'), array('status' => 400));
+		if ( empty( $merchant_access_token ) ) {
+			return new WP_Error( 'missing_token', __( 'Missing merchant access token', 'facebook-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		// Update all available options
-		if (!empty($access_token)) {
-			update_option('wc_facebook_access_token', $access_token);
+		if ( ! empty( $access_token ) ) {
+			update_option( 'wc_facebook_access_token', $access_token );
 		}
-		
-		update_option('wc_facebook_merchant_access_token', $merchant_access_token);
-		
-		if (!empty($page_access_token)) {
-			update_option('wc_facebook_page_access_token', $page_access_token);
+
+		update_option( 'wc_facebook_merchant_access_token', $merchant_access_token );
+
+		if ( ! empty( $page_access_token ) ) {
+			update_option( 'wc_facebook_page_access_token', $page_access_token );
 		}
-		
-		if (!empty($product_catalog_id)) {
-			update_option('wc_facebook_product_catalog_id', $product_catalog_id);
+
+		if ( ! empty( $product_catalog_id ) ) {
+			update_option( 'wc_facebook_product_catalog_id', $product_catalog_id );
 		}
-		
-		if (!empty($pixel_id)) {
-			update_option('wc_facebook_pixel_id', $pixel_id);
+
+		if ( ! empty( $pixel_id ) ) {
+			update_option( 'wc_facebook_pixel_id', $pixel_id );
 		}
 
 		return new WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __('Facebook settings updated successfully', 'facebook-for-woocommerce')
+				'message' => __( 'Facebook settings updated successfully', 'facebook-for-woocommerce' ),
 			),
 			200
 		);
@@ -210,15 +210,15 @@ class MetaExtension {
 	 *
 	 * @param string $method HTTP method (GET, POST, etc.)
 	 * @param string $endpoint API endpoint
-	 * @param array $params Request parameters
+	 * @param array  $params Request parameters
 	 * @return array Response data
+	 * @throws \Exception If the request fails.
 	 */
-	private static function callApi($method, $endpoint, $params)
-	{
+	private static function call_api( $method, $endpoint, $params ) {
 		$url = 'https://graph.facebook.com/v18.0/' . $endpoint;
-		
-		if ($method === 'GET') {
-			$url = add_query_arg($params, $url);
+
+		if ( 'GET' === $method ) {
+			$url = add_query_arg( $params, $url );
 		}
 
 		$args = array(
@@ -229,60 +229,59 @@ class MetaExtension {
 			),
 		);
 
-		if ($method === 'POST') {
-			$args['body'] = json_encode($params);
+		if ( 'POST' === $method ) {
+			$args['body'] = json_encode( $params );
 		}
 
-		$response = wp_remote_request($url, $args);
+		$response = wp_remote_request( $url, $args );
 
-		if (is_wp_error($response)) {
-			throw new \Exception($response->get_error_message());
+		if ( is_wp_error( $response ) ) {
+			throw new \Exception( $response->get_error_message() );
 		}
 
-		$body = wp_remote_retrieve_body($response);
-		return json_decode($body, true);
+		$body = wp_remote_retrieve_body( $response );
+		return json_decode( $body, true );
 	}
 
 	/**
 	 * Get a URL to use to render the CommerceExtension IFrame for an onboarded Store.
 	 *
-	 * @param string $external_business_id External business ID
+	 * @param string      $external_business_id External business ID
 	 * @param string|null $access_token Access token
 	 * @return string
 	 */
-	public static function getCommerceExtensionIFrameURL($external_business_id, $access_token = null)
-	{
-		if (empty($access_token)) {
-			$access_token = get_option('wc_facebook_access_token', '');
+	public static function get_commerce_extension_iframe_url( $external_business_id, $access_token = null ) {
+		if ( empty( $access_token ) ) {
+			$access_token = get_option( 'wc_facebook_access_token', '' );
 		}
 
 		try {
 			$request = array(
-				'access_token' => $access_token,
-				'fields'       => 'commerce_extension',
+				'access_token'             => $access_token,
+				'fields'                   => 'commerce_extension',
 				'fbe_external_business_id' => $external_business_id,
 			);
 
-			$response = self::callApi('GET', 'fbe_business', $request);
+			$response = self::call_api( 'GET', 'fbe_business', $request );
 
-			if (!empty($response['commerce_extension']['uri'])) {
+			if ( ! empty( $response['commerce_extension']['uri'] ) ) {
 				$uri = $response['commerce_extension']['uri'];
-				
+
 				// Allow for URL override through constant or filter
-				$base_url_override = defined('FACEBOOK_COMMERCE_EXTENSION_BASE_URL') 
-					? FACEBOOK_COMMERCE_EXTENSION_BASE_URL 
+				$base_url_override = defined( 'FACEBOOK_COMMERCE_EXTENSION_BASE_URL' )
+					? constant( 'FACEBOOK_COMMERCE_EXTENSION_BASE_URL' )
 					: null;
-				
-				$base_url_override = apply_filters('wc_facebook_commerce_extension_base_url', $base_url_override);
-				
-				if ($base_url_override) {
-					$uri = str_replace('https://www.commercepartnerhub.com/', $base_url_override, $uri);
+
+				$base_url_override = apply_filters( 'wc_facebook_commerce_extension_base_url', $base_url_override );
+
+				if ( $base_url_override ) {
+					$uri = str_replace( 'https://www.commercepartnerhub.com/', $base_url_override, $uri );
 				}
-				
+
 				return $uri;
 			}
-		} catch (\Exception $e) {
-			error_log('Facebook Commerce Extension URL Error: ' . $e->getMessage());
+		} catch ( \Exception $e ) {
+			error_log( 'Facebook Commerce Extension URL Error: ' . $e->getMessage() );
 		}
 
 		return '';
@@ -295,15 +294,14 @@ class MetaExtension {
 	 * @param string $external_business_id External business ID.
 	 * @return string
 	 */
-	public static function generateIframeManagementUrl($plugin, $external_business_id)
-	{
-		$access_token = get_option('wc_facebook_access_token', '');
-		
-		if (empty($access_token)) {
+	public static function generate_iframe_management_url( $plugin, $external_business_id ) {
+		$access_token = get_option( 'wc_facebook_access_token', '' );
+
+		if ( empty( $access_token ) ) {
 			return '';
 		}
 
-		return self::getCommerceExtensionIFrameURL($external_business_id, $access_token);
+		return self::get_commerce_extension_iframe_url( $external_business_id, $access_token );
 	}
 
 	/**
@@ -313,17 +311,16 @@ class MetaExtension {
 	 * @param string $external_business_id External business ID.
 	 * @return void
 	 */
-	public static function render_management_iframe($plugin, $external_business_id)
-	{
-		$iframe_url = self::generateIframeManagementUrl($plugin, $external_business_id);
-		
-		if (empty($iframe_url)) {
+	public static function render_management_iframe( $plugin, $external_business_id ) {
+		$iframe_url = self::generate_iframe_management_url( $plugin, $external_business_id );
+
+		if ( empty( $iframe_url ) ) {
 			return;
 		}
-		
+
 		?>
 		<iframe
-			src="<?php echo esc_url($iframe_url); ?>"
+			src="<?php echo esc_url( $iframe_url ); ?>"
 			width="100%"
 			height="800"
 			frameborder="0"
