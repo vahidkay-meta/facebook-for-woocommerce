@@ -10,7 +10,7 @@
 
 namespace WooCommerce\Facebook\Admin\Settings_Screens;
 
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 use WooCommerce\Facebook\Admin\Abstract_Settings_Screen;
 use WooCommerce\Facebook\Framework\Api\Exception as ApiException;
@@ -171,7 +171,7 @@ class Connection extends Abstract_Settings_Screen {
 
 		// if the catalog ID is set, update the URL and try to get its name for display
 		$catalog_id = $static_items['catalog']['value'];
-		if ( !empty( $catalog_id ) ) {
+		if ( ! empty( $catalog_id ) ) {
 			$static_items['catalog']['url'] = "https://www.facebook.com/commerce/catalogs/{$catalog_id}/products/";
 			try {
 				$response = facebook_for_woocommerce()->get_api()->get_catalog( $catalog_id );
@@ -282,7 +282,7 @@ class Connection extends Abstract_Settings_Screen {
 	 */
 	private function render_facebook_box_iframe( $is_connected ) {
 		$connection = facebook_for_woocommerce()->get_connection_handler();
-		$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generateIframeSplashUrl(
+		$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generate_iframe_splash_url(
 			$is_connected,
 			$connection->get_plugin(),
 			$connection->get_external_business_id()
@@ -312,6 +312,15 @@ class Connection extends Abstract_Settings_Screen {
 		} else {
 			$title = __( 'Grow your business on Facebook', 'facebook-for-woocommerce' );
 		}
+
+
+
+		$subtitle = __( 'Use this WooCommerce and Facebook integration to:', 'facebook-for-woocommerce' );
+		$benefits = array(
+			__( 'Create an ad in a few steps', 'facebook-for-woocommerce' ),
+			__( 'Use built-in best practices for online sales', 'facebook-for-woocommerce' ),
+			__( 'Get reporting on sales and revenue', 'facebook-for-woocommerce' ),
+		);
 
 		?>
 		<div id="wc-facebook-connection-box">
@@ -399,9 +408,7 @@ class Connection extends Abstract_Settings_Screen {
 				'title'    => __( 'Enable debug mode', 'facebook-for-woocommerce' ),
 				'type'     => 'checkbox',
 				'desc'     => __( 'Log plugin events for debugging.', 'facebook-for-woocommerce' ),
-				/**
-				 * Translators: %s URL to the documentation page.
-				 */
+				/* translators: %s URL to the documentation page. */
 				'desc_tip' => sprintf( __( 'Only enable this if you are experiencing problems with the plugin. <a href="%s" target="_blank">Learn more</a>.', 'facebook-for-woocommerce' ), 'https://woocommerce.com/document/facebook-for-woocommerce/#debug-tools' ),
 				'default'  => 'no',
 			),
@@ -411,9 +418,7 @@ class Connection extends Abstract_Settings_Screen {
 				'title'    => __( 'Experimental! Enable new style feed generation', 'facebook-for-woocommerce' ),
 				'type'     => 'checkbox',
 				'desc'     => __( 'Use new, memory improved, feed generation process.', 'facebook-for-woocommerce' ),
-				/**
-				 * Translators: %s URL to the documentation page.
-				 */
+				/* translators: %s URL to the documentation page. */
 				'desc_tip' => sprintf( __( 'This is an experimental feature in testing phase. Only enable this if you are experiencing problems with feed generation. <a href="%s" target="_blank">Learn more</a>.', 'facebook-for-woocommerce' ), 'https://woocommerce.com/document/facebook-for-woocommerce/#feed-generation' ),
 				'default'  => 'no',
 			),
