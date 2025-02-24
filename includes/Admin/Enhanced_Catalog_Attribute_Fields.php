@@ -143,14 +143,13 @@ class Enhanced_Catalog_Attribute_Fields {
 		}
 
 		array_multisort( $priority, SORT_DESC, $recommended_attributes );
-
-		foreach ( $recommended_attributes as $attribute ) {
-			$this->render_attribute( $attribute );
-		}
-
 		$selector_value      = $this->get_value( self::OPTIONAL_SELECTOR_KEY, $category_id );
 		$is_showing_optional = 'on' === $selector_value;
 		$this->render_selector_checkbox( $is_showing_optional );
+
+		foreach ( $recommended_attributes as $attribute ) {
+			$this->render_attribute( $attribute, true, $is_showing_optional );
+		}
 
 		foreach ( $optional_attributes as $attribute ) {
 			$this->render_attribute( $attribute, true, $is_showing_optional );
@@ -159,7 +158,7 @@ class Enhanced_Catalog_Attribute_Fields {
 
 	private function render_selector_checkbox( $is_showing_optional ) {
 		$selector_id    = self::FIELD_ENHANCED_CATALOG_ATTRIBUTE_PREFIX . self::OPTIONAL_SELECTOR_KEY;
-		$selector_label = __( 'Show advanced options', 'facebook-for-woocommerce' );
+		$selector_label = __( 'Show more attributes', 'facebook-for-woocommerce' );
 		$checked_attr   = $is_showing_optional ? 'checked="checked"' : '';
 
 		if ( self::PAGE_TYPE_EDIT_PRODUCT === $this->page_type ) {
@@ -244,7 +243,6 @@ class Enhanced_Catalog_Attribute_Fields {
 		?>
 		<label for="<?php echo esc_attr( $attr_id ); ?>">
 			<?php echo esc_html( $label ); ?>
-			<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		</label>
 		<?php
 	}
@@ -280,6 +278,7 @@ class Enhanced_Catalog_Attribute_Fields {
 				<option value="<?php echo esc_attr( $opt ); ?>" <?php echo esc_attr( $selected_attr ); ?>> <?php echo esc_html( $opt ); ?></option>
 			<?php } ?>
 		</select/>
+		<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		<?php
 	}
 
@@ -289,6 +288,7 @@ class Enhanced_Catalog_Attribute_Fields {
 		}
 		?>
 		<input type="text" value="<?php echo esc_attr( $attribute['value'] ); ?>" name="<?php echo esc_attr( $attr_id ); ?>" id="<?php echo esc_attr( $attr_id ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>"/>
+		<span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $attribute['description'] ); ?>"></span>
 		<?php
 	}
 }

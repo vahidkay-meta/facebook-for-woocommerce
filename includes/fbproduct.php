@@ -14,6 +14,7 @@ require_once __DIR__ . '/fbutils.php';
 use WooCommerce\Facebook\Framework\Plugin\Compatibility;
 use WooCommerce\Facebook\Framework\Helper;
 use WooCommerce\Facebook\Products;
+use WooCommerce\Facebook\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,15 +33,22 @@ class WC_Facebook_Product {
 	// to this object.
 	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
 	const FB_PRODUCT_PRICE         = 'fb_product_price';
+	const FB_SIZE                  = 'fb_size';
+	const FB_COLOR                 = 'fb_color';
+	const FB_MATERIAL              = 'fb_material';
+	const FB_PATTERN               = 'fb_pattern';
 	const FB_PRODUCT_IMAGE         = 'fb_product_image';
-    const FB_PRODUCT_VIDEO         = 'fb_product_video';
-    const FB_VARIANT_IMAGE           = 'fb_image';
-    const FB_VISIBILITY              = 'fb_visibility';
-    const FB_REMOVE_FROM_SYNC        = 'fb_remove_from_sync';
+	const FB_PRODUCT_CONDITION     = 'fb_product_condition';
+	const FB_AGE_GROUP             = 'fb_age_group';
+	const FB_GENDER                = 'fb_gender';
+	const FB_PRODUCT_VIDEO         = 'fb_product_video';
+	const FB_VARIANT_IMAGE         = 'fb_image';
+	const FB_VISIBILITY            = 'fb_visibility';
+	const FB_REMOVE_FROM_SYNC      = 'fb_remove_from_sync';
 	const FB_RICH_TEXT_DESCRIPTION = 'fb_rich_text_description';
-	const FB_BRAND               = 'fb_brand';
-	const FB_VARIABLE_BRAND      = 'fb_variable_brand';
-	const FB_MPN              	 = 'fb_mpn';
+	const FB_BRAND                 = 'fb_brand';
+	const FB_VARIABLE_BRAND        = 'fb_variable_brand';
+	const FB_MPN                   = 'fb_mpn';
 
 	const MIN_DATE_1 = '1970-01-29';
 	const MIN_DATE_2 = '1970-01-30';
@@ -126,9 +134,9 @@ class WC_Facebook_Product {
 		// Variable products should use some data from the parent_product
 		// For performance reasons, that data shouldn't be regenerated every time.
 		if ( $parent_product ) {
-			$this->gallery_urls        = $parent_product->get_gallery_urls();
-			$this->fb_use_parent_image = $parent_product->get_use_parent_image();
-			$this->main_description    = $parent_product->get_fb_description();
+			$this->gallery_urls          = $parent_product->get_gallery_urls();
+			$this->fb_use_parent_image   = $parent_product->get_use_parent_image();
+			$this->main_description      = $parent_product->get_fb_description();
 			$this->rich_text_description = $parent_product->get_rich_text_description();
 		}
 	}
@@ -300,33 +308,33 @@ class WC_Facebook_Product {
 		$video_urls = array();
 
 		$attached_videos = get_attached_media( 'video', $this->id );
-		
-            $custom_video_urls = $this->woo_product->get_meta( self::FB_PRODUCT_VIDEO );
 
-        if ( empty( $attached_videos ) && empty( $custom_video_urls ) ) {
-            return $video_urls;
-        }
+			$custom_video_urls = $this->woo_product->get_meta( self::FB_PRODUCT_VIDEO );
 
-            // Add custom video URLs to the list
-            if (!empty($custom_video_urls) && is_array($custom_video_urls)) {
-                foreach ($custom_video_urls as $custom_url) {
-                    $custom_url = trim($custom_url);
-                    if (!empty($custom_url)) {
-                        $video_urls[] = array('url' => $custom_url);
-                    }
-                }
-            }
-        
-            // Add attached video URLs to the list, excluding duplicates from custom video URLs
-            if (!empty($attached_videos)) {
-                $custom_video_url_set = array_flip(array_column($video_urls, 'url'));
-                foreach ($attached_videos as $video) {
-                    $url = wp_get_attachment_url($video->ID);
-                    if ($url && !isset($custom_video_url_set[$url])) {
-                        $video_urls[] = array('url' => $url);
-                    }
-                }
-        }
+		if ( empty( $attached_videos ) && empty( $custom_video_urls ) ) {
+			return $video_urls;
+		}
+
+			// Add custom video URLs to the list
+		if ( ! empty( $custom_video_urls ) && is_array( $custom_video_urls ) ) {
+			foreach ( $custom_video_urls as $custom_url ) {
+				$custom_url = trim( $custom_url );
+				if ( ! empty( $custom_url ) ) {
+					$video_urls[] = array( 'url' => $custom_url );
+				}
+			}
+		}
+
+			// Add attached video URLs to the list, excluding duplicates from custom video URLs
+		if ( ! empty( $attached_videos ) ) {
+			$custom_video_url_set = array_flip( array_column( $video_urls, 'url' ) );
+			foreach ( $attached_videos as $video ) {
+				$url = wp_get_attachment_url( $video->ID );
+				if ( $url && ! isset( $custom_video_url_set[ $url ] ) ) {
+					$video_urls[] = array( 'url' => $url );
+				}
+			}
+		}
 
 		return $video_urls;
 	}
@@ -380,16 +388,21 @@ class WC_Facebook_Product {
 			);
 		}
 	}
-	
+
 	public function set_product_video_urls( $attachment_ids ) {
-		$video_urls = array_filter(array_map(function($id) {
-            return trim(wp_get_attachment_url($id));
-        }, explode(',', $attachment_ids)));
-        update_post_meta(
-            $this->id,
-            self::FB_PRODUCT_VIDEO,
-            $video_urls
-        );
+		$video_urls = array_filter(
+			array_map(
+				function ( $id ) {
+					return trim( wp_get_attachment_url( $id ) );
+				},
+				explode( ',', $attachment_ids )
+			)
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_PRODUCT_VIDEO,
+			$video_urls
+		);
 	}
 
 	public function set_rich_text_description( $rich_text_description ) {
@@ -413,6 +426,29 @@ class WC_Facebook_Product {
 			$fb_brand
 		);
 	}
+	
+	
+	public function set_fb_material( $fb_material ) {
+		$fb_brand = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_material )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_MATERIAL,
+			$fb_material
+		);
+	}
+	
+	public function set_fb_pattern( $fb_pattern ) {
+		$fb_brand = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_pattern )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_PATTERN,
+			$fb_pattern
+		);
+	}
 
 	public function set_fb_mpn( $fb_mpn ) {
 		$fb_mpn = stripslashes(
@@ -423,6 +459,99 @@ class WC_Facebook_Product {
 			self::FB_MPN,
 			$fb_mpn
 		);
+	}
+
+	public function set_fb_condition( $condition ) {
+		$condition = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $condition )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_PRODUCT_CONDITION,
+				$condition
+			);
+	}
+
+
+	public function set_fb_age_group( $age_group ) {
+		$age_group = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $age_group )
+		);
+
+		update_post_meta(
+			$this->id,
+			self::FB_AGE_GROUP,
+			$age_group
+		);
+
+	}
+	
+	public function set_fb_gender( $gender ) {
+		$gender = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $gender )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_GENDER,
+			$gender
+		);
+	}
+	
+	public function set_color( $color ) {
+		$color = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $color )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_COLOR,
+				$color
+			);
+	}
+
+	public function set_pattern( $pattern ) {
+		$pattern = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $pattern )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_PATTERN,
+				$pattern
+			);
+	}
+
+	public function set_material( $material ) {
+		$material = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $material )
+		);
+			update_post_meta(
+				$this->id,
+				self::FB_MATERIAL,
+				$material
+			);
+	}
+
+	public function set_fb_color( $fb_color ) {
+		$gender = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $fb_color )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_COLOR,
+			$fb_color
+		);
+	}
+
+
+	public function set_fb_size( $size ) {
+		$size = stripslashes(
+			WC_Facebookcommerce_Utils::clean_string( $size )
+		);
+		update_post_meta(
+			$this->id,
+			self::FB_SIZE,
+			$size
+		);
+
 	}
 
 	public function set_price( $price ) {
@@ -467,20 +596,20 @@ class WC_Facebook_Product {
 		);
 
 		// If empty and this is a variation, get the parent brand
-		if ( empty( $fb_brand ) && $this->is_type('variation') ) {
+		if ( empty( $fb_brand ) && $this->is_type( 'variation' ) ) {
 			$parent_id = $this->get_parent_id();
 			if ( $parent_id ) {
-				$fb_brand = get_post_meta($parent_id, self::FB_BRAND, true);
+				$fb_brand = get_post_meta( $parent_id, self::FB_BRAND, true );
 			}
 		}
 
 		// Fallback to brand attribute or store name if no brand found
 		if ( empty( $fb_brand ) ) {
-			$brand = get_post_meta( $this->id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
+			$brand          = get_post_meta( $this->id, Products::ENHANCED_CATALOG_ATTRIBUTES_META_KEY_PREFIX . 'brand', true );
 			$brand_taxonomy = get_the_term_list( $this->id, 'product_brand', '', ', ' );
 			if ( $brand ) {
 				$fb_brand = $brand;
-			} elseif ( !is_wp_error( $brand_taxonomy ) && $brand_taxonomy ) {
+			} elseif ( ! is_wp_error( $brand_taxonomy ) && $brand_taxonomy ) {
 				$fb_brand = $brand_taxonomy;
 			} else {
 				$fb_brand = wp_strip_all_tags( WC_Facebookcommerce_Utils::get_store_name() );
@@ -614,10 +743,10 @@ class WC_Facebook_Product {
 	 */
 	public function add_sale_price( $product_data, $for_items_batch = false ) {
 
-		$sale_price = $this->woo_product->get_sale_price();
+		$sale_price                = $this->woo_product->get_sale_price();
 		$sale_price_effective_date = '';
-		$sale_start = '';
-		$sale_end = '';
+		$sale_start                = '';
+		$sale_end                  = '';
 
 		// check if sale exist
 		if ( is_numeric( $sale_price ) && $sale_price > 0 ) {
@@ -633,7 +762,7 @@ class WC_Facebook_Product {
 				( $sale_start == self::MIN_DATE_1 . self::MIN_TIME && $sale_end == self::MAX_DATE . self::MAX_TIME )
 				? ''
 				: $sale_start . '/' . $sale_end;
-				$sale_price =
+				$sale_price            =
 				intval( round( $this->get_price_plus_tax( $sale_price ) * 100 ) );
 
 			// Set Sale start and end as empty if set to default values
@@ -664,10 +793,10 @@ class WC_Facebook_Product {
 		);
 
 		// If empty and this is a variation, get the parent MPN
-		if ( empty( $fb_mpn ) && $this->is_type('variation') ) {
+		if ( empty( $fb_mpn ) && $this->is_type( 'variation' ) ) {
 			$parent_id = $this->get_parent_id();
 			if ( $parent_id ) {
-				$fb_mpn = get_post_meta($parent_id, self::FB_MPN, true);
+				$fb_mpn = get_post_meta( $parent_id, self::FB_MPN, true );
 			}
 		}
 
@@ -707,6 +836,143 @@ class WC_Facebook_Product {
 			},
 			$option_values
 		);
+	}
+
+	public function get_fb_condition() {
+		// Get condition directly from post meta
+		$fb_condition = get_post_meta(
+			$this->id,
+			self::FB_PRODUCT_CONDITION,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_condition ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_condition = get_post_meta( $parent_id, self::FB_PRODUCT_CONDITION, true );
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_condition ) ?: Admin::CONDITION_NEW;
+	}
+
+
+	public function get_fb_age_group() {
+		// Get age group directly from post meta
+		$fb_age_group = get_post_meta(
+			$this->id,
+			self::FB_AGE_GROUP,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_age_group ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_age_group = get_post_meta( $parent_id, self::FB_AGE_GROUP, true );
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_age_group );
+	}
+
+	public function get_fb_gender() {
+		// Get gender directly from post meta
+		$fb_gender = get_post_meta(
+			$this->id,
+			self::FB_GENDER,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_gender ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_gender = get_post_meta( $parent_id, self::FB_GENDER, true );
+			}
+		}
+
+		return WC_Facebookcommerce_Utils::clean_string( $fb_gender );
+	}
+
+
+	public function get_fb_size() {
+		// Get size directly from post meta
+		$fb_size = get_post_meta(
+			$this->id,
+			self::FB_SIZE,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_size ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_size = get_post_meta( $parent_id, self::FB_SIZE, true );
+			}
+		}
+
+		return mb_substr( WC_Facebookcommerce_Utils::clean_string( $fb_size ), 0, 200 );
+	}
+
+
+	public function get_fb_color() {
+		// Get color directly from post meta
+		$fb_size = get_post_meta(
+			$this->id,
+			self::FB_COLOR,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_size ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_size = get_post_meta( $parent_id, self::FB_COLOR, true );
+			}
+		}
+
+		return mb_substr( WC_Facebookcommerce_Utils::clean_string( $fb_size ), 0, 200 );
+	}
+
+	public function get_fb_material() {
+		// Get material directly from post meta
+		$fb_material = get_post_meta(
+			$this->id,
+			self::FB_MATERIAL,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_material ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_material = get_post_meta( $parent_id, self::FB_MATERIAL, true );
+			}
+		}
+
+		return mb_substr( WC_Facebookcommerce_Utils::clean_string( $fb_material ), 0, 200 );
+	}
+
+
+	public function get_fb_pattern() {
+		// Get color directly from post meta
+		$fb_pattern = get_post_meta(
+			$this->id,
+			self::FB_PATTERN,
+			true
+		);
+
+		// If empty and this is a variation, get the parent condition
+		if ( empty( $fb_pattern ) && $this->is_type( 'variation' ) ) {
+			$parent_id = $this->get_parent_id();
+			if ( $parent_id ) {
+				$fb_pattern = get_post_meta( $parent_id, self::FB_PATTERN, true );
+			}
+		}
+
+		return mb_substr( WC_Facebookcommerce_Utils::clean_string( $fb_pattern ), 0, 200 );
 	}
 
 
@@ -828,65 +1094,79 @@ class WC_Facebook_Product {
 		$custom_fields = $this->get_facebook_specific_fields();
 
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
-			$product_data   = array(
-					'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
-					'description'           => $this->get_fb_description(),
-					'rich_text_description' => $this->get_rich_text_description(),
-					'image_link'            => $image_urls[0],
-					'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
-					'link'                  => $product_url,
-					'product_type'          => $categories['categories'],
-					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
-					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-					'retailer_id'           => $retailer_id,
-					'price'                 => $this->get_fb_price( true ),
-					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
-					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
-					'custom_fields'			=> $custom_fields,
+			$product_data = array(
+				'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
+				'description'           => $this->get_fb_description(),
+				'rich_text_description' => $this->get_rich_text_description(),
+				'image_link'            => $image_urls[0],
+				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
+				'link'                  => $product_url,
+				'product_type'          => $categories['categories'],
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+				'mpn'                   => Helper::str_truncate( $this->get_fb_mpn(), 100 ),
+				'gender'                => $this->get_fb_gender(),
+				'color'                 => $this->get_fb_color(),
+				'pattern'               => Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'              => Helper::str_truncate( $this->get_fb_material(), 100 ),
+				'size'                  => $this->get_fb_size(),
+				'age_group'             => $this->get_fb_age_group(),
+				'condition'             => $this->get_fb_condition(),
+				'retailer_id'           => $retailer_id,
+				'price'                 => $this->get_fb_price( true ),
+				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
+				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
+				'custom_fields'         => $custom_fields,
 			);
-			$product_data   = $this->add_sale_price( $product_data, true );
+			$product_data = $this->add_sale_price( $product_data, true );
 			if ( ! empty( $video_urls ) ) {
 				$product_data['video'] = $video_urls;
 			}
 		} else {
 			$product_data = array(
-					'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
-					'description'           => $this->get_fb_description(),
-					'image_url'             => $image_urls[0],
-					'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
-					'url'                   => $product_url,
-					'rich_text_description' => $this->get_rich_text_description(),
-					/**
-					 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
-					 * This field should have the Google product category for the item. Google product category is not a required field
-					 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
-					 * it when a Google product category is set.
-					 *
-					 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
-					 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
-					 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
-					 */
-					'category'              => $categories['categories'],
-					'product_type'          => $categories['categories'],
-					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
-				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-					'retailer_id'           => $retailer_id,
-					'price'                 => $this->get_fb_price(),
-					'currency'              => get_woocommerce_currency(),
-					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
-					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
-					'custom_fields'			=> $custom_fields
+				'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
+				'description'           => $this->get_fb_description(),
+				'image_url'             => $image_urls[0],
+				'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
+				'url'                   => $product_url,
+				'rich_text_description' => $this->get_rich_text_description(),
+				/**
+				 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
+				 * This field should have the Google product category for the item. Google product category is not a required field
+				 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
+				 * it when a Google product category is set.
+				 *
+				 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
+				 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
+				 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
+				 */
+				'category'              => $categories['categories'],
+				'gender'                => $this->get_fb_gender(),
+				'size'                  => $this->get_fb_size(),
+				'color'                 => $this->get_fb_color(),
+				'pattern'               => Helper::str_truncate( $this->get_fb_pattern(), 100 ),
+				'material'              => Helper::str_truncate( $this->get_fb_material(), 200 ),
+				'age_group'             => $this->get_fb_age_group(),
+				'condition'             => $this->get_fb_condition(),
+				'product_type'          => $categories['categories'],
+				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+				'mpn'                   => Helper::str_truncate( $this->get_fb_mpn(), 100 ),
+				'retailer_id'           => $retailer_id,
+				'price'                 => $this->get_fb_price(),
+				'currency'              => get_woocommerce_currency(),
+				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
+				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
+				'custom_fields'         => $custom_fields,
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {
 				$product_data['video'] = $video_urls;
 			}
-			$product_data   = $this->add_sale_price( $product_data );
+			$product_data = $this->add_sale_price( $product_data );
 		}//end if
 
 		$google_product_category = Products::get_google_product_category_id( $this->woo_product );
 		if ( $google_product_category ) {
-			$product_data[ 'google_product_category' ] = $google_product_category;
+			$product_data['google_product_category'] = $google_product_category;
 		}
 
 		// Currently only items batch and feed support enhanced catalog fields
@@ -898,7 +1178,7 @@ class WC_Facebook_Product {
 		// In case if variant is not stock managed but parent is, fallback on parent value.
 		if ( $this->woo_product->managing_stock() ) {
 			$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $this->woo_product->get_stock_quantity() );
-		} else if ( $this->woo_product->is_type( 'variation' ) ) {
+		} elseif ( $this->woo_product->is_type( 'variation' ) ) {
 			$parent_product = wc_get_product( $this->woo_product->get_parent_id() );
 			if ( $parent_product && $parent_product->managing_stock() ) {
 				$product_data['quantity_to_sell_on_facebook'] = (int) max( 0, $parent_product->get_stock_quantity() );
@@ -1012,7 +1292,7 @@ class WC_Facebook_Product {
 
 		$matched_attributes = array_filter(
 			$all_attributes,
-			function( $attribute ) use ( $sanitized_keys ) {
+			function ( $attribute ) use ( $sanitized_keys ) {
 				if ( is_array( $attribute ) && isset( $attribute['key'] ) ) {
 					return in_array( $attribute['key'], $sanitized_keys );
 				}
@@ -1053,7 +1333,7 @@ class WC_Facebook_Product {
 		foreach ( $variant_names as $original_variant_name ) {
 
 			// Ensure that the attribute exists before accessing it
-			if ( !isset( $attributes[ $original_variant_name ] ) ) {
+			if ( ! isset( $attributes[ $original_variant_name ] ) ) {
 				continue; // Skip if the attribute is not set
 			}
 
@@ -1247,10 +1527,9 @@ class WC_Facebook_Product {
 	 */
 	private function get_facebook_specific_fields(): array {
 		return array(
-			'has_fb_description' => (bool) get_post_meta($this->id, self::FB_PRODUCT_DESCRIPTION, true),
-			'has_fb_price'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_PRICE, true),
-			'has_fb_image'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_IMAGE, true)
+			'has_fb_description' => (bool) get_post_meta( $this->id, self::FB_PRODUCT_DESCRIPTION, true ),
+			'has_fb_price'       => (bool) get_post_meta( $this->id, self::FB_PRODUCT_PRICE, true ),
+			'has_fb_image'       => (bool) get_post_meta( $this->id, self::FB_PRODUCT_IMAGE, true ),
 		);
 	}
-
 }
