@@ -1958,7 +1958,7 @@ class Admin {
 			return [];
 		}
 
-		$attributes      = $product->get_attributes();
+		$attributes = $product->get_attributes();
 		$facebook_fields = [];
 
 		$attribute_map = [
@@ -1967,17 +1967,15 @@ class Admin {
 			'colour'   => \WC_Facebook_Product::FB_COLOR, // Add support for British spelling
 			'size'     => \WC_Facebook_Product::FB_SIZE,
 			'pattern'  => \WC_Facebook_Product::FB_PATTERN,
-			'brand'  => \WC_Facebook_Product::FB_BRAND,
-			'mpn'  => \WC_Facebook_Product::FB_MPN,
+			'brand'    => \WC_Facebook_Product::FB_BRAND,
+			'mpn'      => \WC_Facebook_Product::FB_MPN,
 		];
 
 		// First, check which fields should be cleared
-		foreach ( $attribute_map as $attribute_name => $meta_key ) {
+		foreach ($attribute_map as $attribute_name => $meta_key) {
 			$attribute_exists = false;
 			foreach ($attributes as $attribute) {
-				// Normalize attribute name for comparison
 				$normalized_attr_name = strtolower($attribute->get_name());
-				// Check if this is either 'color' or 'colour' when checking the color field
 				if ($normalized_attr_name === $attribute_name || 
 					($meta_key === \WC_Facebook_Product::FB_COLOR && 
 					 ($normalized_attr_name === 'color' || $normalized_attr_name === 'colour'))) {
@@ -1987,9 +1985,7 @@ class Admin {
 			}
 			
 			if (!$attribute_exists && !isset($facebook_fields[array_search($meta_key, $attribute_map)])) {
-				// Only clear if no variant of the attribute exists
 				delete_post_meta($product_id, $meta_key);
-				// For color/colour, we want to set the field name as 'color'
 				$field_name = ($meta_key === \WC_Facebook_Product::FB_COLOR) ? 'color' : $attribute_name;
 				$facebook_fields[$field_name] = '';
 			}
@@ -2002,9 +1998,8 @@ class Admin {
 			// Special handling for color/colour
 			if ($normalized_attr_name === 'color' || $normalized_attr_name === 'colour') {
 				$meta_key = \WC_Facebook_Product::FB_COLOR;
-				$field_name = 'color'; // Always use 'color' for the field name
+				$field_name = 'color';
 			} else {
-				// For other attributes, proceed as normal
 				$meta_key = $attribute_map[$normalized_attr_name] ?? null;
 				$field_name = $normalized_attr_name;
 			}
@@ -2012,20 +2007,21 @@ class Admin {
 			if ($meta_key) {
 				$values = [];
 
-				if ( $attribute->is_taxonomy() ) {
+				if ($attribute->is_taxonomy()) {
 					$terms = $attribute->get_terms();
-					if ( $terms ) {
-						$values = wp_list_pluck( $terms, 'name' );
+					if ($terms) {
+						$values = wp_list_pluck($terms, 'name');
 					}
 				} else {
 					$values = $attribute->get_options();
 				}
 				
 				if (!empty($values)) {
-					$facebook_fields[$field_name] = $values[0];
-					update_post_meta($product_id, $meta_key, $values[0]);
+					// Join multiple values with a pipe character and spaces
+					$joined_values = implode(' | ', $values);
+					$facebook_fields[$field_name] = $joined_values;
+					update_post_meta($product_id, $meta_key, $joined_values);
 				} else {
-					// If attribute exists but has no values, clear the meta
 					delete_post_meta($product_id, $meta_key);
 					$facebook_fields[$field_name] = '';
 				}
