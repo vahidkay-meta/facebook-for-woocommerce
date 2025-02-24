@@ -10,19 +10,23 @@
 
 namespace WooCommerce\Facebook\Handlers;
 
-defined('ABSPATH') or exit;
+defined( 'ABSPATH' ) || exit;
 
 use WooCommerce\Facebook\Handlers\Connection;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-class MetaExtension
-{
+/**
+ * Handles Meta Commerce Extension functionality and configuration.
+ *
+ * @since 2.0.0
+ */
+class MetaExtension {
 
 	/** @var string Client token */
 	const CLIENT_TOKEN = '195311308289826|52dcd04d6c7ed113121b5eb4be23b4a7';
-	const APP_ID = '474166926521348';
+	const APP_ID       = '474166926521348';
 	/** @var string Business name */
 	const BUSINESS_NAME = 'WooCommerce';
 
@@ -45,14 +49,13 @@ class MetaExtension
 	 * @param string $external_business_id External business ID.
 	 * @return string
 	 */
-	public static function generateIframeSplashUrl($is_connected, $plugin, $external_business_id)
-	{
+	public static function generate_iframe_splash_url( $is_connected, $plugin, $external_business_id ) {
 		$external_client_metadata = array(
-			'shop_domain'      => wc_get_page_permalink( 'shop' ) ?: home_url(),
-			'admin_url'        => admin_url(),
-			'client_version'   => $plugin->get_version(),
+			'shop_domain'                           => wc_get_page_permalink( 'shop' ) ? wc_get_page_permalink( 'shop' ) : \home_url(),
+			'admin_url'                             => admin_url(),
+			'client_version'                        => $plugin->get_version(),
 			'commerce_partner_seller_platform_type' => 'MAGENTO_OPEN_SOURCE',
-			'country_code'     => WC()->countries->get_base_country(),
+			'country_code'                          => WC()->countries->get_base_country(),
 		);
 		return add_query_arg(
 			array(
@@ -65,7 +68,7 @@ class MetaExtension
 				'timezone'                 => 'America/Los_Angeles',
 				'external_business_id'     => $external_business_id,
 				'installed'                => $is_connected,
-				'external_client_metadata' => rawurlencode(json_encode($external_client_metadata)),
+				'external_client_metadata' => rawurlencode( wp_json_encode( $external_client_metadata ) ),
 			),
 			'https://www.commercepartnerhub.com/commerce_extension/splash/'
 		);
