@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile
 /**
  * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
  *
@@ -49,7 +48,7 @@ class MetaExtension
 	public static function generateIframeSplashUrl($is_connected, $plugin, $external_business_id)
 	{
 		$external_client_metadata = array(
-			'shop_domain'      => wc_get_page_permalink('shop') ?: home_url(),
+			'shop_domain'      => wc_get_page_permalink( 'shop' ) ?: home_url(),
 			'admin_url'        => admin_url(),
 			'client_version'   => $plugin->get_version(),
 			'commerce_partner_seller_platform_type' => 'MAGENTO_OPEN_SOURCE',

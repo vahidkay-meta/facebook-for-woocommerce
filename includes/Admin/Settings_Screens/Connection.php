@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile
 /**
  * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
  *
@@ -52,7 +51,7 @@ class Connection extends Abstract_Settings_Screen
 		add_action('admin_notices', array($this, 'add_notices'));
 
 		// Add action to enqueue the message handler script
-		add_action('admin_footer', array($this, 'render_message_handler'));
+		add_action( 'admin_footer', array( $this, 'render_message_handler' ) );
 	}
 
 
@@ -271,12 +270,11 @@ class Connection extends Abstract_Settings_Screen
 	 *
 	 * @param bool $is_connected whether the plugin is connected
 	 */
-	private function render_facebook_box($is_connected)
-	{
-		if ($this->use_iframe_connection()) {
-			$this->render_facebook_box_iframe($is_connected);
+	private function render_facebook_box( $is_connected ) {
+		if ( $this->use_iframe_connection() ) {
+			$this->render_facebook_box_iframe( $is_connected );
 		} else {
-			$this->render_facebook_box_legacy($is_connected);
+			$this->render_facebook_box_legacy( $is_connected );
 		}
 	}
 
@@ -363,9 +361,8 @@ class Connection extends Abstract_Settings_Screen
 	 *
 	 * @since 2.0.0
 	 */
-	public function render_message_handler()
-	{
-		if (!$this->is_current_screen_page()) {
+	public function render_message_handler() {
+		if ( ! $this->is_current_screen_page() ) {
 			return;
 		}
 	?>
