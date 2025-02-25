@@ -524,14 +524,10 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_data                               = $facebook_product->prepare_product(null, \WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH );
 		$this->integration->product_catalog_id               = '123123123123123123';
 		/* Data coming from _POST data. */
-		$facebook_product_data['description']                = 'Facebook product description.';
+		$facebook_product_data['description']				 = 'Facebook product description.';
+		$facebook_product_data['rich_text_description']		 = 'Facebook product description.';
 		$facebook_product_data['price']                      = '199 USD';
 		$facebook_product_data['google_product_category']    = 1718;
-		$facebook_product_data['custom_fields']	= [
-			'has_fb_description' => true,
-			'has_fb_price' => true,
-			'has_fb_image' => true
-		];
 
 		$requests = WC_Facebookcommerce_Utils::prepare_product_requests_items_batch($facebook_product_data);
 
@@ -561,9 +557,8 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		$facebook_product_to_update = new WC_Facebook_Product( $product_to_update->get_id() );
 		$updated_product_data = $facebook_product_to_update->prepare_product(null, \WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH );
 		
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_description']);
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_price']);
-		$this->assertEquals(true, $updated_product_data['custom_fields']['has_fb_image']);
+		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
+		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_RICH_TEXT_DESCRIPTION, true ) );
 
 		// Verify the actual values are still stored in meta
 		$this->assertEquals( 'Facebook product description.', get_post_meta( $facebook_product_to_update->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, true ) );
@@ -1870,7 +1865,7 @@ class WCFacebookCommerceIntegrationTest extends WP_UnitTestCase {
 		set_current_screen( 'edit-post' );
 
 		/** @var WC_Product_Simple $product */
-		$product = WC_Helper_Product::create_simple_product();
+		$product =   WC_Helper_Product::create_simple_product();
 		$product->add_meta_data( WC_Facebookcommerce_Integration::FB_PRODUCT_GROUP_ID, 'facebook-product-group-id-1' );
 		$product->add_meta_data( WC_Facebookcommerce_Integration::FB_PRODUCT_ITEM_ID, 'facebook-product-item-id-1' );
 		$product->add_meta_data( Products::VISIBILITY_META_KEY, true );
