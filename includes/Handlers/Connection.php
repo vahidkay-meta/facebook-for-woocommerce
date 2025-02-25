@@ -25,7 +25,6 @@ defined( 'ABSPATH' ) or exit;
  * @since 2.0.0
  */
 class Connection {
-// comment test
 
 	/** @var string Facebook client identifier */
 	const CLIENT_ID = '474166926521348';
