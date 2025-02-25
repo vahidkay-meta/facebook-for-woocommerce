@@ -1,5 +1,12 @@
 *** Facebook for WooCommerce Changelog ***
 
+= 3.4.0 - 2025-02-19 =
+* Add - FB product video field to add videos. Also added products sync to support the video field with Batch API by @gurtejrehal in #2874
+* Tweak - tests for #2874 by @gurtejrehal in #2888
+* Tweak - tests for Product Update action as ramp up task by @nealweiMeta in #2883
+* Fix - translations loading before the init hook by @iodic in #2866
+* Fix - Fixed feeds by requesting a feed file upload session after feed file is generated and added missing new fields to the feed file by @mshymon in #2841
+
 = 3.3.5 - 2025-02-12 = 
 * Add - Rich Text Description to Woo Product Sync with Meta by devbodaghe in #2843
 
