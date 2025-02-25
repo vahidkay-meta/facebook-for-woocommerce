@@ -38,10 +38,7 @@ class Connection extends Abstract_Settings_Screen {
 	 * Connection constructor.
 	 */
 	public function __construct() {
-
-		$this->id    = self::ID;
-		$this->label = __( 'Connection', 'facebook-for-woocommerce' );
-		$this->title = __( 'Connection', 'facebook-for-woocommerce' );
+		add_action( 'init', array( $this, 'initHook' ) );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 
@@ -49,6 +46,15 @@ class Connection extends Abstract_Settings_Screen {
 
 		// Add action to enqueue the message handler script
 		add_action( 'admin_footer', array( $this, 'render_message_handler' ) );
+	}
+
+	/**
+	 * Initializes this settings page's properties.
+	 */
+	public function initHook(): void {
+		$this->id    = self::ID;
+		$this->label = __( 'Connection', 'facebook-for-woocommerce' );
+		$this->title = __( 'Connection', 'facebook-for-woocommerce' );
 	}
 
 

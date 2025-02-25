@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <phpunit
-		bootstrap="tests/bootstrap.php"
-		backupGlobals="false"
-		colors="true"
-		convertErrorsToExceptions="true"
-		convertNoticesToExceptions="true"
-		convertWarningsToExceptions="true"
-		convertDeprecationsToExceptions="true"
-		defaultTestSuite="unit"
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
+	defaultTestSuite="unit"
 >
 	<testsuites>
 		<testsuite name="unit">
@@ -17,4 +17,9 @@
 			<directory suffix=".php">./tests/integration</directory>
 		</testsuite>
 	</testsuites>
+	<coverage>
+		<include>
+			<directory>includes</directory>
+		</include>
+	</coverage>
 </phpunit>

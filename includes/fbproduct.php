@@ -30,12 +30,14 @@ class WC_Facebook_Product {
 
 	// Should match facebook-commerce.php while we migrate that code over
 	// to this object.
-	const FB_PRODUCT_DESCRIPTION = 'fb_product_description';
-	const FB_PRODUCT_PRICE       = 'fb_product_price';
-	const FB_PRODUCT_IMAGE       = 'fb_product_image';
-	const FB_VARIANT_IMAGE       = 'fb_image';
-	const FB_VISIBILITY          = 'fb_visibility';
-	const FB_REMOVE_FROM_SYNC    = 'fb_remove_from_sync';
+	const FB_PRODUCT_DESCRIPTION   = 'fb_product_description';
+	const FB_PRODUCT_PRICE         = 'fb_product_price';
+	const FB_PRODUCT_IMAGE         = 'fb_product_image';
+    const FB_PRODUCT_VIDEO         = 'fb_product_video';
+    const FB_VARIANT_IMAGE           = 'fb_image';
+    const FB_VISIBILITY              = 'fb_visibility';
+    const FB_REMOVE_FROM_SYNC        = 'fb_remove_from_sync';
+	const FB_RICH_TEXT_DESCRIPTION = 'fb_rich_text_description';
 	const FB_BRAND               = 'fb_brand';
 	const FB_VARIABLE_BRAND      = 'fb_variable_brand';
 	const FB_MPN              	 = 'fb_mpn';
@@ -92,14 +94,19 @@ class WC_Facebook_Product {
 	 */
 	public $fb_visibility;
 
+	/**
+	 * @var bool Product rich text description.
+	 */
+	public $rich_text_description;
+
 	public function __construct( $wpid, $parent_product = null ) {
 
 		if ( $wpid instanceof WC_Product ) {
 			$this->id          = $wpid->get_id();
 			$this->woo_product = $wpid;
 		} else {
-			$this->id                     = $wpid;
-			$this->woo_product            = wc_get_product( $wpid );
+			$this->id          = $wpid;
+			$this->woo_product = wc_get_product( $wpid );
 		}
 
 		$this->fb_description         = '';
@@ -107,6 +114,7 @@ class WC_Facebook_Product {
 		$this->fb_use_parent_image    = null;
 		$this->main_description       = '';
 		$this->sync_short_description = \WC_Facebookcommerce_Integration::PRODUCT_DESCRIPTION_MODE_SHORT === facebook_for_woocommerce()->get_integration()->get_product_description_mode();
+		$this->rich_text_description  = '';
 
 		if ( $meta = get_post_meta( $this->id, self::FB_VISIBILITY, true ) ) {
 			$this->fb_visibility = wc_string_to_bool( $meta );
@@ -121,6 +129,7 @@ class WC_Facebook_Product {
 			$this->gallery_urls        = $parent_product->get_gallery_urls();
 			$this->fb_use_parent_image = $parent_product->get_use_parent_image();
 			$this->main_description    = $parent_product->get_fb_description();
+			$this->rich_text_description = $parent_product->get_rich_text_description();
 		}
 	}
 
@@ -238,7 +247,7 @@ class WC_Facebook_Product {
 		 * @param string $size The image size. e.g. 'full', 'medium', 'thumbnail'.
 		 */
 		$image_size               = apply_filters( 'facebook_for_woocommerce_fb_product_image_size', 'full' );
-		$product_image_url        = wp_get_attachment_image_url( $this->woo_product->get_image_id(), $image_size ); ;
+		$product_image_url        = wp_get_attachment_image_url( $this->woo_product->get_image_id(), $image_size );
 		$parent_product_image_url = null;
 		$custom_image_url         = $this->woo_product->get_meta( self::FB_PRODUCT_IMAGE );
 
@@ -291,19 +300,32 @@ class WC_Facebook_Product {
 		$video_urls = array();
 
 		$attached_videos = get_attached_media( 'video', $this->id );
-		if ( empty( $attached_videos ) ) {
-			return $video_urls;
-		}
-		foreach ( $attached_videos as $video ) {
-			$url = wp_get_attachment_url( $video->ID );
-			if ( $url ) {
-				array_push(
-					$video_urls,
-					array(
-						'url' => $url,
-					)
-				);
-			}
+		
+            $custom_video_urls = $this->woo_product->get_meta( self::FB_PRODUCT_VIDEO );
+
+        if ( empty( $attached_videos ) && empty( $custom_video_urls ) ) {
+            return $video_urls;
+        }
+
+            // Add custom video URLs to the list
+            if (!empty($custom_video_urls) && is_array($custom_video_urls)) {
+                foreach ($custom_video_urls as $custom_url) {
+                    $custom_url = trim($custom_url);
+                    if (!empty($custom_url)) {
+                        $video_urls[] = array('url' => $custom_url);
+                    }
+                }
+            }
+        
+            // Add attached video URLs to the list, excluding duplicates from custom video URLs
+            if (!empty($attached_videos)) {
+                $custom_video_url_set = array_flip(array_column($video_urls, 'url'));
+                foreach ($attached_videos as $video) {
+                    $url = wp_get_attachment_url($video->ID);
+                    if ($url && !isset($custom_video_url_set[$url])) {
+                        $video_urls[] = array('url' => $url);
+                    }
+                }
         }
 
 		return $video_urls;
@@ -338,9 +360,7 @@ class WC_Facebook_Product {
 	}
 
 	public function set_description( $description ) {
-		$description          = stripslashes(
-			WC_Facebookcommerce_Utils::clean_string( $description )
-		);
+		$description          = stripslashes( WC_Facebookcommerce_Utils::clean_string( $description ) );
 		$this->fb_description = $description;
 		update_post_meta(
 			$this->id,
@@ -359,6 +379,28 @@ class WC_Facebook_Product {
 				$image
 			);
 		}
+	}
+	
+	public function set_product_video_urls( $attachment_ids ) {
+		$video_urls = array_filter(array_map(function($id) {
+            return trim(wp_get_attachment_url($id));
+        }, explode(',', $attachment_ids)));
+        update_post_meta(
+            $this->id,
+            self::FB_PRODUCT_VIDEO,
+            $video_urls
+        );
+	}
+
+	public function set_rich_text_description( $rich_text_description ) {
+		$rich_text_description       =
+			WC_Facebookcommerce_Utils::clean_string( $rich_text_description, false );
+		$this->rich_text_description = $rich_text_description;
+		update_post_meta(
+			$this->id,
+			self::FB_RICH_TEXT_DESCRIPTION,
+			$rich_text_description
+		);
 	}
 
 	public function set_fb_brand( $fb_brand ) {
@@ -408,7 +450,7 @@ class WC_Facebook_Product {
 	}
 
 	public function set_use_parent_image( $setting ) {
-		$this->fb_use_parent_image = ( $setting == 'yes' );
+		$this->fb_use_parent_image = ( $setting === 'yes' );
 		update_post_meta(
 			$this->id,
 			self::FB_VARIANT_IMAGE,
@@ -506,8 +548,67 @@ class WC_Facebook_Product {
 	}
 
 	/**
+	 * Get the rich text description for a product.
+	 *
+	 * This function retrieves the rich text product description, prioritizing Facebook
+	 * rich text descriptions over WooCommerce product descriptions.
+	 * 1. Check if the Facebook rich text description is set and not empty.
+	 * 2. If the rich text description is not set or empty, use the WooCommerce RTD if available.
+	 *
+	 * @return string The rich text description for the product.
+	 */
+	public function get_rich_text_description() {
+		$rich_text_description = '';
+
+		// Check if the fb description is set as that takes preference
+		if ( $this->rich_text_description ) {
+			$rich_text_description = $this->rich_text_description;
+		} elseif ( $this->fb_description ) {
+			$rich_text_description = $this->fb_description;
+		}
+
+		// Try to get rich text description from post meta if description has been set
+		if ( empty( $rich_text_description ) ) {
+			$rich_text_description = get_post_meta(
+				$this->id,
+				self::FB_RICH_TEXT_DESCRIPTION,
+				true
+			);
+
+		}
+
+		// For variable products, we want to use the rich text description of the variant.
+		// If that's not available, fall back to the main (parent) product's rich text description.
+		if ( empty( $rich_text_description ) && WC_Facebookcommerce_Utils::is_variation_type( $this->woo_product->get_type() ) ) {
+			$rich_text_description = WC_Facebookcommerce_Utils::clean_string( $this->woo_product->get_description(), false );
+
+			// If the variant's rich text description is still empty, use the main product's rich text description as a fallback
+			if ( empty( $rich_text_description ) && $this->main_description ) {
+				$rich_text_description = $this->main_description;
+			}
+		}
+
+		// If no description is found from meta or variation, get from product
+		if ( empty( $rich_text_description ) ) {
+			$post         = $this->get_post_data();
+			$post_content = WC_Facebookcommerce_Utils::clean_string( $post->post_content, false );
+			$post_excerpt = WC_Facebookcommerce_Utils::clean_string( $post->post_excerpt, false );
+
+			if ( ! empty( $post_content ) ) {
+				$rich_text_description = $post_content;
+			}
+
+			if ( $this->sync_short_description || ( empty( $rich_text_description ) && ! empty( $post_excerpt ) ) ) {
+				$rich_text_description = $post_excerpt;
+			}
+		}
+
+		return apply_filters( 'facebook_for_woocommerce_fb_rich_text_description', $rich_text_description, $this->id );
+	}
+
+	/**
 	 * @param array $product_data
-	 * @param bool $for_items_batch
+	 * @param bool  $for_items_batch
 	 *
 	 * @return array
 	 */
@@ -545,7 +646,7 @@ class WC_Facebook_Product {
 		// check if sale is expired and sale time range is valid
 		if ( $for_items_batch ) {
 			$product_data['sale_price_effective_date'] = $sale_price_effective_date;
-			$product_data['sale_price']                = is_numeric( $sale_price ) ? self::format_price_for_fb_items_batch( $sale_price ) : "";
+			$product_data['sale_price']                = is_numeric( $sale_price ) ? self::format_price_for_fb_items_batch( $sale_price ) : '';
 		} else {
 			$product_data['sale_price_start_date'] = $sale_start;
 			$product_data['sale_price_end_date']   = $sale_end;
@@ -582,12 +683,12 @@ class WC_Facebook_Product {
 				'price' => $price,
 			);
 			return get_option( 'woocommerce_tax_display_shop' ) === 'incl'
-				  ? wc_get_price_including_tax( $woo_product, $args )
-				  : wc_get_price_excluding_tax( $woo_product, $args );
+					? wc_get_price_including_tax( $woo_product, $args )
+					: wc_get_price_excluding_tax( $woo_product, $args );
 		} else {
 			return get_option( 'woocommerce_tax_display_shop' ) === 'incl'
-				  ? $woo_product->get_price_including_tax( 1, $price )
-				  : $woo_product->get_price_excluding_tax( 1, $price );
+					? $woo_product->get_price_including_tax( 1, $price )
+					: $woo_product->get_price_excluding_tax( 1, $price );
 		}
 	}
 
@@ -724,68 +825,64 @@ class WC_Facebook_Product {
 		$categories =
 		WC_Facebookcommerce_Utils::get_product_categories( $id );
 
-		$custom_fields = $this->get_facebook_specific_fields();
-
 		if ( self::PRODUCT_PREP_TYPE_ITEMS_BATCH === $type_to_prepare_for ) {
-			$product_data = array(
-				'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
-				'description'           => $this->get_fb_description(),
-				'image_link'            => $image_urls[0],
-				'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
-				'link'                  => $product_url,
-				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
-				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-				'retailer_id'           => $retailer_id,
-				'price'                 => $this->get_fb_price( true ),
-				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
-				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
-				'custom_fields'			=> $custom_fields
+			$product_data   = array(
+					'title'                 => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
+					'description'           => $this->get_fb_description(),
+					'rich_text_description' => $this->get_rich_text_description(),
+					'image_link'            => $image_urls[0],
+					'additional_image_link' => $this->get_additional_image_urls( $image_urls ),
+					'link'                  => $product_url,
+					'product_type'          => $categories['categories'],
+					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+					'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
+					'retailer_id'           => $retailer_id,
+					'price'                 => $this->get_fb_price( true ),
+					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
+					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 			);
 			$product_data   = $this->add_sale_price( $product_data, true );
-			$gpc_field_name = 'google_product_category';
 			if ( ! empty( $video_urls ) ) {
 				$product_data['video'] = $video_urls;
 			}
 		} else {
 			$product_data = array(
-				'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
-				'description'           => $this->get_fb_description(),
-				'image_url'             => $image_urls[0],
-				'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
-				'url'                   => $product_url,
-				/**
-				 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
-				 * This field should have the Google product category for the item. Google product category is not a required field
-				 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
-				 * it when a Google product category is set.
-				 *
-				 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
-				 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
-				 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
-				 */
-				'category'              => $categories['categories'],
-				'product_type'          => $categories['categories'],
-				'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
+					'name'                  => WC_Facebookcommerce_Utils::clean_string( $this->get_title() ),
+					'description'           => $this->get_fb_description(),
+					'image_url'             => $image_urls[0],
+					'additional_image_urls' => $this->get_additional_image_urls( $image_urls ),
+					'url'                   => $product_url,
+					'rich_text_description' => $this->get_rich_text_description(),
+					/**
+					 * 'category' is a required field for creating a ProductItem object when posting to /{product_catalog_id}/products.
+					 * This field should have the Google product category for the item. Google product category is not a required field
+					 * in the WooCommerce product editor. Hence, we are setting 'category' to Woo product categories by default and overriding
+					 * it when a Google product category is set.
+					 *
+					 * @see https://developers.facebook.com/docs/marketing-api/reference/product-catalog/products/#parameters-2
+					 * @see https://github.com/woocommerce/facebook-for-woocommerce/pull/2575
+					 * @see https://github.com/woocommerce/facebook-for-woocommerce/issues/2593
+					 */
+					'category'              => $categories['categories'],
+					'product_type'          => $categories['categories'],
+					'brand'                 => Helper::str_truncate( $this->get_fb_brand(), 100 ),
 				'mpn'                 	=> Helper::str_truncate( $this->get_fb_mpn(), 100 ),
-				'retailer_id'           => $retailer_id,
-				'price'                 => $this->get_fb_price(),
-				'currency'              => get_woocommerce_currency(),
-				'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
-				'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
-				'custom_fields'			=> $custom_fields
+					'retailer_id'           => $retailer_id,
+					'price'                 => $this->get_fb_price(),
+					'currency'              => get_woocommerce_currency(),
+					'availability'          => $this->is_in_stock() ? 'in stock' : 'out of stock',
+					'visibility'            => Products::is_product_visible( $this->woo_product ) ? \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_VISIBLE : \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN,
 			);
 
 			if ( self::PRODUCT_PREP_TYPE_NORMAL !== $type_to_prepare_for && ! empty( $video_urls ) ) {
 				$product_data['video'] = $video_urls;
 			}
 			$product_data   = $this->add_sale_price( $product_data );
-			$gpc_field_name = 'category';
 		}//end if
 
 		$google_product_category = Products::get_google_product_category_id( $this->woo_product );
 		if ( $google_product_category ) {
-			$product_data[ $gpc_field_name ] = $google_product_category;
+			$product_data[ 'google_product_category' ] = $google_product_category;
 		}
 
 		// Currently only items batch and feed support enhanced catalog fields
@@ -827,25 +924,25 @@ class WC_Facebook_Product {
 			// No Visibility Option for Variations
 			// get_virtual() returns true for "unassembled bundles", so we exclude
 			// bundles from this check.
-			if ( true === $this->get_virtual() && 'bundle' !== $this->get_type() ) {
-				$product_data['visibility'] = \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN;
-			}
+		if ( true === $this->get_virtual() && 'bundle' !== $this->get_type() ) {
+			$product_data['visibility'] = \WC_Facebookcommerce_Integration::FB_SHOP_PRODUCT_HIDDEN;
+		}
 
 		if ( self::PRODUCT_PREP_TYPE_FEED !== $type_to_prepare_for ) {
 			$this->prepare_variants_for_item( $product_data );
 		} elseif (
-		WC_Facebookcommerce_Utils::is_all_caps( $product_data['description'] )
+			WC_Facebookcommerce_Utils::is_all_caps( $product_data['description'] )
 		) {
 			$product_data['description'] =
 			mb_strtolower( $product_data['description'] );
 		}
 
 		/**
-		   * Filters the generated product data.
-		   *
-		   * @param int   $id           Woocommerce product id
-		   * @param array $product_data An array of product data
-		   */
+			* Filters the generated product data.
+			*
+			* @param int   $id           Woocommerce product id
+			* @param array $product_data An array of product data
+			*/
 		return apply_filters(
 			'facebook_for_woocommerce_integration_prepare_product',
 			$product_data,
@@ -863,7 +960,7 @@ class WC_Facebook_Product {
 	 * @return array
 	 */
 	private function apply_enhanced_catalog_fields_from_attributes( $product_data, $google_category_id ) {
-		$category_handler   = facebook_for_woocommerce()->get_facebook_category_handler();
+		$category_handler = facebook_for_woocommerce()->get_facebook_category_handler();
 		if ( empty( $google_category_id ) || ! $category_handler->is_category( $google_category_id ) ) {
 			return $product_data;
 		}
@@ -903,7 +1000,7 @@ class WC_Facebook_Product {
 	public function get_matched_attributes_for_product( $product, $all_attributes ) {
 		$matched_attributes = array();
 		$sanitized_keys     = array_map(
-			function( $key ) {
+			function ( $key ) {
 					return \WC_Facebookcommerce_Utils::sanitize_variant_name( $key, false );
 			},
 			array_keys( $product->get_attributes() )
@@ -1137,19 +1234,6 @@ class WC_Facebook_Product {
 		}//end try
 
 		return $final_variants;
-	}
-
-	/**
-	 * Returns information about which fields are using Facebook-specific values.
-	 *
-	 * @return array
-	 */
-	private function get_facebook_specific_fields(): array {
-		return array(
-			'has_fb_description' => (bool) get_post_meta($this->id, self::FB_PRODUCT_DESCRIPTION, true),
-			'has_fb_price'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_PRICE, true),
-			'has_fb_image'       => (bool) get_post_meta($this->id, self::FB_PRODUCT_IMAGE, true)
-		);
 	}
 
 }
