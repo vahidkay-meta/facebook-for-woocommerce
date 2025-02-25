@@ -25,14 +25,14 @@ class Connection extends Abstract_Settings_Screen {
 	const ID = 'connection';
 
 	/**
-	 * Determines if the iframe connection should be used.
+	 * Determines if we should use enhanced onboarding.
 	 *
 	 * @since 2.0.0
 	 *
 	 * @return bool
 	 */
-	protected function use_iframe_connection() {
-		return true;
+	protected function use_enhanced_onboarding() {
+		return facebook_for_woocommerce()->get_integration()->use_enhanced_onboarding();
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Connection extends Abstract_Settings_Screen {
 		// Check if we have a merchant access token
 		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
 
-		if ( ! empty( $merchant_access_token ) && $this->use_iframe_connection() ) {
+		if ( ! empty( $merchant_access_token ) && $this->use_enhanced_onboarding() ) {
 			// Render the management iframe
 			$connection = facebook_for_woocommerce()->get_connection_handler();
 			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
@@ -157,7 +157,7 @@ class Connection extends Abstract_Settings_Screen {
 		 * TODO: add pixel & ad account API retrieval when we gain the ads_management permission
 		 * TODO: add the page name and link when we gain the manage_pages permission
 		 */
-		$static_items = $this->use_iframe_connection() ? array() : array(
+		$static_items = $this->use_enhanced_onboarding() ? array() : array(
 			'page'                          => array(
 				'label' => __( 'Page', 'facebook-for-woocommerce' ),
 				'value' => facebook_for_woocommerce()->get_integration()->get_facebook_page_id(),
@@ -286,7 +286,7 @@ class Connection extends Abstract_Settings_Screen {
 	 * @param bool $is_connected whether the plugin is connected
 	 */
 	private function render_facebook_box( $is_connected ) {
-		if ( $this->use_iframe_connection() ) {
+		if ( $this->use_enhanced_onboarding() ) {
 			$this->render_facebook_box_iframe( $is_connected );
 		} else {
 			$this->render_facebook_box_legacy( $is_connected );
