@@ -870,7 +870,7 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 			$woo_product->set_description( sanitize_text_field( wp_unslash( $_POST[ self::FB_PRODUCT_DESCRIPTION ] ) ) );
 			$woo_product->set_rich_text_description( $_POST[ self::FB_PRODUCT_DESCRIPTION ] );
 		}
-		
+
 		if ( isset( $_POST[ WC_Facebook_Product::FB_PRODUCT_PRICE ] ) ) {
 			$woo_product->set_price( sanitize_text_field( wp_unslash( $_POST[ WC_Facebook_Product::FB_PRODUCT_PRICE ] ) ) );
 		}
@@ -1235,7 +1235,7 @@ class WC_Facebookcommerce_Integration extends WC_Integration {
 	 * @param string|null         $fb_product_group_id
 	 * @return string
 	 */
-	public function create_product_simple( WC_Facebook_Product $woo_product, string $fb_product_group_id = null ): string {
+	public function create_product_simple( WC_Facebook_Product $woo_product, ?string $fb_product_group_id = null ): string {
 		$retailer_id = WC_Facebookcommerce_Utils::get_fb_retailer_id( $woo_product );
 
 		if ( ! $fb_product_group_id ) {
