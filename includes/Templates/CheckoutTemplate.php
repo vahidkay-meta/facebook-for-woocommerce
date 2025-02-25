@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile
 /**
  * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
  *
@@ -13,17 +12,17 @@
 
 namespace WooCommerce\Facebook\Templates;
 
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 get_header(); ?>
 
 <div id="primary" class="content-area">
-    <main id="main" class="site-main" role="main">
-        <?php
-        // Display the WooCommerce cart
-        echo do_shortcode('[woocommerce_checkout]');
-        ?>
-    </main><!-- .site-main -->
+	<main id="main" class="site-main" role="main">
+		<?php
+		// Display the WooCommerce cart
+		echo do_shortcode( '[woocommerce_checkout]' );
+		?>
+	</main><!-- .site-main -->
 </div><!-- .content-area -->
 
 <?php get_footer(); ?>
