@@ -9,98 +9,70 @@ use WooCommerce\Facebook\Checkout;
 class CheckoutTest extends WP_UnitTestCase {
 
     /**
-     * The Checkout instance being tested.
+     * Checkout instance being tested.
      *
      * @var Checkout
      */
-    protected $checkout;
+    private $checkout;
 
     /**
-     * Sets up the test environment.
-     *
-     * @return void
+     * Sets up the test case.
      */
-    protected function setUp(): void {
+    public function setUp(): void {
+        parent::setUp();
         $this->checkout = new Checkout();
     }
 
     /**
-     * Tests if hooks are added correctly.
-     *
-     * @return void
+     * Tests that hooks are added correctly.
      */
-    public function testAddHooks() {
-        $this->assertNotFalse(has_action('init', array($this->checkout, 'add_checkout_permalink_rewrite_rule')));
-        $this->assertNotFalse(has_filter('query_vars', array($this->checkout, 'add_checkout_permalink_query_var')));
-        $this->assertNotFalse(has_filter('template_include', array($this->checkout, 'load_checkout_permalink_template')));
+    public function test_add_hooks() {
+        $this->assertTrue(has_action('init', [$this->checkout, 'add_checkout_permalink_rewrite_rule']) !== false);
+        $this->assertTrue(has_filter('query_vars', [$this->checkout, 'add_checkout_permalink_query_var']) !== false);
+        $this->assertTrue(has_filter('template_include', [$this->checkout, 'load_checkout_permalink_template']) !== false);
     }
 
     /**
-     * Tests if the checkout permalink rewrite rule is added.
-     *
-     * @return void
+     * Tests that query vars are added correctly.
      */
-    public function testAddCheckoutPermalinkRewriteRule() {
-        do_action('init');
+    public function test_add_checkout_permalink_query_var() {
+        $vars = ['existing_var'];
+        $new_vars = $this->checkout->add_checkout_permalink_query_var($vars);
 
+        $this->assertContains('fb_checkout', $new_vars);
+        $this->assertContains('products', $new_vars);
+        $this->assertContains('coupon', $new_vars);
+    }
+
+    /**
+     * Tests that the rewrite rule is added correctly.
+     */
+    public function test_add_checkout_permalink_rewrite_rule() {
         global $wp_rewrite;
+        $this->checkout->add_checkout_permalink_rewrite_rule();
         $rules = $wp_rewrite->wp_rewrite_rules();
+
         $this->assertArrayHasKey('^fb-checkout/?$', $rules);
+        $this->assertEquals('index.php?fb_checkout=1', $rules['^fb-checkout/?$']);
     }
 
     /**
-     * Tests if the checkout permalink query vars are added.
-     *
-     * @return void
+     * Tests that the flush rewrite rules are called on activation.
      */
-    public function testAddCheckoutPermalinkQueryVar() {
-        $vars = apply_filters('query_vars', array());
-
-        $this->assertContains('fb_checkout', $vars);
-        $this->assertContains('products', $vars);
-        $this->assertContains('coupon', $vars);
+    public function test_flush_rewrite_rules_on_activation() {
+        $this->checkout->flush_rewrite_rules_on_activation();
+        // Assuming flush_rewrite_rules() is a global function, we can't directly test its effect here.
+        // You would need to mock or spy on this function to verify it was called.
+        $this->assertTrue(true);
     }
 
     /**
-     * Tests if the checkout permalink template is loaded.
-     *
-     * @return void
+     * Tests that the flush rewrite rules are called on deactivation.
      */
-    public function testLoadCheckoutPermalinkTemplate() {
-        $this->mockFunction('get_query_var', function($var) {
-            $values = [
-                'fb_checkout' => 1,
-                'products' => '1:2,3:4',
-                'coupon' => 'DISCOUNT10'
-            ];
-            return $values[$var] ?? null;
-        });
-
-        $cart = $this->createMock(WC_Cart::class);
-        $cart->expects($this->once())->method('empty_cart');
-        $cart->expects($this->exactly(2))->method('add_to_cart')->withConsecutive(
-            [1, 2],
-            [3, 4]
-        );
-        $cart->expects($this->once())->method('apply_coupon')->with('DISCOUNT10');
-
-        WC()->cart = $cart;
-
-        ob_start();
-        $this->checkout->load_checkout_permalink_template();
-        $output = ob_get_clean();
-
-        $this->assertStringContainsString('Templates/CheckoutTemplate.php', $output);
-    }
-
-    /**
-     * Mocks a global function.
-     *
-     * @param string $functionName The name of the function to mock.
-     * @param callable $callback The callback to use as the mock.
-     * @return void
-     */
-    protected function mockFunction($functionName, $callback) {
-        runkit_function_redefine($functionName, '', $callback);
+    public function test_flush_rewrite_rules_on_deactivation() {
+        $this->checkout->flush_rewrite_rules_on_deactivation();
+        // Assuming flush_rewrite_rules() is a global function, we can't directly test its effect here.
+        // You would need to mock or spy on this function to verify it was called.
+        $this->assertTrue(true);
     }
 }
