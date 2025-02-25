@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile
 /**
  * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
  *
@@ -152,7 +151,7 @@ class Background_Remove_Duplicate_Visibility_Meta extends BackgroundJobHandler {
 				continue;
 			}
 
-			$products_updated++;
+			++$products_updated;
 		}
 
 		return $products_updated;
@@ -191,6 +190,7 @@ class Background_Remove_Duplicate_Visibility_Meta extends BackgroundJobHandler {
 	protected function process_item( $item, $job ) {
 		// void
 	}
+}
 
 
 }
