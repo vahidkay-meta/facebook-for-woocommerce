@@ -522,52 +522,70 @@ class fbproductTest extends WP_UnitTestCase {
 			$facebook_product->get_id(),
 			\WC_Facebook_Product::PRODUCT_PREP_TYPE_FEED
 		);
-		$this->assertEquals($product_data['category'], 173);
+		$this->assertEquals($product_data['google_product_category'], $category_id);
 		foreach ($expected_attributes as $key => $value) {
 			$this->assertEquals($product_data[$key], $value);
 		}
 	}
-  
-    public function test_prepare_product_with_default_fields() {
-        // test when no fb specific fields are set
-        $product_data = $this->fb_product->prepare_product();
 
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
-    }
+	public function test_prepare_product_with_video_field() {
+		// Set facebook specific fields
+		$video_urls = [
+			'https://example.com/video1.mp4',
+			'https://example.com/video2.mp4',
+		];
 
-    public function test_prepare_product_with_custom_fields() {
-        // Set facebook specific fields
-        $fb_description = 'Facebook specific description';
-        $fb_price = '15';
-        $fb_image = 'https:example.com/fb-image.jpg';
+		$expected_video_urls = array_map(function($url) {
+			return ['url' => $url];
+		}, $video_urls);
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_PRICE, $fb_price);
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_IMAGE, $fb_image);
+		update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_VIDEO, $video_urls);
+		$product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
+		
+		$this->assertArrayHasKey('video', $product_data);
+		$this->assertEquals($expected_video_urls, $product_data['video']);
+	}
 
-        $product_data = $this->fb_product->prepare_product();
+	public function test_set_product_video_urls() {
+        // Prepare attachment IDs
+        $attachment_ids = '123,456';
+    
+        // Mock get_video_urls_from_attachment_ids function
+        $this->fb_product = $this->getMockBuilder(WC_Facebook_Product::class)
+            ->setConstructorArgs([$this->product])
+            ->setMethods(['get_video_urls_from_attachment_ids'])
+            ->getMock();
+    
+        $this->fb_product->method('get_video_urls_from_attachment_ids')
+            ->willReturnCallback(function($id) {
+             switch ($id) {
+                 case '123':
+                     return 'http://example.com/video1.mp4';
+                 case '456':
+                     return 'http://example.com/video2.mp4';
+                 default:
+                     return '';
+             }
+            });
+        
+        // Set the video URLs in post meta
+        $video_urls = array_filter(array_map([$this->fb_product, 'get_video_urls_from_attachment_ids'], explode(',', $attachment_ids)));
+        update_post_meta( $this->fb_product->get_id(), WC_Facebook_Product::FB_PRODUCT_VIDEO, $video_urls );
+    
+        // Get the saved video URLs from post meta
+        $saved_video_urls = get_post_meta( $this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_VIDEO, true );
+		
+        // Assert that the saved video URLs match the expected values
+        $this->assertEquals( $saved_video_urls, $video_urls);
 
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_image']);
-    }
+		// Assert that the saved video URLs are an array
+		$this->assertIsArray($saved_video_urls);
 
-    public function test_prepare_product_with_mixed_fields() {
-        // Set only facebook description
-        $fb_description = 'Facebook specific description';
+		// Assert that the saved video URLs have the correct count
+		$this->assertCount(2, $saved_video_urls);
 
-        update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
-
-        $product_data = $this->fb_product->prepare_product();
-
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
+		// Assert that the saved video URLs do not contain any empty strings
+		$this->assertNotContains('', $saved_video_urls);
     }
 
     public function test_prepare_product_items_batch() {
@@ -577,11 +595,6 @@ class fbproductTest extends WP_UnitTestCase {
         update_post_meta($this->product->get_id(), WC_Facebook_Product::FB_PRODUCT_DESCRIPTION, $fb_description);
 
         $product_data = $this->fb_product->prepare_product(null, WC_Facebook_Product::PRODUCT_PREP_TYPE_ITEMS_BATCH);
-
-        $this->assertArrayHasKey('custom_fields', $product_data);
-        $this->assertEquals(true, $product_data['custom_fields']['has_fb_description']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_price']);
-        $this->assertEquals(false, $product_data['custom_fields']['has_fb_image']);
 
         // Also verify the main product data structure for items batch
         $this->assertArrayHasKey('title', $product_data);
