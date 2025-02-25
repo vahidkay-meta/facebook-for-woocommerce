@@ -31,7 +31,14 @@ class Advertise extends Abstract_Settings_Screen {
 	 * @since 2.2.0
 	 */
 	public function __construct() {
-		$this->id    = self::ID;
+		add_action( 'init', array( $this, 'initHook' ) );
+	}
+
+	/**
+	 * Initializes this settings page's properties.
+	 */
+	public function initHook(): void {
+		$this->id                = self::ID;
 		$this->label             = __( 'Advertise', 'facebook-for-woocommerce' );
 		$this->title             = __( 'Advertise', 'facebook-for-woocommerce' );
 		$this->documentation_url = 'https://woocommerce.com/document/facebook-for-woocommerce/#how-to-create-ads-on-facebook';
