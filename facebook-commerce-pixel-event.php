@@ -132,7 +132,7 @@ class WC_Facebookcommerce_Pixel {
 		 *
 		 * @return string HTML scripts
 		 */
-		public function pixel_base_code() { #comment test git
+		public function pixel_base_code() {
 
 			$pixel_id = self::get_pixel_id();
 
