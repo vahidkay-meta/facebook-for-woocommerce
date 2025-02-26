@@ -397,7 +397,11 @@ class Connection extends Abstract_Settings_Screen {
 						merchant_access_token: message.access_token,
 						page_access_token: '',
 						product_catalog_id: message.catalog_id,
-						pixel_id: message.pixel_id
+						pixel_id: message.pixel_id,
+						page_id: message.page_id,
+						commerce_partner_integration_id: message.commerce_partner_integration_id,
+						profiles: message.profiles,
+						installed_features: message.installed_features
 					};
 
 					fetch('/wp-json/wc-facebook/v1/update_tokens', {

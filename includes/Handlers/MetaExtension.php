@@ -140,10 +140,9 @@ class MetaExtension {
 	/**
 	 * Permission callback for the REST API endpoint.
 	 *
-	 * @param WP_REST_Request $request The request object.
 	 * @return bool
 	 */
-	public static function rest_update_fb_tokens_permission_callback( $request ) {
+	public static function rest_update_fb_tokens_permission_callback() {
 		return current_user_can( 'manage_woocommerce' );
 	}
 
@@ -151,12 +150,15 @@ class MetaExtension {
 	 * REST API endpoint callback to update Facebook settings.
 	 *
 	 * Expects POST parameters:
-	 *  - nonce: security nonce.
-	 *  - access_token: system user access token.
-	 *  - merchant_access_token: merchant access token.
+	 *  - merchant_access_token: merchant access token (required).
+	 *  - access_token: system user access token (required).
 	 *  - page_access_token: page access token.
-	 *  - product_catalog_id: product catalog ID (optional).
-	 *  - pixel_id: pixel ID (optional).
+	 *  - product_catalog_id: product catalog ID.
+	 *  - pixel_id: pixel ID.
+	 *  - page_id: page ID.
+	 *  - commerce_partner_integration_id: commerce partner integration ID.
+	 *  - profiles: profiles dat).
+	 *  - installed_features: installed features data.
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 * @return WP_REST_Response|WP_Error
@@ -165,35 +167,42 @@ class MetaExtension {
 		// Get JSON data from request body
 		$params = $request->get_json_params();
 
-		// Sanitize and retrieve data
-		$access_token          = isset( $params['access_token'] ) ? sanitize_text_field( $params['access_token'] ) : '';
-		$merchant_access_token = isset( $params['merchant_access_token'] ) ? sanitize_text_field( $params['merchant_access_token'] ) : '';
-		$page_access_token     = isset( $params['page_access_token'] ) ? sanitize_text_field( $params['page_access_token'] ) : '';
-		$product_catalog_id    = isset( $params['product_catalog_id'] ) ? sanitize_text_field( $params['product_catalog_id'] ) : '';
-		$pixel_id              = isset( $params['pixel_id'] ) ? sanitize_text_field( $params['pixel_id'] ) : '';
-
-		// Only validate merchant_access_token as required
-		if ( empty( $merchant_access_token ) ) {
-			return new WP_Error( 'missing_token', __( 'Missing merchant access token', 'facebook-for-woocommerce' ), array( 'status' => 400 ) );
+		// Required parameter check
+		if ( empty( $params['merchant_access_token'] ) ) {
+			return new WP_Error(
+				'missing_token',
+				__( 'Missing merchant access token', 'facebook-for-woocommerce' ),
+				array( 'status' => 400 )
+			);
 		}
 
-		// Update all available options
-		if ( ! empty( $access_token ) ) {
-			update_option( 'wc_facebook_access_token', $access_token );
-		}
+		// Define option mappings with sanitization
+		$options = array(
+			'access_token'                    => 'wc_facebook_access_token',
+			'merchant_access_token'           => 'wc_facebook_merchant_access_token',
+			'page_access_token'               => 'wc_facebook_page_access_token',
+			'product_catalog_id'              => 'wc_facebook_product_catalog_id',
+			'pixel_id'                        => 'wc_facebook_pixel_id',
+			'page_id'                         => 'wc_facebook_page_id',
+			'commerce_partner_integration_id' => 'wc_facebook_commerce_partner_integration_id',
+			'profiles'                        => 'wc_facebook_profiles',
+			'installed_features'              => 'wc_facebook_installed_features',
+		);
 
-		update_option( 'wc_facebook_merchant_access_token', $merchant_access_token );
+		// Process each option
+		foreach ( $options as $param_key => $option_name ) {
+			if ( isset( $params[ $param_key ] ) ) {
+				$value = $params[ $param_key ];
 
-		if ( ! empty( $page_access_token ) ) {
-			update_option( 'wc_facebook_page_access_token', $page_access_token );
-		}
-
-		if ( ! empty( $product_catalog_id ) ) {
-			update_option( 'wc_facebook_product_catalog_id', $product_catalog_id );
-		}
-
-		if ( ! empty( $pixel_id ) ) {
-			update_option( 'wc_facebook_pixel_id', $pixel_id );
+				// Apply sanitization to string values only
+				if ( in_array( $param_key, array( 'profiles', 'installed_features' ), true ) ) {
+					// These are arrays/objects, don't sanitize
+					update_option( $option_name, $value );
+				} else {
+					// Text fields get sanitized
+					update_option( $option_name, sanitize_text_field( $value ) );
+				}
+			}
 		}
 
 		return new WP_REST_Response(
@@ -230,7 +239,7 @@ class MetaExtension {
 		);
 
 		if ( 'POST' === $method ) {
-			$args['body'] = json_encode( $params );
+			$args['body'] = wp_json_encode( $params );
 		}
 
 		$response = wp_remote_request( $url, $args );
@@ -281,7 +290,7 @@ class MetaExtension {
 				return $uri;
 			}
 		} catch ( \Exception $e ) {
-			error_log( 'Facebook Commerce Extension URL Error: ' . $e->getMessage() );
+			facebook_for_woocommerce()->log( 'Facebook Commerce Extension URL Error: ' . $e->getMessage() );
 		}
 
 		return '';

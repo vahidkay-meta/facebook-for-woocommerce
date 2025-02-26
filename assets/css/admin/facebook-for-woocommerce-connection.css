@@ -1,3 +1,14 @@
+#wc-facebook-connection-box {
+	width: 50%;
+	min-width: 720px;
+	color: #050505;
+	background: #FFF url( '../../images/background.png' ) no-repeat;
+	background-position: right 30px center;
+	padding: 10px 15px 20px;
+	box-shadow: 0 0 3px rgba( 0, 0, 0, 0.2 );
+	margin-bottom: 20px;
+}
+
 #facebook-commerce-iframe {
 	width: 100%;
 	min-height: calc(100vh - 200px);
