@@ -382,7 +382,7 @@ class Connection extends Abstract_Settings_Screen {
 		// Check if we have a merchant access token
 		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
 
-		if ( ! empty( $merchant_access_token ) ) {
+		if ( ! $this->use_enhanced_onboarding() ) {
 			return;
 		}
 		?>
@@ -418,7 +418,7 @@ class Connection extends Abstract_Settings_Screen {
 				}
 
 				if (messageEvent === 'CommerceExtension::RESIZE') {
-					const iframe = document.getElementById('facebook-commerce-iframe');
+					const iframe = document.getElementById('facebook-commerce-iframe') || document.getElementById('facebook-commerce-management-iframe');
 					if (iframe && message.height) {
 						iframe.height = message.height;
 					}

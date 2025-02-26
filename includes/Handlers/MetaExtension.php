@@ -53,7 +53,7 @@ class MetaExtension {
 			'shop_domain'                           => wc_get_page_permalink( 'shop' ) ? wc_get_page_permalink( 'shop' ) : \home_url(),
 			'admin_url'                             => admin_url(),
 			'client_version'                        => $plugin->get_version(),
-			'commerce_partner_seller_platform_type' => 'SELF_SERVE',
+			'commerce_partner_seller_platform_type' => 'SELF_SERVE_PLATFORM',
 			'country_code'                          => WC()->countries->get_base_country(),
 		);
 		return add_query_arg(
