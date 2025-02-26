@@ -24,7 +24,7 @@ class ConnectionTest extends TestCase {
      */
     public function test_use_iframe_connection_enabled_by_default() {
         $reflection = new \ReflectionClass($this->connection);
-        $method = $reflection->getMethod('use_iframe_connection');
+        $method = $reflection->getMethod('use_enhanced_onboarding');
         $method->setAccessible(true);
 
         $this->assertTrue($method->invoke($this->connection));
@@ -36,10 +36,10 @@ class ConnectionTest extends TestCase {
     public function test_render_facebook_box_iframe() {
         // Create a mock for the Connection class that returns a predictable iframe URL
         $connection_mock = $this->getMockBuilder(Connection::class)
-            ->onlyMethods(['use_iframe_connection'])
+            ->onlyMethods(['use_enhanced_onboarding'])
             ->getMock();
         
-        $connection_mock->method('use_iframe_connection')
+        $connection_mock->method('use_enhanced_onboarding')
             ->willReturn(true);
         
         // Create a reflection to access the private method
@@ -104,7 +104,7 @@ class ConnectionTest extends TestCase {
         $this->assertStringContainsString('CommerceExtension::UNINSTALL', $output);
         
         // Assert fetch request setup
-        $this->assertStringContainsString('fetch(\'/wp-json/wc-facebook/v1/update_tokens\'', $output);
+        $this->assertStringContainsString('fetch(\'/wp-json/wc-facebook/v1/update_fb_settings\'', $output);
         $this->assertStringContainsString('method: \'POST\'', $output);
         $this->assertStringContainsString('credentials: \'same-origin\'', $output);
     }

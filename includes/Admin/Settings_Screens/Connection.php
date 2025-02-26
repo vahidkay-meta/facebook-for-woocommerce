@@ -118,7 +118,6 @@ class Connection extends Abstract_Settings_Screen {
 	 * @since 2.0.0
 	 */
 	public function render() {
-
 		// Check if we have a merchant access token
 		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
 
@@ -399,12 +398,15 @@ class Connection extends Abstract_Settings_Screen {
 						product_catalog_id: message.catalog_id,
 						pixel_id: message.pixel_id,
 						page_id: message.page_id,
-						commerce_partner_integration_id: message.commerce_partner_integration_id,
+						business_manager_id: message.business_manager_id,
+						commerce_merchant_settings_id: message.installed_features.find(f => f.feature_type === 'fb_shop')?.connected_assets?.commerce_merchant_settings_id || '',
+						ad_account_id: message.installed_features.find(f => f.feature_type === 'ads')?.connected_assets?.ad_account_id || '',
+						commerce_partner_integration_id: message.commerce_partner_integration_id || '',
 						profiles: message.profiles,
 						installed_features: message.installed_features
 					};
 
-					fetch('/wp-json/wc-facebook/v1/update_tokens', {
+					fetch('/wp-json/wc-facebook/v1/update_fb_settings', {
 						method: 'POST',
 						credentials: 'same-origin',
 						headers: {
@@ -417,7 +419,12 @@ class Connection extends Abstract_Settings_Screen {
 					.then(data => {
 						if (data.success) {
 							window.location.reload();
+						} else {
+							console.error('Error updating Facebook settings:', data);
 						}
+					})
+					.catch(error => {
+						console.error('Error during settings update:', error);
 					});
 				}
 
@@ -429,7 +436,24 @@ class Connection extends Abstract_Settings_Screen {
 				}
 
 				if (messageEvent === 'CommerceExtension::UNINSTALL') {
-					window.location.reload();
+					fetch('/wp-json/wc-facebook/v1/uninstall', {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-WP-Nonce': '<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>'
+						}
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							window.location.reload();
+						}
+					})
+					.catch(error => {
+						console.error('Error during uninstall:', error);
+						window.location.reload();
+					});
 				}
 			}, false);
 		</script>

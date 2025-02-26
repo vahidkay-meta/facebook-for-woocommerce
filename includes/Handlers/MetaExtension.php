@@ -30,15 +30,389 @@ class MetaExtension {
 	/** @var string Business name */
 	const BUSINESS_NAME = 'WooCommerce';
 
+	/** @var string API version */
+	const API_VERSION = 'v18.0';
+
+	/** @var string Commerce Hub base URL */
+	const COMMERCE_HUB_URL = 'https://www.commercepartnerhub.com/';
+
+	/** @var string Option names for Facebook settings */
+	const OPTION_ACCESS_TOKEN                    = 'wc_facebook_access_token';
+	const OPTION_MERCHANT_ACCESS_TOKEN           = 'wc_facebook_merchant_access_token';
+	const OPTION_PAGE_ACCESS_TOKEN               = 'wc_facebook_page_access_token';
+	const OPTION_SYSTEM_USER_ID                  = 'wc_facebook_system_user_id';
+	const OPTION_BUSINESS_MANAGER_ID             = 'wc_facebook_business_manager_id';
+	const OPTION_AD_ACCOUNT_ID                   = 'wc_facebook_ad_account_id';
+	const OPTION_INSTAGRAM_BUSINESS_ID           = 'wc_facebook_instagram_business_id';
+	const OPTION_COMMERCE_MERCHANT_SETTINGS_ID   = 'wc_facebook_commerce_merchant_settings_id';
+	const OPTION_EXTERNAL_BUSINESS_ID            = 'wc_facebook_external_business_id';
+	const OPTION_COMMERCE_PARTNER_INTEGRATION_ID = 'wc_facebook_commerce_partner_integration_id';
+	const OPTION_PRODUCT_CATALOG_ID              = 'wc_facebook_product_catalog_id';
+	const OPTION_PIXEL_ID                        = 'wc_facebook_pixel_id';
+	const OPTION_PROFILES                        = 'wc_facebook_profiles';
+	const OPTION_INSTALLED_FEATURES              = 'wc_facebook_installed_features';
+	const OPTION_HAS_CONNECTED_FBE_2             = 'wc_facebook_has_connected_fbe_2';
+	const OPTION_HAS_AUTHORIZED_PAGES            = 'wc_facebook_has_authorized_pages_read_engagement';
+
+	/** @var string Nonce action */
+	const NONCE_ACTION = 'wc_facebook_ajax_token_update';
+
 	/**
 	 * Constructor.
 	 *
 	 * @since 2.0.0
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_wc_facebook_update_tokens', array( __CLASS__, 'ajax_update_fb_settings' ) );
 		add_action( 'rest_api_init', array( __CLASS__, 'init_rest_endpoint' ) );
 	}
+
+	// ==========================
+	// = Settings Management    =
+	// ==========================
+
+	/**
+	 * Validates if the required tokens are present.
+	 *
+	 * @since 2.0.0
+	 * @param array $tokens Array of tokens to validate.
+	 * @return bool True if all required tokens are present.
+	 */
+	private static function validate_required_tokens( $tokens ) {
+		return ! empty( $tokens['access_token'] ) && ! empty( $tokens['merchant_access_token'] ) && ! empty( $tokens['page_access_token'] );
+	}
+
+	/**
+	 * Updates Facebook settings options.
+	 *
+	 * @since 2.0.0
+	 * @param array $settings Array of settings to update.
+	 * @return void
+	 */
+	private static function update_settings( $settings ) {
+		foreach ( $settings as $key => $value ) {
+			if ( ! empty( $key ) ) {
+				update_option( $key, $value );
+			}
+		}
+	}
+
+	/**
+	 * Sanitizes and retrieves a value from an array.
+	 *
+	 * @since 2.0.0
+	 * @param array  $data Array to retrieve value from.
+	 * @param string $key Key to retrieve.
+	 * @param bool   $sanitize Whether to sanitize the value.
+	 * @return mixed|string The value or empty string if not set.
+	 */
+	private static function get_param_value( $data, $key, $sanitize = true ) {
+		if ( ! isset( $data[ $key ] ) ) {
+			return '';
+		}
+
+		$value = $data[ $key ];
+
+		if ( $sanitize && is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Maps request parameters to option names.
+	 *
+	 * @since 2.0.0
+	 * @param array $params Request parameters.
+	 * @return array Mapped options with values.
+	 */
+	private static function map_params_to_options( $params ) {
+		$options = array();
+
+		// Define parameter to option mapping
+		$mapping = array(
+			'access_token'                    => self::OPTION_ACCESS_TOKEN,
+			'merchant_access_token'           => self::OPTION_MERCHANT_ACCESS_TOKEN,
+			'page_access_token'               => self::OPTION_PAGE_ACCESS_TOKEN,
+			'system_user_id'                  => self::OPTION_SYSTEM_USER_ID,
+			'business_manager_id'             => self::OPTION_BUSINESS_MANAGER_ID,
+			'ad_account_id'                   => self::OPTION_AD_ACCOUNT_ID,
+			'instagram_business_id'           => self::OPTION_INSTAGRAM_BUSINESS_ID,
+			'commerce_merchant_settings_id'   => self::OPTION_COMMERCE_MERCHANT_SETTINGS_ID,
+			'external_business_id'            => self::OPTION_EXTERNAL_BUSINESS_ID,
+			'commerce_partner_integration_id' => self::OPTION_COMMERCE_PARTNER_INTEGRATION_ID,
+			'product_catalog_id'              => self::OPTION_PRODUCT_CATALOG_ID,
+			'pixel_id'                        => self::OPTION_PIXEL_ID,
+			'profiles'                        => self::OPTION_PROFILES,
+			'installed_features'              => self::OPTION_INSTALLED_FEATURES,
+			// Integration settings with special handling
+			'page_id'                         => \WC_Facebookcommerce_Integration::SETTING_FACEBOOK_PAGE_ID,
+			'catalog_id'                      => \WC_Facebookcommerce_Integration::OPTION_PRODUCT_CATALOG_ID,
+		);
+
+		// Process each parameter
+		foreach ( $mapping as $param_key => $option_name ) {
+			if ( isset( $params[ $param_key ] ) ) {
+				// Skip if this is an alias and we've already processed the canonical field
+				if ( 'product_catalog_id' === $param_key && isset( $params['catalog_id'] ) ) {
+					continue;
+				}
+
+				// Determine if we should sanitize
+				$sanitize = ! in_array( $param_key, array( 'profiles', 'installed_features' ), true );
+
+				$options[ $option_name ] = self::get_param_value( $params, $param_key, $sanitize );
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Updates connection status flags based on tokens.
+	 *
+	 * @since 2.0.0
+	 * @param array $params Parameters containing tokens.
+	 * @return void
+	 */
+	private static function update_connection_status( $params ) {
+		if ( ! empty( $params['access_token'] ) ) {
+			update_option( self::OPTION_HAS_CONNECTED_FBE_2, 'yes' );
+		}
+
+		if ( ! empty( $params['page_access_token'] ) ) {
+			update_option( self::OPTION_HAS_AUTHORIZED_PAGES, 'yes' );
+		}
+	}
+
+	/**
+	 * Clears Facebook integration options.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	private static function clear_integration_options() {
+		$options = array(
+			// Connection handler options
+			self::OPTION_ACCESS_TOKEN,
+			self::OPTION_MERCHANT_ACCESS_TOKEN,
+			self::OPTION_PAGE_ACCESS_TOKEN,
+			self::OPTION_SYSTEM_USER_ID,
+			self::OPTION_BUSINESS_MANAGER_ID,
+			self::OPTION_AD_ACCOUNT_ID,
+			self::OPTION_INSTAGRAM_BUSINESS_ID,
+			self::OPTION_COMMERCE_MERCHANT_SETTINGS_ID,
+			self::OPTION_EXTERNAL_BUSINESS_ID,
+			self::OPTION_COMMERCE_PARTNER_INTEGRATION_ID,
+
+			// Additional data stored during connection
+			self::OPTION_PROFILES,
+			self::OPTION_INSTALLED_FEATURES,
+
+			// Connection status flags
+			self::OPTION_HAS_CONNECTED_FBE_2,
+			self::OPTION_HAS_AUTHORIZED_PAGES,
+		);
+
+		// Clear all options
+		foreach ( $options as $option_name ) {
+			if ( in_array( $option_name, array( self::OPTION_PROFILES, self::OPTION_INSTALLED_FEATURES ), true ) ) {
+				update_option( $option_name, null );
+			} elseif ( in_array( $option_name, array( self::OPTION_HAS_CONNECTED_FBE_2, self::OPTION_HAS_AUTHORIZED_PAGES ), true ) ) {
+				update_option( $option_name, 'no' );
+			} else {
+				update_option( $option_name, '' );
+			}
+		}
+
+		// Integration settings - use constants for consistency
+		update_option( \WC_Facebookcommerce_Integration::SETTING_FACEBOOK_PAGE_ID, '' );
+		update_option( \WC_Facebookcommerce_Integration::SETTING_FACEBOOK_PIXEL_ID, '' );
+	}
+
+	// ==========================
+	// = API Communication      =
+	// ==========================
+
+	/**
+	 * Makes an API call to Facebook's Graph API.
+	 *
+	 * @param string $method HTTP method (GET, POST, etc.)
+	 * @param string $endpoint API endpoint
+	 * @param array  $params Request parameters
+	 * @return array Response data
+	 * @throws \Exception If the request fails.
+	 */
+	private static function call_api( $method, $endpoint, $params ) {
+		$url = 'https://graph.facebook.com/' . self::API_VERSION . '/' . $endpoint;
+
+		if ( 'GET' === $method ) {
+			$url = add_query_arg( $params, $url );
+		}
+
+		$args = array(
+			'method'  => $method,
+			'timeout' => 30,
+			'headers' => array(
+				'Content-Type' => 'application/json',
+			),
+		);
+
+		if ( 'POST' === $method ) {
+			$args['body'] = wp_json_encode( $params );
+		}
+
+		$response = wp_remote_request( $url, $args );
+
+		if ( is_wp_error( $response ) ) {
+			throw new \Exception( $response->get_error_message() );
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = wp_remote_retrieve_body( $response );
+		$data        = json_decode( $body, true );
+
+		// Check for API errors
+		if ( $status_code >= 400 ) {
+			$error_message = isset( $data['error']['message'] ) ? $data['error']['message'] : __( 'Unknown API error', 'facebook-for-woocommerce' );
+			throw new \Exception( sprintf( 'Facebook API error (%d): %s', $status_code, $error_message ) );
+		}
+
+		return $data;
+	}
+
+	// ==========================
+	// = REST API Endpoints     =
+	// ==========================
+
+	/**
+	 * REST API endpoint initialization.
+	 *
+	 * @return void
+	 */
+	public static function init_rest_endpoint() {
+		register_rest_route(
+			'wc-facebook/v1',
+			'update_fb_settings',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( __CLASS__, 'rest_update_fb_settings' ),
+				'permission_callback' => array( __CLASS__, 'rest_update_fb_settings_permission_callback' ),
+			)
+		);
+
+		register_rest_route(
+			'wc-facebook/v1',
+			'uninstall',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( __CLASS__, 'rest_handle_uninstall' ),
+				'permission_callback' => array( __CLASS__, 'rest_update_fb_settings_permission_callback' ),
+			)
+		);
+	}
+
+	/**
+	 * Permission callback for the REST API endpoint.
+	 *
+	 * @return bool
+	 */
+	public static function rest_update_fb_settings_permission_callback() {
+		return current_user_can( 'manage_woocommerce' );
+	}
+
+	/**
+	 * REST API endpoint callback to update Facebook settings.
+	 *
+	 * Expects POST parameters:
+	 *  - merchant_access_token: merchant access token (required).
+	 *  - access_token: system user access token (required).
+	 *  - page_access_token: page access token.
+	 *  - product_catalog_id: product catalog ID.
+	 *  - pixel_id: pixel ID.
+	 *  - page_id: page ID.
+	 *  - commerce_partner_integration_id: commerce partner integration ID.
+	 *  - profiles: profiles data.
+	 *  - installed_features: installed features data.
+	 *
+	 * @param WP_REST_Request $request The request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function rest_update_fb_settings( WP_REST_Request $request ) {
+		// Get JSON data from request body
+		$params = $request->get_json_params();
+
+		// Required parameter check
+		if ( empty( $params['merchant_access_token'] ) ) {
+			return new WP_Error(
+				'missing_token',
+				__( 'Missing merchant access token', 'facebook-for-woocommerce' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Map parameters to options and update settings
+		$options = self::map_params_to_options( $params );
+		self::update_settings( $options );
+
+		// Update connection status flags
+		self::update_connection_status( $params );
+
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __( 'Facebook settings updated successfully', 'facebook-for-woocommerce' ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST API endpoint callback to handle uninstall requests.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function rest_handle_uninstall() {
+		try {
+			// Try to disconnect from Facebook API first
+			$external_business_id = get_option( self::OPTION_EXTERNAL_BUSINESS_ID, '' );
+			if ( ! empty( $external_business_id ) ) {
+				try {
+					facebook_for_woocommerce()->get_api()->delete_mbe_connection( (string) $external_business_id );
+				} catch ( \Exception $e ) {
+					facebook_for_woocommerce()->log( sprintf( 'Error during API uninstall: %s', $e->getMessage() ) );
+					// Continue with local disconnection even if API call fails
+				}
+			}
+
+			// Clear all integration options
+			self::clear_integration_options();
+
+			// Get the integration instance and update the product catalog ID
+			$integration = facebook_for_woocommerce()->get_integration();
+			if ( $integration ) {
+				$integration->update_product_catalog_id( '' );
+			}
+
+			return new WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Facebook integration successfully uninstalled', 'facebook-for-woocommerce' ),
+				),
+				200
+			);
+		} catch ( \Exception $e ) {
+			return new WP_Error(
+				'uninstall_error',
+				$e->getMessage(),
+				array( 'status' => 500 )
+			);
+		}
+	}
+
+	// ==========================
+	// = IFrame Management      =
+	// ==========================
 
 	/**
 	 * Generates the Commerce Hub iframe splash page URL.
@@ -69,187 +443,8 @@ class MetaExtension {
 				'installed'                => $is_connected,
 				'external_client_metadata' => rawurlencode( wp_json_encode( $external_client_metadata ) ),
 			),
-			'https://www.commercepartnerhub.com/commerce_extension/splash/'
+			self::COMMERCE_HUB_URL . 'commerce_extension/splash/'
 		);
-	}
-
-	/**
-	 * AJAX endpoint to update Facebook settings with authenticated tokens.
-	 *
-	 * Expects POST parameters:
-	 *  - nonce: security nonce.
-	 *  - access_token: system user access token.
-	 *  - merchant_access_token: merchant access token.
-	 *  - page_access_token: page access token.
-	 *  - product_catalog_id: product catalog ID (optional).
-	 *  - pixel_id: pixel ID (optional).
-	 *
-	 * @return void JSON response.
-	 */
-	public static function ajax_update_fb_settings() {
-		// Ensure the current user can manage WooCommerce settings.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'facebook-for-woocommerce' ) ) );
-		}
-
-		// Validate the nonce.
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'wc_facebook_ajax_token_update' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'facebook-for-woocommerce' ) ) );
-		}
-
-		// Sanitize and retrieve POST data.
-		$access_token          = isset( $_POST['access_token'] ) ? sanitize_text_field( wp_unslash( $_POST['access_token'] ) ) : '';
-		$merchant_access_token = isset( $_POST['merchant_access_token'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_access_token'] ) ) : '';
-		$page_access_token     = isset( $_POST['page_access_token'] ) ? sanitize_text_field( wp_unslash( $_POST['page_access_token'] ) ) : '';
-		$product_catalog_id    = isset( $_POST['product_catalog_id'] ) ? sanitize_text_field( wp_unslash( $_POST['product_catalog_id'] ) ) : '';
-		$pixel_id              = isset( $_POST['pixel_id'] ) ? sanitize_text_field( wp_unslash( $_POST['pixel_id'] ) ) : '';
-
-		// Validate required tokens.
-		if ( empty( $access_token ) || empty( $merchant_access_token ) || empty( $page_access_token ) ) {
-			wp_send_json_error( array( 'message' => __( 'Missing required token data', 'facebook-for-woocommerce' ) ) );
-		}
-
-		// Update Facebook settings via options.
-		update_option( 'wc_facebook_access_token', $access_token );
-		update_option( 'wc_facebook_merchant_access_token', $merchant_access_token );
-		update_option( 'wc_facebook_page_access_token', $page_access_token );
-		update_option( 'wc_facebook_product_catalog_id', $product_catalog_id );
-		update_option( 'wc_facebook_pixel_id', $pixel_id );
-
-		wp_send_json_success( array( 'message' => __( 'Facebook settings updated successfully', 'facebook-for-woocommerce' ) ) );
-	}
-
-	/**
-	 * REST API endpoint initialization.
-	 *
-	 * @return void
-	 */
-	public static function init_rest_endpoint() {
-		register_rest_route(
-			'wc-facebook/v1',
-			'update_tokens',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( __CLASS__, 'rest_update_fb_tokens' ),
-				'permission_callback' => array( __CLASS__, 'rest_update_fb_tokens_permission_callback' ),
-			)
-		);
-	}
-
-	/**
-	 * Permission callback for the REST API endpoint.
-	 *
-	 * @return bool
-	 */
-	public static function rest_update_fb_tokens_permission_callback() {
-		return current_user_can( 'manage_woocommerce' );
-	}
-
-	/**
-	 * REST API endpoint callback to update Facebook settings.
-	 *
-	 * Expects POST parameters:
-	 *  - merchant_access_token: merchant access token (required).
-	 *  - access_token: system user access token (required).
-	 *  - page_access_token: page access token.
-	 *  - product_catalog_id: product catalog ID.
-	 *  - pixel_id: pixel ID.
-	 *  - page_id: page ID.
-	 *  - commerce_partner_integration_id: commerce partner integration ID.
-	 *  - profiles: profiles dat).
-	 *  - installed_features: installed features data.
-	 *
-	 * @param WP_REST_Request $request The request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public static function rest_update_fb_tokens( WP_REST_Request $request ) {
-		// Get JSON data from request body
-		$params = $request->get_json_params();
-
-		// Required parameter check
-		if ( empty( $params['merchant_access_token'] ) ) {
-			return new WP_Error(
-				'missing_token',
-				__( 'Missing merchant access token', 'facebook-for-woocommerce' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		// Define option mappings with sanitization
-		$options = array(
-			'access_token'                    => 'wc_facebook_access_token',
-			'merchant_access_token'           => 'wc_facebook_merchant_access_token',
-			'page_access_token'               => 'wc_facebook_page_access_token',
-			'product_catalog_id'              => 'wc_facebook_product_catalog_id',
-			'pixel_id'                        => 'wc_facebook_pixel_id',
-			'page_id'                         => 'wc_facebook_page_id',
-			'commerce_partner_integration_id' => 'wc_facebook_commerce_partner_integration_id',
-			'profiles'                        => 'wc_facebook_profiles',
-			'installed_features'              => 'wc_facebook_installed_features',
-		);
-
-		// Process each option
-		foreach ( $options as $param_key => $option_name ) {
-			if ( isset( $params[ $param_key ] ) ) {
-				$value = $params[ $param_key ];
-
-				// Apply sanitization to string values only
-				if ( in_array( $param_key, array( 'profiles', 'installed_features' ), true ) ) {
-					// These are arrays/objects, don't sanitize
-					update_option( $option_name, $value );
-				} else {
-					// Text fields get sanitized
-					update_option( $option_name, sanitize_text_field( $value ) );
-				}
-			}
-		}
-
-		return new WP_REST_Response(
-			array(
-				'success' => true,
-				'message' => __( 'Facebook settings updated successfully', 'facebook-for-woocommerce' ),
-			),
-			200
-		);
-	}
-
-	/**
-	 * Makes an API call to Facebook's Graph API.
-	 *
-	 * @param string $method HTTP method (GET, POST, etc.)
-	 * @param string $endpoint API endpoint
-	 * @param array  $params Request parameters
-	 * @return array Response data
-	 * @throws \Exception If the request fails.
-	 */
-	private static function call_api( $method, $endpoint, $params ) {
-		$url = 'https://graph.facebook.com/v18.0/' . $endpoint;
-
-		if ( 'GET' === $method ) {
-			$url = add_query_arg( $params, $url );
-		}
-
-		$args = array(
-			'method'  => $method,
-			'timeout' => 30,
-			'headers' => array(
-				'Content-Type' => 'application/json',
-			),
-		);
-
-		if ( 'POST' === $method ) {
-			$args['body'] = wp_json_encode( $params );
-		}
-
-		$response = wp_remote_request( $url, $args );
-
-		if ( is_wp_error( $response ) ) {
-			throw new \Exception( $response->get_error_message() );
-		}
-
-		$body = wp_remote_retrieve_body( $response );
-		return json_decode( $body, true );
 	}
 
 	/**
@@ -261,7 +456,7 @@ class MetaExtension {
 	 */
 	public static function get_commerce_extension_iframe_url( $external_business_id, $access_token = null ) {
 		if ( empty( $access_token ) ) {
-			$access_token = get_option( 'wc_facebook_access_token', '' );
+			$access_token = get_option( self::OPTION_ACCESS_TOKEN, '' );
 		}
 
 		try {
@@ -284,7 +479,7 @@ class MetaExtension {
 				$base_url_override = apply_filters( 'wc_facebook_commerce_extension_base_url', $base_url_override );
 
 				if ( $base_url_override ) {
-					$uri = str_replace( 'https://www.commercepartnerhub.com/', $base_url_override, $uri );
+					$uri = str_replace( self::COMMERCE_HUB_URL, $base_url_override, $uri );
 				}
 
 				return $uri;
@@ -304,7 +499,7 @@ class MetaExtension {
 	 * @return string
 	 */
 	public static function generate_iframe_management_url( $plugin, $external_business_id ) {
-		$access_token = get_option( 'wc_facebook_access_token', '' );
+		$access_token = get_option( self::OPTION_ACCESS_TOKEN, '' );
 
 		if ( empty( $access_token ) ) {
 			return '';

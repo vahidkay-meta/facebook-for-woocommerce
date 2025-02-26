@@ -52,7 +52,7 @@ class MetaExtensionTest extends WP_UnitTestCase {
     /**
      * Test REST API token update with valid data
      */
-    public function test_rest_update_fb_tokens_valid_data() {
+    public function test_rest_update_fb_settings_valid_data() {
         // Create a mock for WP_REST_Request
         $request = $this->getMockBuilder(WP_REST_Request::class)
                         ->disableOriginalConstructor()
@@ -70,7 +70,7 @@ class MetaExtensionTest extends WP_UnitTestCase {
                     'pixel_id' => '789012'
                 ]);
 
-        $response = MetaExtension::rest_update_fb_tokens($request);
+        $response = MetaExtension::rest_update_fb_settings($request);
 
         $this->assertInstanceOf(WP_REST_Response::class, $response);
         $this->assertEquals(200, $response->get_status());
@@ -87,7 +87,7 @@ class MetaExtensionTest extends WP_UnitTestCase {
     /**
      * Test REST API token update with missing required merchant token
      */
-    public function test_rest_update_fb_tokens_missing_merchant_token() {
+    public function test_rest_update_fb_settings_missing_merchant_token() {
         // Create a mock for WP_REST_Request
         $request = $this->getMockBuilder(WP_REST_Request::class)
                         ->disableOriginalConstructor()
@@ -102,7 +102,7 @@ class MetaExtensionTest extends WP_UnitTestCase {
                     'page_access_token' => 'test_page_token'
                 ]);
 
-        $response = MetaExtension::rest_update_fb_tokens($request);
+        $response = MetaExtension::rest_update_fb_settings($request);
 
         $this->assertInstanceOf(WP_Error::class, $response);
         $this->assertEquals('missing_token', $response->get_error_code());
