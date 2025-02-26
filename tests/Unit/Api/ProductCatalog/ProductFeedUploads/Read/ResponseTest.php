@@ -13,16 +13,20 @@ class ProductFeedUploadReadResponseTest extends WP_UnitTestCase {
      */
     public function test_response() {
         $json = '{
-            "error_count": 0,
-            "warning_count": 2,
-            "num_detected_items": 100,
-            "num_persisted_items": 98,
-            "url": "http://example.com/feed.xml",
-            "end_time": "2023-10-01T12:00:00+0000"
+            "id": "product_feed_upload_id",
+            "data": {
+                "error_count": 0,
+                "warning_count": 2,
+                "num_detected_items": 100,
+                "num_persisted_items": 98,
+                "url": "http://example.com/feed.xml",
+                "end_time": "2023-10-01T12:00:00+0000"
+            }
         }';
 
         $response = new Response($json);
 
+        $this->assertEquals('product_feed_upload_id', $response->id);
         $this->assertEquals(0, $response->data['error_count']);
         $this->assertEquals(2, $response->data['warning_count']);
         $this->assertEquals(100, $response->data['num_detected_items']);
