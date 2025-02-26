@@ -12,7 +12,7 @@ class ProductFeedUploadRequestTest extends WP_UnitTestCase {
      * @return void
      */
     public function test_request() {
-        $product_feed_id = 'facebook-product-feed-id';
+        $product_feed_id = 'product_feed_upload_id';
         $data = [
             'name' => 'Test Product Feed',
             'schedule' => [
@@ -24,7 +24,7 @@ class ProductFeedUploadRequestTest extends WP_UnitTestCase {
         $request = new Request($product_feed_id, $data);
 
         $this->assertEquals('POST', $request->get_method());
-        $this->assertEquals('/facebook-product-feed-id/uploads', $request->get_path());
+        $this->assertEquals('/product_feed_upload_id/uploads', $request->get_path());
         $this->assertEquals($data, $request->get_data());
     }
 }

@@ -12,10 +12,16 @@ class ProductFeedUploadResponseTest extends WP_UnitTestCase {
      * @return void
      */
     public function test_response() {
-        $json = '{"id":"facebook-upload-id","data":{"upload_status":"success"}}';
+        $json = '{
+            "id": "product_feed_upload_id",
+            "data": {
+                "upload_status": "success"
+            }
+        }';
+
         $response = new Response($json);
 
-        $this->assertEquals('facebook-upload-id', $response->id);
+        $this->assertEquals('product_feed_upload_id', $response->id);
         $this->assertEquals('success', $response->data['upload_status']);
     }
 }
