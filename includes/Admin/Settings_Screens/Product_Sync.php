@@ -23,7 +23,6 @@ use WooCommerce\Facebook\Products\Sync;
  * The Product Sync settings screen object.
  */
 class Product_Sync extends Abstract_Settings_Screen {
-	// this comment is a test and will be reverted
 
 	/** @var string screen ID */
 	const ID = 'product_sync';
