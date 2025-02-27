@@ -1,5 +1,10 @@
 *** Facebook for WooCommerce Changelog ***
 
+= 3.4.1 - 2025-02-27 = 
+* Tweak - Removed custom field definitions by @devbodaghe in #2876
+* Dev - Improved readability of function prepare_product() in fbproduct.php by @mshymon in #2889
+* Dev - Enabled PHPUnit code coverage report generation by @carterbruce in #2893
+
 = 3.4.0 - 2025-02-19 =
 * Add - FB product video field to add videos. Also added products sync to support the video field with Batch API by @gurtejrehal in #2874
 * Tweak - tests for #2874 by @gurtejrehal in #2888
