@@ -149,7 +149,8 @@ class Locale {
 
 			foreach ( self::$supported_locales as $locale ) {
 
-				if ( $name = \Locale::getDisplayName( $locale, substr( $locale, 0, 2 ) ) ) {
+				$name = \Locale::getDisplayName( $locale, substr( $locale, 0, 2 ) );
+				if ( $name ) {
 
 					$locales[ $locale ] = ucfirst( $name );
 				}
