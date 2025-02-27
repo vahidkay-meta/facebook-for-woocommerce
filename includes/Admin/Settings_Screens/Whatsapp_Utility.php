@@ -57,12 +57,6 @@ class Whatsapp_Utility extends Abstract_Settings_Screen {
 		}
 
 		wp_enqueue_style( 'wc-facebook-admin-whatsapp-settings', facebook_for_woocommerce()->get_plugin_url() . '/assets/css/admin/facebook-for-woocommerce-whatsapp-utility.css', array(), \WC_Facebookcommerce::VERSION );
-		wp_enqueue_script(
-			'facebook-for-woocommerce-connect-whatsapp',
-			facebook_for_woocommerce()->get_asset_build_dir_url() . '/admin/whatsapp-connection.js',
-			array( 'jquery', 'jquery-blockui', 'jquery-tiptip', 'wc-enhanced-select' ),
-			\WC_Facebookcommerce::PLUGIN_VERSION
-		);
 	}
 
 
@@ -77,12 +71,7 @@ class Whatsapp_Utility extends Abstract_Settings_Screen {
 	<div class="onboarding-card">
 		<h2>Get started with WhatsApp utility messages</h2>
 		<p>Connect your WhatsApp Business Account to start sending utility messages.</p>
-		<a
-					id="woocommerce-whatsapp-connection"
-					class="connect-button"
-					href="#"
-					style="vertical-align: middle; margin-left: 20px;"
-				><?php esc_html_e( 'Connect Whatsapp Account', 'facebook-for-woocommerce' ); ?></a>
+		<button class="connect-button">Connect WhatsApp Account</button>
 	</div>
 		<?php
 
