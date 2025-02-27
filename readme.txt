@@ -3,7 +3,7 @@ Contributors: facebook, automattic, woothemes
 Tags: facebook, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.7
-Stable tag: 3.4.0
+Stable tag: 3.4.1
 Requires PHP: 7.4
 MySQL: 5.6 or greater
 License: GPLv2 or later
@@ -39,6 +39,11 @@ When opening a bug on GitHub, please give us as many details as possible.
 * Current version of Facebook-for-WooCommerce, WooCommerce, Wordpress, PHP
 
 == Changelog ==
+= 3.4.1 - 2025-02-27 = 
+* Tweak - Removed custom field definitions by @devbodaghe in #2876
+* Dev - Improved readability of function prepare_product() in fbproduct.php by @mshymon in #2889
+* Dev - Enabled PHPUnit code coverage report generation by @carterbruce in #2893
+
 = 3.4.0 - 2025-02-19 =
 * Add - FB product video field to add videos. Also added products sync to support the video field with Batch API by @gurtejrehal in #2874
 * Tweak - tests for #2874 by @gurtejrehal in #2888
@@ -74,9 +79,3 @@ When opening a bug on GitHub, please give us as many details as possible.
 * Fix - Sale price effective date by @vinkmeta in #2809
 * Fix - Sync stock quantity when available by @mshymon in #2811
 * Fix - Sync product GTIN when available by @mshymon in #2810
-
-= 3.3.0 - 2024-11-07 =
-* Add - Extension navigation tabs on Product Sets screens.
-* Tweak - Tooltips, config labels, documentation links.
-* Tweak - WC 9.4 compatibility.
-* Tweak - WP 6.7 compatibility.
