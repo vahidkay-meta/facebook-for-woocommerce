@@ -118,16 +118,9 @@ class Connection extends Abstract_Settings_Screen {
 	 * @since 2.0.0
 	 */
 	public function render() {
-		// Check if we have a merchant access token
-		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
-
-		if ( ! empty( $merchant_access_token ) && $this->use_enhanced_onboarding() ) {
-			// Render the management iframe
-			$connection = facebook_for_woocommerce()->get_connection_handler();
-			\WooCommerce\Facebook\Handlers\MetaExtension::render_management_iframe(
-				$connection->get_plugin(),
-				$connection->get_external_business_id()
-			);
+		// Check if we should render iframe
+		if ( $this->use_enhanced_onboarding() ) {
+			$this->render_facebook_iframe();
 			return;
 		}
 
@@ -276,44 +269,42 @@ class Connection extends Abstract_Settings_Screen {
 		parent::render();
 	}
 
-
 	/**
-	 * Renders the Facebook CTA box.
+	 * Renders the appropriate Facebook iframe based on connection status.
 	 *
 	 * @since 2.0.0
-	 *
-	 * @param bool $is_connected whether the plugin is connected
 	 */
-	private function render_facebook_box( $is_connected ) {
-		if ( $this->use_enhanced_onboarding() ) {
-			$this->render_facebook_box_iframe( $is_connected );
+	private function render_facebook_iframe() {
+		$connection            = facebook_for_woocommerce()->get_connection_handler();
+		$is_connected          = $connection->is_connected();
+		$merchant_access_token = get_option( 'wc_facebook_merchant_access_token', '' );
+
+		if ( ! empty( $merchant_access_token ) && $is_connected ) {
+			// Get management iframe URL for connected merchants
+			$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generate_iframe_management_url(
+				$connection->get_external_business_id()
+			);
 		} else {
-			$this->render_facebook_box_legacy( $is_connected );
+			// Get onboarding iframe URL for new connections
+			$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generate_iframe_splash_url(
+				$is_connected,
+				$connection->get_plugin(),
+				$connection->get_external_business_id()
+			);
 		}
-	}
 
-	/**
-	 * Renders the Facebook CTA box using iframe implementation.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param bool $is_connected whether the plugin is connected
-	 */
-	private function render_facebook_box_iframe( $is_connected ) {
-		$connection = facebook_for_woocommerce()->get_connection_handler();
-		$iframe_url = \WooCommerce\Facebook\Handlers\MetaExtension::generate_iframe_splash_url(
-			$is_connected,
-			$connection->get_plugin(),
-			$connection->get_external_business_id()
-		);
+		if ( empty( $iframe_url ) ) {
+			return;
+		}
+
 		?>
 		<iframe
 			src="<?php echo esc_url( $iframe_url ); ?>"
 			width="100%"
-			height="600"
+			height="800"
 			frameborder="0"
 			style="background: transparent;"
-			id="facebook-commerce-iframe"></iframe>
+			id=""></iframe>
 		<?php
 	}
 
@@ -324,7 +315,7 @@ class Connection extends Abstract_Settings_Screen {
 	 *
 	 * @param bool $is_connected whether the plugin is connected
 	 */
-	private function render_facebook_box_legacy( $is_connected ) {
+	private function render_facebook_box( $is_connected ) {
 		if ( $is_connected ) {
 			$title = __( 'Reach the Right People and Sell More Online', 'facebook-for-woocommerce' );
 		} else {
@@ -429,7 +420,7 @@ class Connection extends Abstract_Settings_Screen {
 				}
 
 				if (messageEvent === 'CommerceExtension::RESIZE') {
-					const iframe = document.getElementById('facebook-commerce-iframe') || document.getElementById('facebook-commerce-management-iframe');
+					const iframe = document.getElementById('facebook-commerce-iframe');
 					if (iframe && message.height) {
 						iframe.height = message.height;
 					}

@@ -109,19 +109,19 @@ class MetaExtensionTest extends WP_UnitTestCase {
     }
 
     /**
-     * Test get_commerce_extension_iframe_url with valid access token
+     * Test generate_iframe_management_url with valid access token
      */
     public function test_get_commerce_extension_iframe_url() {
         // Set up the access token
         update_option('wc_facebook_access_token', 'test_access_token');
         
         // Test with empty business ID (should return empty string)
-        $url = MetaExtension::get_commerce_extension_iframe_url('');
+        $url = MetaExtension::generate_iframe_management_url('');
         $this->assertEmpty($url);
         
         // Test with valid business ID but we can't mock the API call
         // so we're just testing the method exists
-        $this->assertTrue(method_exists(MetaExtension::class, 'get_commerce_extension_iframe_url'));
+        $this->assertTrue(method_exists(MetaExtension::class, 'generate_iframe_management_url'));
     }
 
     /**
@@ -132,10 +132,10 @@ class MetaExtensionTest extends WP_UnitTestCase {
         
         // Test with no access token
         update_option('wc_facebook_access_token', '');
-        $url = MetaExtension::generate_iframe_management_url($plugin, 'test_business_id');
+        $url = MetaExtension::generate_iframe_management_url('test_business_id');
         $this->assertEmpty($url);
         
-        // Since we can't easily mock the get_commerce_extension_iframe_url method,
+        // Since we can't easily mock the call_api method,
         // we'll just verify the method exists and is called
         $this->assertTrue(method_exists(MetaExtension::class, 'generate_iframe_management_url'));
     }
@@ -155,5 +155,24 @@ class MetaExtensionTest extends WP_UnitTestCase {
         
         // If we got here without errors, the test passes
         $this->assertTrue(true);
+    }
+
+    /**
+     * Test that generate_iframe_management_url works correctly
+     * This is a simplified test since we can't mock private static methods
+     */
+    public function test_get_commerce_extension_iframe_management_url() {
+        $external_business_id = 'test_business_id';
+        
+        // Set up the access token
+        update_option(MetaExtension::OPTION_ACCESS_TOKEN, 'test_token');
+        
+        // Since we can't mock the private static call_api method,
+        // we'll just test that the method exists and returns empty string
+        // when no API response is available
+        $result = MetaExtension::generate_iframe_management_url($external_business_id);
+        
+        // Without a real API response, the method should return empty string
+        $this->assertEmpty($result);
     }
 }

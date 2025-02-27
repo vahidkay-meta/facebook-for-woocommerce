@@ -448,15 +448,16 @@ class MetaExtension {
 	}
 
 	/**
-	 * Get a URL to use to render the CommerceExtension IFrame for an onboarded Store.
+	 * Generates the Commerce Hub iframe management page URL.
 	 *
-	 * @param string      $external_business_id External business ID
-	 * @param string|null $access_token Access token
+	 * @param string $external_business_id External business ID.
 	 * @return string
 	 */
-	public static function get_commerce_extension_iframe_url( $external_business_id, $access_token = null ) {
+	public static function generate_iframe_management_url( $external_business_id ) {
+		$access_token = get_option( self::OPTION_ACCESS_TOKEN, '' );
+
 		if ( empty( $access_token ) ) {
-			$access_token = get_option( self::OPTION_ACCESS_TOKEN, '' );
+			return '';
 		}
 
 		try {
@@ -469,68 +470,11 @@ class MetaExtension {
 			$response = self::call_api( 'GET', 'fbe_business', $request );
 
 			if ( ! empty( $response['commerce_extension']['uri'] ) ) {
-				$uri = $response['commerce_extension']['uri'];
-
-				// Allow for URL override through constant or filter
-				$base_url_override = defined( 'FACEBOOK_COMMERCE_EXTENSION_BASE_URL' )
-					? constant( 'FACEBOOK_COMMERCE_EXTENSION_BASE_URL' )
-					: null;
-
-				$base_url_override = apply_filters( 'wc_facebook_commerce_extension_base_url', $base_url_override );
-
-				if ( $base_url_override ) {
-					$uri = str_replace( self::COMMERCE_HUB_URL, $base_url_override, $uri );
-				}
-
-				return $uri;
+				return $response['commerce_extension']['uri'];
 			}
 		} catch ( \Exception $e ) {
 			facebook_for_woocommerce()->log( 'Facebook Commerce Extension URL Error: ' . $e->getMessage() );
 		}
-
 		return '';
-	}
-
-	/**
-	 * Generates the Commerce Hub iframe management page URL.
-	 *
-	 * @param object $plugin The plugin instance.
-	 * @param string $external_business_id External business ID.
-	 * @return string
-	 */
-	public static function generate_iframe_management_url( $plugin, $external_business_id ) {
-		$access_token = get_option( self::OPTION_ACCESS_TOKEN, '' );
-
-		if ( empty( $access_token ) ) {
-			return '';
-		}
-
-		return self::get_commerce_extension_iframe_url( $external_business_id, $access_token );
-	}
-
-	/**
-	 * Renders the management iframe.
-	 *
-	 * @param object $plugin               The plugin instance.
-	 * @param string $external_business_id External business ID.
-	 * @return void
-	 */
-	public static function render_management_iframe( $plugin, $external_business_id ) {
-		$iframe_url = self::generate_iframe_management_url( $plugin, $external_business_id );
-
-		if ( empty( $iframe_url ) ) {
-			return;
-		}
-
-		?>
-		<iframe
-			src="<?php echo esc_url( $iframe_url ); ?>"
-			width="100%"
-			height="800"
-			frameborder="0"
-			style="background: transparent;"
-			id="facebook-commerce-management-iframe">
-		</iframe>
-		<?php
 	}
 }
