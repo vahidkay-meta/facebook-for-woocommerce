@@ -114,6 +114,9 @@ class WC_Facebookcommerce extends WooCommerce\Facebook\Framework\Plugin {
 	/** @var WooCommerce\Facebook\Products\FBCategories instance. */
 	private $fb_categories;
 
+	/** @var WooCommerce\Facebook\AdvertiseASC\AscSelector */
+	private $admin_settings_asc;
+
 	/**
 	 * The Debug tools instance.
 	 *
